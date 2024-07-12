@@ -1,12 +1,9 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <style>
-      body {
-        margin: 0px;
-        padding: 0px;
-      }
-    </style>
+    <link rel="icon" type="image/x-icon" href="image/icontestHtml.png"> 
+    <title>hrmc.ngs.computer</title>
+    <link rel="stylesheet" type="text/css" href="styles.css" /> 
   </head>
   <body>
     <p>.</p>
@@ -32,27 +29,32 @@
       const endAngleInput = document.getElementById('end-angle');
       const startAngleValue = document.getElementById('start-angle-value');
       const endAngleValue = document.getElementById('end-angle-value');
-      function update() {
-          var canvas = document.getElementById('myCanvas');
-          var context = canvas.getContext('2d');
-          context.clearRect(0, 0, canvas.width, canvas.height);
+      const mql = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
 
-          var x = canvas.width / 2;
-          var y = canvas.height / 2;
-          var radius = 90;
-          var startAngle = startAngleInput.value * Math.PI;
-          var endAngle = endAngleInput.value * Math.PI;
-          var counterClockwise = false;
+      function update() {
+        //windowに合わせて色を変えるための定義
+        const isDark = mql.matches;
+        
+        var canvas = document.getElementById('myCanvas');
+        var context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        var x = canvas.width / 2;
+        var y = canvas.height / 2;
+        var radius = 90;
+        var startAngle = startAngleInput.value * Math.PI;
+        var endAngle = endAngleInput.value * Math.PI;
+        var counterClockwise = false;
     
-          context.beginPath();
-          context.arc(x, y, radius, startAngle, endAngle, counterClockwise);
-          context.lineWidth = 15;
+        context.beginPath();
+        context.arc(x, y, radius, startAngle, endAngle, counterClockwise);
+        context.lineWidth = 15;
     
           // line color
-          context.strokeStyle = 'black';
-          context.stroke();
-          startAngleValue.value = startAngleInput.value;
-          endAngleValue.value = endAngleInput.value;
+        context.strokeStyle = isDark ? 'silver' : 'gray';
+        context.stroke();
+        startAngleValue.value = startAngleInput.value;
+        endAngleValue.value = endAngleInput.value;
       }
 
       function updateStartAngleValue(e) {
@@ -65,12 +67,14 @@
       }
 
       update();
+      
       startAngleInput.addEventListener('input', update);
       startAngleInput.addEventListener('change', update);
       startAngleValue.addEventListener('change', updateStartAngleValue)
       endAngleInput.addEventListener('input', update);
       endAngleInput.addEventListener('change', update);
       endAngleValue.addEventListener('change', updateEndAngleValue)
+      mql.addEventListener('change', update);
     </script>
   </body>
 </html>      

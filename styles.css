@@ -1,0 +1,20 @@
+table {
+    border-collapse: collapse;
+    border: 1px solid #ccc;
+    width: 500px;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 0.5em;
+  }
+  th {
+    text-align: right;
+    width: 10em;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body {
+      background: #333;
+      color: #f3f3f3
+    }
+  }
