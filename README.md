@@ -1,1 +1,1 @@
-[![URL](https://hrmc.ngs.computer/)
+[URL](https://hrmc.ngs.computer/)
