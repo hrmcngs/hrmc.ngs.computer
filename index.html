@@ -2,9 +2,111 @@
   <head>
     <meta charset="utf-8">
     <title>hrmc.ngs.computer</title>
+    <style>
+      table {
+        border-collapse: collapse;
+        border: 1px solid #ccc;
+        width: 500px;
+      }
+      th, td {
+        border: 1px solid #ccc;
+        padding: 0.5em;
+      }
+      th {
+        text-align: right;
+        width: 10em;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #333;
+          color: #f3f3f3
+        }
+      }
+    </style>
   </head>
   <body>
     <h1>Hello</h1>
     <p>world.</p>
+    <input type="range" min="0" max="359" id="degrees">
+    <table>
+      <tbody>
+        <tr>
+          <th>degrees</th>
+          <td id="degrees-value"></td>
+        </tr>
+        <tr>
+          <th>radian</th>
+          <td id="radian-value"></td>
+        </tr>
+        <tr>
+          <th>x</th>
+          <td id="x-value"></td>
+        </tr>
+        <tr>
+          <th>y</th>
+          <td id="y-value"></td>
+        </tr>
+      </tbody>
+    </table>
+    <script>
+      const degrees = document.getElementById('degrees');
+
+      // canvasを作ってHTMLに突っ込む。
+const canvas = document.createElement('canvas');
+const context = canvas.getContext('2d');
+canvas.width = 500;
+canvas.height = 500;
+document.body.appendChild(canvas);
+
+// 円運動の中心座標。
+// 今回はcanvasの真ん中を中心に移動する。
+const centerX = 250;
+const centerY = 250;
+
+// 円を描画する中心からの距離。
+const distanceFromCenter = 150;
+
+// 表示する円のサイズ。
+const circleSize = 30;
+
+// 変化させていくパラメータ。
+// angleRadを増加させていき、
+// それに伴いxとyが変化していくようにする。
+let x = centerX;
+let y = centerY;
+let angleRad = 0;
+
+// メインループ
+function loop(timestamp) {
+  // 描画内容を消去する。
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // angleRadを1度ずつ変化させていく。
+  // 1度はMath.PI/180ラジアン。
+  angleRad = degrees.value * Math.PI / 180;
+
+  // ここで座標を変化させていく。
+  x = distanceFromCenter * Math.cos(angleRad) + centerX;
+  y = distanceFromCenter * Math.sin(angleRad) + centerY;
+
+  // 求めた座標に円を描画する。
+  const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  context.beginPath();
+  context.arc(x, y, circleSize, 0, Math.PI * 2);
+  context.fillStyle = isDark ? 'red' : 'blue';
+  context.fill();
+
+  document.getElementById('x-value').innerText = x;
+  document.getElementById('y-value').innerText = y;
+  document.getElementById('radian-value').innerText = angleRad;
+  document.getElementById('degrees-value').innerText = degrees.value;
+  
+
+  window.requestAnimationFrame(loop);
+}
+
+window.requestAnimationFrame(loop);
+    </script>
   </body>
 </html>
