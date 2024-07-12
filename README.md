@@ -1,2 +1,1 @@
-[file:///C:/Users/hrmcn/web/hrmc.ngs.computer/index.html
-](https://hrmc.ngs.computer/)
+[https://github.com/hrmcngs/hrmc.ngs.computer/blob/main/image/icontestHtml.png](https://hrmc.ngs.computer/)
