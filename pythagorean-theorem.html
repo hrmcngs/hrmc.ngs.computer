@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/x-icon" href="image/icontestHtml.png"> 
+    <title>hrmc.ngs.computer</title>
+    <link rel="stylesheet" type="text/css" href="styles.css" /> 
+    <style>
+        *{
+            position:relative;
+        }
+
+
+        #triangle{
+            width:230px;
+            display:flex;
+            align-self:center;
+            margin:auto;
+        }
+        body{
+            background-color:#932;
+        }
+        input::placeholder{
+            text-align:center;
+            font-weight:bold;
+            color:black;
+        }
+        input{
+            width:40px;
+        }
+        #bInput{
+            left:330px;
+            top:20px;
+        }
+        #aInput{
+            left:235px;
+            bottom:100px;
+        }
+        #button{
+            width:70px;
+        }
+        #result{
+            width:40px;
+            background-color:white;
+            text-align:center;
+            position:relative;
+            font-weight:bold;
+            font-family:sans-serif;
+            left:340px;
+            bottom:100px;
+        }
+        #heading{
+            color:white;
+            text-align:center;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="heading"> Pythagorean Theorem <br> Calculator</h1>
+    
+    <div id="container">
+       
+        <img id="triangle" alt="triangle" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Triangle.Right.svg/1200px-Triangle.Right.svg.png">
+      
+      
+        <input placeholder="A" id="aInput">
+
+
+       <input placeholder="B" id="bInput">
+       <div id="result"></div>
+
+
+       <button id="button">Calculate</button>
+    </div>
+
+
+    <script>
+       var button = document.getElementById('button');
+
+
+function calculateHypotenuse(){
+    var a = document.getElementById('aInput').value;
+    var b = document.getElementById('bInput').value;
+
+
+    var result = document.getElementById('result');
+
+
+    var hypotenuse = Math.round(Math.sqrt((a*a)+ (b*b)));
+    
+    result.innerHTML=hypotenuse;
+}
+
+
+button.addEventListener('click',  calculateHypotenuse)
+</script>
+</body>
+</html>
+
