@@ -1,98 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <link rel="icon" type="image/x-icon" href="image/icontestHtml.png"> 
     <title>hrmc.ngs.computer</title>
     <link rel="stylesheet" type="text/css" href="styles.css" /> 
     <style>
-        *{
-            position:relative;
-        }
-
-
-        #triangle{
-            width:230px;
-            display:flex;
-            align-self:center;
-            margin:auto;
-        }
-        body{
-            background-color:#932;
-        }
-        input::placeholder{
-            text-align:center;
-            font-weight:bold;
-            color:black;
-        }
-        input{
-            width:40px;
-        }
-        #bInput{
-            left:330px;
-            top:20px;
-        }
-        #aInput{
-            left:235px;
-            bottom:100px;
-        }
-        #button{
-            width:70px;
-        }
-        #result{
-            width:40px;
-            background-color:white;
-            text-align:center;
-            position:relative;
-            font-weight:bold;
-            font-family:sans-serif;
-            left:340px;
-            bottom:100px;
-        }
-        #heading{
-            color:white;
-            text-align:center;
-        }
+        *{   }
     </style>
 </head>
-<body>
-    <h1 id="heading"> Pythagorean Theorem <br> Calculator</h1>
+<body onload="RandomFn()">
+    <h1>Pythagorean Theorem</h1>
+    <h2>Enter the sides of the triangle</h2>
+    <p>A:<input type="number" id="a" min="1"></p>
+    <p>B:<input type="number" id="b" min="1"></p>
     
-    <div id="container">
-       
-        <img id="triangle" alt="triangle" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Triangle.Right.svg/1200px-Triangle.Right.svg.png">
+    <button onclick="update()">Press button to find the hypotenuse!</button>
+    
+    <p>A<sup>2</sup> = <span id="aSqu"></span>
+    <p>B<sup>2</sup> = <span id="bSqu"></span>
+    <p>A<sup>2</sup> + B<sup>2</sup>  = <span id="aAndB"></span>
+    <p>Hypotenuse = <span id="sqrtC"></span>
       
       
-        <input placeholder="A" id="aInput">
+    <div id="triangle"></div>
+    <!-- <img src="http://www.bsharpentertainment.co.za/theatre/wp-content/uploads/The-Minions.png" width=50%> -->
+ 
+<script>
+function update(){
+  var sideA = document.getElementById("a").value;
+  var sideB = document.getElementById("b").value;
+ 
 
+  if(sideA<1 || sideB<1){
+     alert("Please enter in a valid number!");
+     }else{
+  //get a squared and b squared
+  document.getElementById("aSqu").innerHTML = sideA * sideA;
+  document.getElementById("bSqu").innerHTML = sideB * sideB;
+  
+  //find sum of a squared and b squared
+  document.getElementById("aAndB").innerHTML = (sideA * sideA) + (sideB * sideB);
+  
+  //find hypotenuse
+   document.getElementById("sqrtC").innerHTML = Math.round((Math.sqrt((sideA * sideA) + (sideB * sideB)) * 100)) / 100;
+  
+  //The div that makes the triangle
+  var tri= document.getElementById("triangle");
+  tri.style.borderTopWidth = sideA * 30 + "px";
+  tri.style.borderLeftWidth = sideB * 30 + "px";
 
-       <input placeholder="B" id="bInput">
-       <div id="result"></div>
-
-
-       <button id="button">Calculate</button>
-    </div>
-
-
-    <script>
-       var button = document.getElementById('button');
-
-
-function calculateHypotenuse(){
-    var a = document.getElementById('aInput').value;
-    var b = document.getElementById('bInput').value;
-
-
-    var result = document.getElementById('result');
-
-
-    var hypotenuse = Math.round(Math.sqrt((a*a)+ (b*b)));
-    
-    result.innerHTML=hypotenuse;
+  
+  //Chooses random values for red green blue
+  var randoR = Math.floor(Math.random() * 255);
+  var randoG = Math.floor(Math.random() * 255);
+  var randoB = Math.floor(Math.random() * 255);
+  
+  //Changes to random background color
+  tri.style.borderLeftColor = "rgb(" + randoR + "," + randoG  + "," +randoB+ ")";
+ }
 }
-
-
-button.addEventListener('click',  calculateHypotenuse)
+ 
 </script>
+
+
 </body>
 </html>
-
