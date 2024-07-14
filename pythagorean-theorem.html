@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html>
 <head>
     <link rel="icon" type="image/x-icon" href="image/icontestHtml.png"> 
@@ -8,7 +8,8 @@
         *{   }
     </style>
 </head>
-<body onload="RandomFn()">
+
+</body>
     <h1>Pythagorean Theorem</h1>
     <h2>Enter the sides of the triangle</h2>
     <p>A:<input type="number" id="a" min="1"></p>
@@ -26,6 +27,8 @@
     <!-- <img src="http://www.bsharpentertainment.co.za/theatre/wp-content/uploads/The-Minions.png" width=50%> -->
  
 <script>
+          const aInput = document.getElementById('a');
+          const bInput = document.getElementById('b');
 function update(){
   var sideA = document.getElementById("a").value;
   var sideB = document.getElementById("b").value;
@@ -56,10 +59,11 @@ function update(){
   var randoB = Math.floor(Math.random() * 255);
   
   //Changes to random background color
-  tri.style.borderLeftColor = "rgb(" + randoR + "," + randoG  + "," +randoB+ ")";
- }
+  tri.style.borderLeftColor = "rgb(" + randoR + "," + randoG  + "," +randoB+ ")";}
+  
 }
- 
+aInput.addEventListener('a', update);
+bInput.addEventListener('b', update);
 </script>
 
 
