@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="icon" type="image/x-icon" href="image/icontestHtml.png"> 
+    <title>hrmc.ngs.computer</title>
+    <link rel="stylesheet" type="text/css" href="styles.css" /> 
+  </head>
+  <body>
+    <p>.</p>
+    <!-- <input type="range" min="-2" max="2" step="0.01" id="start-angle">
+    <input type="range" min="-2" max="2" step="0.01" id="end-angle">
+     -->
+
+    <table>
+        <tbody>
+          <tr>
+            <th><label for="id-block-or-item-0">item id:</label></th>
+            <td><input type="text" id="id-block-or-item-0"/></td>
+            <th><label for="id-block-or-item-3">item id:</label></th>
+            <td><input type="text" id="id-block-or-item-3"></td>
+            <th><label for="id-block-or-item-6">item id:</label></th>
+            <td><input type="text" id="id-block-or-item-6"></td>
+            </tr>
+            <tr>
+              <th><label for="id-block-or-item-1">item id:</label></th>
+              <td><input type="text" id="id-block-or-item-1"/></td>
+              <th><label for="id-block-or-item-4">item id:</label></th>
+              <td><input type="text" id="id-block-or-item-4"></td>
+              <th><label for="id-block-or-item-7">item id:</label></th>
+              <td><input type="text" id="id-block-or-item-7"></td></tr>
+            </tr>
+            <tr>
+              <th><label for="id-block-or-item-2">item id:</label></th>
+              <td><input type="text" id="id-block-or-item-2"/></td>
+              <th><label for="id-block-or-item-5">item id:</label></th>
+              <td><input type="text" id="id-block-or-item-5"></td>
+              <th><label for="id-block-or-item-8">item id:</label></th>
+              <td><input type="text" id="id-block-or-item-8"></td>
+            </tr>
+          </tbody>
+      </table>
+    <canvas id="myCanvas" width="578" height="250"></canvas>
+    <script>
+      const startAngleInput = document.getElementById('start-angle');
+      const endAngleInput = document.getElementById('end-angle');
+      const startAngleValue = document.getElementById('start-angle-value');
+      const endAngleValue = document.getElementById('end-angle-value');
+      const mql = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+
+      function update() {
+        //windowに合わせて色を変えるための定義
+        const isDark = mql.matches;
+        
+        var canvas = document.getElementById('myCanvas');
+        var context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        var x = canvas.width / 2;
+        var y = canvas.height / 2;
+        var radius = 90;
+        var startAngle = startAngleInput.value * Math.PI;
+        var endAngle = endAngleInput.value * Math.PI;
+        var counterClockwise = false;
+    
+        context.beginPath();
+        context.arc(x, y, radius, startAngle, endAngle, counterClockwise);
+        context.lineWidth = 15;
+    
+          // line color
+        context.strokeStyle = isDark ? 'silver' : 'gray';
+        context.stroke();
+        startAngleValue.value = startAngleInput.value;
+        endAngleValue.value = endAngleInput.value;
+      }
+
+      function updateStartAngleValue(e) {
+        startAngleInput.value = e.target.value;
+        update();
+      }
+      function updateEndAngleValue(e) {
+        endAngleInput.value = e.target.value;
+        update();
+      }
+
+      update();
+      
+      startAngleInput.addEventListener('input', update);
+      startAngleInput.addEventListener('change', update);
+      startAngleValue.addEventListener('change', updateStartAngleValue)
+      endAngleInput.addEventListener('input', update);
+      endAngleInput.addEventListener('change', update);
+      endAngleValue.addEventListener('change', updateEndAngleValue)
+      mql.addEventListener('change', update);
+    </script>
+  </body>
+</html>      
