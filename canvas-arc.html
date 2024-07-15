@@ -10,7 +10,8 @@
     <input type="range" min="-2" max="2" step="0.01" id="start-angle">
     <input type="range" min="-2" max="2" step="0.01" id="end-angle">
     <br><br>
-    <a class="button" href="index.html">index</a>
+    <a class="button" href="home.html">home</a>
+    <a class="button" href="rotation.html">rotation</a>
     <a class="button" href="pythagorean-theorem.html">pythagorean-theorem</a>
     <a class="button" href="miencraft-crafting-recipe.html">miencraft-crafting-recipe</a>
     <a class="button" href="miencraft-blasting-recipe.html">miencraft-blasting-recipe</a>
@@ -49,11 +50,19 @@
         var startAngle = startAngleInput.value * Math.PI;
         var endAngle = endAngleInput.value * Math.PI;
         var counterClockwise = false;
-    
+        
         context.beginPath();
         context.arc(x, y, radius, startAngle, endAngle, counterClockwise);
         context.lineWidth = 15;
-    
+        const canvas = document.getElementById("canvas");
+        if (canvas.getContext) {
+          const ctx = canvas.getContext("2d");
+          ctx.beginPath();
+          ctx.moveTo(75, 50);
+          ctx.lineTo(100, 75);
+          ctx.lineTo(100, 25);
+          ctx.fill();
+        } 
           // line color
         context.strokeStyle = isDark ? 'silver' : 'gray';
         context.stroke();
