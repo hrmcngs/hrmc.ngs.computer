@@ -22,3 +22,7 @@ table {
       color: #f3f3f3
     }
   }
+
+  #log {
+    white-space: pre-wrap;
+  }
