@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <link rel="icon" type="image/x-icon" href="image/icontestHtml.png"> 
+    <title>hrmc.ngs.computer</title>
+    <link rel="stylesheet" type="text/css" href="styles.css"/> 
+  </head>
+  <body>
+    <p>.</p>
+    <!-- <input type="range" min="-2" max="2" step="0.01" id="start-angle">
+    <input type="range" min="-2" max="2" step="0.01" id="end-angle">
+     -->
+     <br><br>
+     <a class="button" href="pythagorean-theorem.html">pythagorean-theorem</a>
+     <a class="button" href="canvas-arc.html">canvas-arc</a>
+     <a class="button" href="index.html">index</a>
+    <table>
+        <tbody>
+          <tr>
+            <th><label for="id-block-or-item-0">item id:</label></th>
+            <td><input placeholder="Enter item id" id="id-block-or-item-0"/></td>
+            <th><label for="id-block-or-item-3">item id:</label></th>
+            <td><input placeholder="Enter item id" id="id-block-or-item-3"></td>
+            <th><label for="id-block-or-item-6">item id:</label></th>
+            <td><input placeholder="Enter item id" id="id-block-or-item-6"></td>
+          </tr>
+          <tr>
+            <th><label for="id-block-or-item-1">item id:</label></th>
+            <td><input placeholder="Enter item id" id="id-block-or-item-1"/></td>
+            <th><label for="id-block-or-item-4">item id:</label></th>
+            <td><input placeholder="Enter item id" id="id-block-or-item-4"></td>
+            <th><label for="id-block-or-item-7">item id:</label></th>
+            <td><input placeholder="Enter item id" id="id-block-or-item-7"></td>
+          </tr>
+          <tr>
+            <th><label for="id-block-or-item-2">item id:</label></th>
+            <td><input placeholder="Enter item id" id="id-block-or-item-2"/></td>
+            <th><label for="id-block-or-item-5">item id:</label></th>
+            <td><input placeholder="Enter item id" id="id-block-or-item-5"></td>
+            <th><label for="id-block-or-item-8">item id:</label></th>
+            <td><input placeholder="Enter item id" id="id-block-or-item-8"></td>
+          </tr>
+          <tr>
+            <th><label for="id-block-or-item-9">item id:</label></th>
+            <td><input placeholder="Enter item id" id="id-block-or-item-9"/></td>
+            <p id="log"></p>
+            <button id="submitButton">Submit</button>
+            <p id="log">Existing text: </p>
+          </tr>
+          </tbody>
+      </table>
+      <input type="number" id="item-count" placeholder="Enter count" min="1" max="64">
+    <canvas id="myCanvas" width="578" height="250"></canvas>
+    <script>
+      const mql = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+      const isDark = mql.matches;
+
+      document.getElementById('submitButton').addEventListener('click', function() {
+            // JSONオブジェクトのテンプレート
+            var jsonTemplate = {
+              "type": "minecraft:crafting_shaped",
+              "pattern": generateRandomPattern(),
+                "key": {},
+                "result": {
+                    "item": "id-block-or-item-9",
+                    "count": 1
+                }
+            };
+
+
+            // テキストフィールドの数
+            var fieldCount = 10; // 0から9まで
+
+            // 各テキストフィールドの値を取得してJSONオブジェクトに追加
+            for (var i = 0; i < fieldCount; i++) {
+                var inputText = document.getElementById('id-block-or-item-' + i).value;
+                jsonTemplate.key[i.toString()] = {
+                    "item": inputText
+                };
+            }
+
+            // countの値を取得してJSONオブジェクトに追加
+            var itemCount = document.getElementById('item-count').value;
+            jsonTemplate.result.count = parseInt(itemCount);
+
+            // JSONオブジェクトを整形して表示
+            document.getElementById('log').textContent = JSON.stringify(jsonTemplate, null, 2);
+        });
+                // ランダムなパターンを生成する関数
+                function generateRandomPattern() {
+            var digits = "0123456788";
+            var pattern = [];
+
+            // パターンをランダムに並べ替える
+            for (var i = 0; i < 3; i++) {
+                var row = "";
+                for (var j = 0; j < 3; j++) {
+                    var randomIndex = Math.floor(Math.random() * digits.length);
+                    row += digits[randomIndex];
+                    digits = digits.replace(digits[randomIndex], '');
+                }
+                pattern.push(row);
+            }
+            return pattern;
+        }
+      // input.addEventListener('input', update);
+      // input.addEventListener('change', update);
+      // startAngleValue.addEventListener('change', updateStartAngleValue)
+      // log.addEventListener('log', update);
+      // endAngleValue.addEventListener('change', updateEndAngleValue)
+      mql.addEventListener('change', update);
+    </script>
+  </body>
+</html>      
