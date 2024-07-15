@@ -4,5 +4,5 @@ https://hrmc.ngs.computer/canvas-arc
 
 https://hrmc.ngs.computer/pythagorean-theorem
 
-https://hrmc.ngs.computer/minecraft-craft-recipe
+https://hrmc.ngs.computer/miencraft-craft-recipe
 
