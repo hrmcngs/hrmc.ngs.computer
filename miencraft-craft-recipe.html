@@ -47,36 +47,11 @@
       </table>
     <canvas id="myCanvas" width="578" height="250"></canvas>
     <script>
-      const startAngleInput = document.getElementById('start-angle');
-      const endAngleInput = document.getElementById('end-angle');
-      const startAngleValue = document.getElementById('start-angle-value');
-      const endAngleValue = document.getElementById('end-angle-value');
       const mql = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
 
       function update() {
         //windowに合わせて色を変えるための定義
         const isDark = mql.matches;
-        
-        var canvas = document.getElementById('myCanvas');
-        var context = canvas.getContext('2d');
-        context.clearRect(0, 0, canvas.width, canvas.height);
-
-        var x = canvas.width / 2;
-        var y = canvas.height / 2;
-        var radius = 90;
-        var startAngle = startAngleInput.value * Math.PI;
-        var endAngle = endAngleInput.value * Math.PI;
-        var counterClockwise = false;
-    
-        context.beginPath();
-        context.arc(x, y, radius, startAngle, endAngle, counterClockwise);
-        context.lineWidth = 15;
-    
-          // line color
-        context.strokeStyle = isDark ? 'silver' : 'gray';
-        context.stroke();
-        startAngleValue.value = startAngleInput.value;
-        endAngleValue.value = endAngleInput.value;
       }
 
       function updateStartAngleValue(e) {
