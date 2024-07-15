@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/x-icon" href="image/icontestHtml.png"> 
+  <title>hrmc.ngs.computer</title>
+  <link rel="stylesheet" type="text/css" href="styles.css"/> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <p>minecraft smelting</p>
+  <br><br>
+  <a class="button" href="pythagorean-theorem.html">pythagorean-theorem</a>
+  <a class="button" href="canvas-arc.html">canvas-arc</a>
+  <a class="button" href="index.html">index</a>
+  <a class="button" href="miencraft-blasting-recipe.html">miencraft-blasting-recipe</a>
+  <a class="button" href="miencraft-crafting-recipe.html">miencraft-crafting-recipe</a>
+  <table>
+    <tbody>
+      <tr>
+        <th><label for="id-block-or-item-0">item id:</label></th>
+        <td><input placeholder="Enter item id" id="id-block-or-item-0"/></td>
+        <th><label for="id-block-or-item-3">item id:</label></th>
+        <td><input placeholder="Enter item id" id="id-block-or-item-1"></td>
+    </tbody>
+  </table>
+    <input type="number" id="experience" placeholder="Enter experience" min="1">
+    <input type="number" id="cookingtime" placeholder="Enter cooking time" min="1">
+    <button id="submitButton">Submit</button>
+    <button id="copyButton">Copy</button>
+    <script>
+        document.getElementById('submitButton').addEventListener('click', function() {
+            // JSONオブジェクトのテンプレート
+            var jsonTemplate = {
+                "type": "minecraft:smelting",
+                "experience": 1,
+                "cookingtime": 200,
+                "ingredient": {
+                    "item": "id-block-or-item-0"
+                },
+                "result": "id-block-or-item-1"
+            };
+
+            // テキストフィールドの値を取得してJSONオブジェクトに追加
+            var inputText0 = document.getElementById('id-block-or-item-0').value;
+            var inputText1 = document.getElementById('id-block-or-item-1').value;
+            jsonTemplate.ingredient.item = inputText0;
+            jsonTemplate.result = inputText1;
+
+            // experienceとcookingtimeの値を取得してJSONオブジェクトに追加
+            var experience = document.getElementById('experience').value;
+            var cookingtime = document.getElementById('cookingtime').value;
+            jsonTemplate.experience = parseInt(experience);
+            jsonTemplate.cookingtime = parseInt(cookingtime);
+
+            // JSONオブジェクトを整形して表示
+            document.getElementById('log').textContent = JSON.stringify(jsonTemplate, null, 2);
+        });
+
+        // コピー機能を追加
+        document.getElementById('copyButton').addEventListener('click', function() {
+            var resultText = document.getElementById('log').textContent;
+            var textArea = document.createElement("textarea");
+            textArea.value = resultText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('Copied to clipboard');
+        });
+    </script>
+       <pre id="log">Existing</pre>
+</body>
+</html>
