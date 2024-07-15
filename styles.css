@@ -12,6 +12,10 @@ table {
     width: 10em;
   }
 
+  a.button  {
+    color: #f99;
+  }
+
   @media (prefers-color-scheme: dark) {
     body {
       background: #333;
