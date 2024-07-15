@@ -44,17 +44,17 @@
             <th><label for="id-block-or-item-9">item id:</label></th>
             <td><input placeholder="Enter item id" id="id-block-or-item-9"/></td>
             <button id="submitButton">Submit</button>
-            
           </tr>
-          </tbody>
+        </tbody>
       </table>
       <input type="number" id="item-count" placeholder="Enter count" min="1" max="64">
+      <button id="copyButton">Copy</button>
     <canvas id="myCanvas" width="578" height="250"></canvas>
     <script>
-      const mql = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
-      const isDark = mql.matches;
-
+      // const mql = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+      // const isDark = mql.matches;
       document.getElementById('submitButton').addEventListener('click', function() {
+            
             // JSONオブジェクトのテンプレート
             var jsonTemplate = {
               "type": "minecraft:crafting_shaped",
@@ -65,8 +65,7 @@
                     "count": 1
                 }
             };
-
-
+            
             // テキストフィールドの数
             var fieldCount = 10; // 0から9まで
 
@@ -96,19 +95,25 @@
                 for (var j = 0; j < 3; j++) {
                     var randomIndex = Math.floor(Math.random() * digits.length);
                     row += digits[randomIndex];
-                    digits = digits.replace(digits[randomIndex], '');
+                    digits = digits.replace(digits[randomIndex],'');
                 }
                 pattern.push(row);
             }
             return pattern;
         }
-      // input.addEventListener('input', update);
-      // input.addEventListener('change', update);
-      // startAngleValue.addEventListener('change', updateStartAngleValue)
-      // log.addEventListener('log', update);
-      // endAngleValue.addEventListener('change', updateEndAngleValue)
-      mql.addEventListener('change', update);
+        // コピー機能を追加
+        document.getElementById('copyButton').addEventListener('click', function() {
+            var resultText = document.getElementById('log').textContent;
+            var textArea = document.createElement("textarea");
+            textArea.value = resultText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('Copied to clipboard');
+        });
+      // mql.addEventListener('change', update);
     </script>
-      <p id="log">Existing text: </p>
+      <p id="log">Existing text</p>
   </body>
 </html>      
