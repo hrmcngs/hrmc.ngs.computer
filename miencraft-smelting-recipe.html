@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="icon" type="image/x-icon" href="image/icontestHtml.png"> 
+    <title>hrmc.ngs.computer</title>
+    <link rel="stylesheet" type="text/css" href="styles.css"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+<body>
+    <p>minecraft smelting</p>
+    <input type="text" id="id-block-or-item-0" placeholder="Base item">
+    <input type="text" id="id-block-or-item-1" placeholder="Addition item/tag">
+    <input type="text" id="id-block-or-item-2" placeholder="Result item">
+    <button id="submitButton">Submit</button>
+    <button id="copyButton">Copy</button>
+    <pre id="log">Existing text</pre>
+
+    <script>
+        document.getElementById('submitButton').addEventListener('click', function() {
+            // JSONオブジェクトのテンプレート
+            var jsonTemplate = {
+                "type": "minecraft:smithing",
+                "base": {
+                    "item": "id-block-or-item-0"
+                },
+                "addition": {
+                    "tag": "id-block-or-item-1"
+                },
+                "result": {
+                    "item": "id-block-or-item-2"
+                }
+            };
+
+            // テキストフィールドの値を取得してJSONオブジェクトに追加
+            var inputText0 = document.getElementById('id-block-or-item-0').value;
+            var inputText1 = document.getElementById('id-block-or-item-1').value;
+            var inputText2 = document.getElementById('id-block-or-item-2').value;
+            jsonTemplate.base.item = inputText0;
+            jsonTemplate.addition.tag = inputText1;
+            jsonTemplate.result.item = inputText2;
+
+            // JSONオブジェクトを整形して表示
+            document.getElementById('log').textContent = JSON.stringify(jsonTemplate, null, 2);
+        });
+
+        // コピー機能を追加
+        document.getElementById('copyButton').addEventListener('click', function() {
+            var resultText = document.getElementById('log').textContent;
+            var textArea = document.createElement("textarea");
+            textArea.value = resultText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('Copied to clipboard');
+        });
+    </script>
+    <ul>
+        <li><a class="button" href="index.html">home</a></li>
+        <li><a class="button" href="rotation.html">rotation</a></li>
+        <li><a class="button" href="pythagorean-theorem.html">pythagorean-theorem</a></li>
+        <li> <a class="button" href="canvas-arc.html">canvas-arc</a></li>
+        <li><a class="button" href="miencraft-crafting-recipe.html">miencraft-crafting-recipe</a></li>
+        <li><a class="button" href="miencraft-blasting-smelting-smoking-campfire-cooking-recipe.html">blasting-smelting-smoking-campfire-cooking</a></li>
+    </ul>
+</body>
+</html>
