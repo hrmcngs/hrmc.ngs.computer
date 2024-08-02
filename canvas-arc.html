@@ -29,7 +29,6 @@
       const startAngleValue = document.getElementById('start-angle-value');
       const endAngleValue = document.getElementById('end-angle-value');
       const mql = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
-
       function update() {
         //windowに合わせて色を変えるための定義
         const isDark = mql.matches;
@@ -37,7 +36,6 @@
         var canvas = document.getElementById('myCanvas');
         var context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
-
         var x = canvas.width / 2;
         var y = canvas.height / 2;
         var radius = 90;
@@ -63,7 +61,6 @@
         startAngleValue.value = startAngleInput.value;
         endAngleValue.value = endAngleInput.value;
       }
-
       function updateStartAngleValue(e) {
         startAngleInput.value = e.target.value;
         update();
@@ -72,7 +69,6 @@
         endAngleInput.value = e.target.value;
         update();
       }
-
       update();
       
       startAngleInput.addEventListener('input', update);
