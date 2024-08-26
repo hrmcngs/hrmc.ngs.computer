@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カスタム3D図形コントローラー</title>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; background-color: #333; color: #fff; }
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 100;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            color: #fff;
+        }
+        #controls ul {
+            padding-left: 20px;
+            list-style-type: disc;
+            margin-bottom: 20px;
+        }
+        #controls li {
+            margin-bottom: 5px;
+        }
+        #controls a {
+            color: #ff9999;
+            text-decoration: none;
+        }
+        #controls a:hover {
+            text-decoration: underline;
+        }
+        #controls label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        #controls input {
+            width: 100%;
+            margin-top: 5px;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="controls">
+        <ul>
+            <li><a href="index.html">home</a></li>
+            <li><a href="rotation.html">rotation</a></li>
+            <li><a href="pythagorean-theorem.html">pythagorean-theorem</a></li>
+            <li><a href="canvas-arc.html">canvas-arc</a></li>
+            <li><a href="miencraft-blasting-smoking-campfire-cooking-recipe.html">blasting-smoking-campfire-cooking</a></li>
+            <li><a href="miencraft-crafting-recipe.html">miencraft-crafting-recipe</a></li>
+            <li><a href="miencraft-smelting-recipe.html">miencraft-smelting-recipe</a></li>
+        </ul>
+
+        <label for="width">幅 (Width):</label>
+        <input type="number" id="width" value="2" step="0.1" min="0.1">
+
+        <label for="height">高さ (Height):</label>
+        <input type="number" id="height" value="2" step="0.1" min="0.1">
+
+        <label for="depth">奥行き (Depth):</label>
+        <input type="number" id="depth" value="2" step="0.1" min="0.1">
+
+        <label for="rotationX">回転X (Rotation X):</label>
+        <input type="range" id="rotationX" min="0" max="360" value="0">
+
+        <label for="rotationY">回転Y (Rotation Y):</label>
+        <input type="range" id="rotationY" min="0" max="360" value="0">
+
+        <label for="rotationZ">回転Z (Rotation Z):</label>
+        <input type="range" id="rotationZ" min="0" max="360" value="0">
+
+        <label for="cameraX">カメラX位置 (Camera X Position):</label>
+        <input type="range" id="cameraX" min="-50" max="50" value="5">
+
+        <label for="cameraY">カメラY位置 (Camera Y Position):</label>
+        <input type="range" id="cameraY" min="-50" max="50" value="5">
+
+        <label for="cameraZ">カメラZ位置 (Camera Z Position):</label>
+        <input type="range" id="cameraZ" min="5" max="50" value="5">
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // シーン、カメラ、レンダラーのセットアップ
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(5, 5, 5);
+        camera.lookAt(scene.position);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // 照明の追加
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(10, 10, 10);
+        scene.add(directionalLight);
+
+        // メッシュとラインの宣言
+        let mesh, wireframe;
+
+        // 初期図形の作成
+        function createShape(width, height, depth) {
+            if (mesh) scene.remove(mesh);
+            if (wireframe) scene.remove(wireframe);
+
+            const geometry = new THREE.BoxGeometry(width, height, depth);
+            const material = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, shininess: 100, side: THREE.DoubleSide });
+            mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+
+            const edgeGeometry = new THREE.EdgesGeometry(geometry);
+            const edgeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
+            wireframe = new THREE.LineSegments(edgeGeometry, edgeMaterial);
+            scene.add(wireframe);
+        }
+
+        // 初期図形を作成
+        createShape(2, 2, 2);
+
+        // コントロール要素の取得
+        const widthInput = document.getElementById('width');
+        const heightInput = document.getElementById('height');
+        const depthInput = document.getElementById('depth');
+        const rotationXInput = document.getElementById('rotationX');
+        const rotationYInput = document.getElementById('rotationY');
+        const rotationZInput = document.getElementById('rotationZ');
+        const cameraXInput = document.getElementById('cameraX');
+        const cameraYInput = document.getElementById('cameraY');
+        const cameraZInput = document.getElementById('cameraZ');
+
+        // 図形を更新する関数
+        function updateShape() {
+            const width = parseFloat(widthInput.value);
+            const height = parseFloat(heightInput.value);
+            const depth = parseFloat(depthInput.value);
+            createShape(width, height, depth);
+        }
+
+        // アニメーションループ
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // 回転の適用
+            mesh.rotation.x = THREE.MathUtils.degToRad(rotationXInput.value);
+            mesh.rotation.y = THREE.MathUtils.degToRad(rotationYInput.value);
+            mesh.rotation.z = THREE.MathUtils.degToRad(rotationZInput.value);
+
+            wireframe.rotation.copy(mesh.rotation);
+
+            // カメラの位置を更新
+            camera.position.x = parseFloat(cameraXInput.value);
+            camera.position.y = parseFloat(cameraYInput.value);
+            camera.position.z = parseFloat(cameraZInput.value);
+
+            // カメラを中心に向ける
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        }
+
+        // リサイズ対応
+        window.addEventListener('resize', function() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            renderer.setSize(width, height);
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+        });
+
+        // 入力要素のイベントリスナー
+        widthInput.addEventListener('input', updateShape);
+        heightInput.addEventListener('input', updateShape);
+        depthInput.addEventListener('input', updateShape);
+
+        animate();
+    </script>
+</body>
+</html>
