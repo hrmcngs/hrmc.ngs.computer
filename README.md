@@ -12,3 +12,5 @@ https://hrmc.ngs.computer/blasting-smelting-smoking-campfire-cooking-recipe
 
 https://hrmc.ngs.computer/miencraft-smelting-recipe
 
+https://hrmc.ngs.computer/3dgraphics.html
+
