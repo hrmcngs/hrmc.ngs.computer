@@ -5,8 +5,6 @@
     <title>hrmc.ngs.computer</title>
     <link rel="stylesheet" type="text/css" href="styles.css"/> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <meta charset="UTF-8"> -->
-    <title>カスタム3D図形コントローラー</title>
     <style>
         body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; background-color: #333; color: #fff; }
         #controls {
@@ -57,7 +55,7 @@
             <li><a href="canvas-arc.html">canvas-arc</a></li>
             <li><a href="miencraft-blasting-smoking-campfire-cooking-recipe.html">blasting-smoking-campfire-cooking</a></li>
             <li><a href="miencraft-crafting-recipe.html">miencraft-crafting-recipe</a></li>
-            <li><a href="miencraft-smelting-recipe.html">miencraft-smelting-recipe</a></li>
+            <li><a href="miencraft-smelting-recipe.html">miencraft-smelting-recipe.html</a></li>
         </ul>
 
         <label for="width">幅 (Width):</label>
@@ -149,6 +147,33 @@
             createShape(width, height, depth);
         }
 
+        // スクロールでスライダー操作を可能にする
+        function enableScrollControl(input) {
+            input.addEventListener('wheel', function(event) {
+                event.preventDefault();
+                const step = input.step ? parseFloat(input.step) : 1;
+                const value = parseFloat(input.value);
+                const min = parseFloat(input.min);
+                const max = parseFloat(input.max);
+
+                const delta = event.deltaY < 0 ? step : -step;
+                const newValue = Math.min(Math.max(value + delta, min), max);
+                input.value = newValue;
+                input.dispatchEvent(new Event('input'));
+            });
+        }
+
+        // スクロール制御を有効にする
+        enableScrollControl(widthInput);
+        enableScrollControl(heightInput);
+        enableScrollControl(depthInput);
+        enableScrollControl(rotationXInput);
+        enableScrollControl(rotationYInput);
+        enableScrollControl(rotationZInput);
+        enableScrollControl(cameraXInput);
+        enableScrollControl(cameraYInput);
+        enableScrollControl(cameraZInput);
+
         // アニメーションループ
         function animate() {
             requestAnimationFrame(animate);
@@ -181,10 +206,13 @@
         });
 
         // 入力要素のイベントリスナー
+        widthInput.addEvent
+        // 入力要素のイベントリスナー
         widthInput.addEventListener('input', updateShape);
         heightInput.addEventListener('input', updateShape);
         depthInput.addEventListener('input', updateShape);
 
+        // アニメーション開始
         animate();
     </script>
 </body>
