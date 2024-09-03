@@ -12,17 +12,155 @@ table {
     width: 10em;
   }
 
-  a.button  {
-    color: #f99;
+  a {
+    color: #3583aa;
+    text-decoration: none;
   }
 
-  @media (prefers-color-scheme: dark) {
-    body {
-      background: #333;
-      color: #f3f3f3
-    }
+  a:visited {
+    color: #788d98;
   }
 
+  a:hover {
+    text-decoration: underline;
+  }
+
+  body {
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+      font-size: 15px;
+      line-height: 2;
+  }
+
+  p,h1,h2,h3,h4,h5,h6 {
+      margin-top: 0;
+     }
+
+  img {
+      vertical-align: bottom;
+  }
+
+  ul {
+      margin: 0;
+      padding: 0;
+  }
+  
   #log {
     white-space: pre-wrap;
   }
+
+header {
+    width: auto;
+    height: 200px;
+    margin: 0 0 ;
+    /* ↑変更した */
+}       
+
+.logo {
+    float: left;
+    margin: 50px 30px;
+}
+
+/* .link {
+  margin-left: 30px;
+} */
+
+.global-nav {
+    float: right;
+    margin-top: 80px;
+}
+
+.link {
+    float: right;
+    margin-top: 50px;
+}
+.global-nav li {
+    float: left;
+    margin: 0 20px;
+    font-size: 20px;
+    list-style: none;
+}
+
+.global-nav li a {
+    color: #ffffff;
+  -webkit-text-stroke-width: 0.75px;
+  -webkit-text-stroke-color: black;
+  font-weight: bold;
+}
+
+.global-nav li a:hover {
+    border-bottom: 2px solid #ffffff;
+    padding-bottom: 3px;
+    text-decoration: none;
+}
+/* .link img {
+  border: solid 1px #777777;
+} */
+
+/* .wrap {
+margin-top: 50px;
+} */
+
+.wrap {
+  clear: both;
+}
+
+.omake li a:hover {
+    border-bottom: 2px solid #ffffff;
+    padding-bottom: 3px;
+    text-decoration: none;
+}
+
+#index {
+    background-image: url(../hrmc.ngs.computer/image/図形生成アプリbackground.jpg);    
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    background-size: cover;
+}
+
+footer {
+    text-align: center;
+    color: #ffffff;
+    padding: 20px 0;
+    background-color: #767671;
+}
+
+#index h1 {
+  margin-top: 50px;
+  font-size: 200px;
+  line-height: 1;
+  color: #ffffff;
+  text-align: center;
+  -webkit-text-stroke-width: 3px;
+  -webkit-text-stroke-color: black;
+}
+
+.content_inside {
+  font-size: 30px;
+  color: #ffffff;
+  -webkit-text-stroke-width: 0.75px;
+  -webkit-text-stroke-color: black;
+  padding: 0 0 200px 30px;
+  font-weight: bold;
+}
+
+.omake a {
+  font-size: 20px;
+  color: #ffffff;
+}
+
+.omake h2 {
+  font-size: 30px;
+  color: #ffffff;
+}
+
+.omake {
+  background-color: #767671;
+  padding: 30px;
+}
+
+.omake li {
+  list-style: none;
+}
