@@ -25,15 +25,12 @@ table {
     text-decoration: underline;
   }
 
-  body {
-      margin: 0;
-      padding: 0;
-      background: #ffffff;
-      font-size: 15px;
-      line-height: 2;
-  }
   @media (prefers-color-scheme: dark) {
     body {
+        margin: 0;
+      padding: 0;
+      font-size: 15px;
+      line-height: 2;
       background: #333;
       color: #f3f3f3
     }
