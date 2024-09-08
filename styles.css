@@ -116,7 +116,7 @@ margin-top: 50px;
 }
 
 #index {
-    background-image: url(../hrmc.ngs.computer/image/図形生成アプリbackground.jpg);    
+    background-image: url(/image/図形生成アプリbackground.jpg);    
     background-repeat: no-repeat;
     background-position: center center;
     background-attachment: fixed;
