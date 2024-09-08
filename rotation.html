@@ -1,15 +1,55 @@
 <html lang="en">
-  
   <head>
     <meta charset="utf-8">
     <link rel="icon" type="image/x-icon" href="image/icontestHtml.png"> 
-    <title>hrmc.ngs.computer</title>
+    <title>図形生成アプリ | 回転</title>
     <link rel="stylesheet" type="text/css" href="styles.css"/> 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
   </head>
-  <body>
+  <body id="rotation">
+    <header>
+        <div class="logo">
+        <a href="index.html"><img src="image/図形生成アプリlogo.png" alt=
+        "図形生成アプリ" width="200">
+        </a>
+        </div>
+        <nav>
+        <!-- 画像をクリックするとツイッターに飛ぶリンク -->
+         <div class="link">
+  <a id="twitterLink" href="https://x.com/0526ngs" target="_blank">
+      <img src="image/iconTwitterhrmcngsHtml.png" alt="Twitter Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://Instagram.com/0526ngs" target="_blank">
+      <img src="image/iconInstagramhrmcngsHtml.png" alt="Instagram Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://github.com/hrmcngs" target="_blank">
+      <img src="image/iconGithubhrmcngsHtml.png" alt="Github Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://x.com/RenkonUmauma65" target="_blank">
+      <img src="image/iconTwitterrenkonHtml.png" alt="Twitter Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://github.com/Renkon65" target="_blank">
+      <img src="image/iconGithubrenkonHtml.png" alt="github Link Image" width="100">
+    </a>
+        </div>
+        <div class="global-nav">
+        <ul>
+            <li><a class="button" href="rotation.html">回転</a></li>
+            <li><a class="button" href="pythagorean-theorem.html">三平方の定理</a></li>
+            <li><a class="button" href="canvas-arc.html">円弧</a></li>
+            <li><a class="button" href="3dgraphics.html">3D図形</a></li>
+        </ul>
+        </div>
+        </div>
+        </nav>
+    </header>
+    <div class="rotation_main">
     <br><br>
     <h1></h1>
-    <p>world.</p>
+    <p></p>
     <input type="range" min="0" max="359" id="degrees">
     <table>
       <tbody>
@@ -76,7 +116,7 @@ function loop(timestamp) {
   const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   context.beginPath();
   context.arc(x, y, circleSize, 0, Math.PI * 2);
-  context.fillStyle = isDark ? 'silver' : 'gray';
+  context.fillStyle = isDark ? 'rgb(41, 73, 216)' : 'rgb(41, 73, 216)';
   context.fill();
 
   document.getElementById('x-value').innerText = x;
@@ -90,14 +130,15 @@ function loop(timestamp) {
 
 window.requestAnimationFrame(loop);
     </script>
-      <ul>
-        <li><a class="button" href="index.html">home</a></li>
-        <li><a class="button" href="pythagorean-theorem.html">pythagorean-theorem</a></li>
-        <li> <a class="button" href="canvas-arc.html">canvas-arc</a></li>
-        <li><a class="button" href="3dgraphics.html">3D graphics</a></li>
-        <li><a class="button" href="miencraft-blasting-smoking-campfire-cooking-recipe.html">blasting-smoking-campfire-cooking</a></li>
-        <li><a class="button" href="miencraft-crafting-recipe.html">miencraft-crafting-recipe</a></li>
-        <li><a class="button" href="miencraft-smelting-recipe.html">miencraft-smelting-recipe</a></li>
-    </ul>
+    </div>
+       <div class="omake">
+          <h2>おまけ</h2>
+          <ul>
+            <li><a class="button" href="miencraft-blasting-smoking-campfire-cooking-recipe.html">blasting-smoking-campfire-cooking</a></li>
+            <li><a class="button" href="miencraft-crafting-recipe.html">minecraft-crafting-recipe</a></li>
+            <li><a class="button" href="miencraft-smelting-recipe.html">minecraft-smelting-recipe</a></li>
+          </ul>
+        </div>
+    <footer><small>2024年9月4日現在最新版</small></footer>
   </body>
 </html>

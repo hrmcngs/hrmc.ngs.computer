@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <link rel="icon" type="image/x-icon" href="image/icontestHtml.png"> 
-    <title>hrmc.ngs.computer</title>
+    <title>図形生成アプリ | 3D図形</title>
     <link rel="stylesheet" type="text/css" href="styles.css"/> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -44,20 +44,49 @@
             color: #000;
         }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
 </head>
-<body>
-
-    <div id="controls">
+<body id="3dgraphics">
+    <header>
+        <div class="logo">
+        <a href="index.html"><img src="image/図形生成アプリlogo.png" alt=
+        "図形生成アプリ" width="200">
+        </a>
+        </div>
+        <nav>
+        <!-- 画像をクリックするとツイッターに飛ぶリンク -->
+         <div class="link">
+  <a id="twitterLink" href="https://x.com/0526ngs" target="_blank">
+      <img src="image/iconTwitterhrmcngsHtml.png" alt="Twitter Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://Instagram.com/0526ngs" target="_blank">
+      <img src="image/iconInstagramhrmcngsHtml.png" alt="Instagram Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://github.com/hrmcngs" target="_blank">
+      <img src="image/iconGithubhrmcngsHtml.png" alt="Github Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://x.com/RenkonUmauma65" target="_blank">
+      <img src="image/iconTwitterrenkonHtml.png" alt="Twitter Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://github.com/Renkon65" target="_blank">
+      <img src="image/iconGithubrenkonHtml.png" alt="github Link Image" width="100">
+    </a>
+        </div>
+        <div class="global-nav">
         <ul>
-            <li><a href="index.html">home</a></li>
-            <li><a href="rotation.html">rotation</a></li>
-            <li><a href="pythagorean-theorem.html">pythagorean-theorem</a></li>
-            <li><a href="canvas-arc.html">canvas-arc</a></li>
-            <li><a href="miencraft-blasting-smoking-campfire-cooking-recipe.html">blasting-smoking-campfire-cooking</a></li>
-            <li><a href="miencraft-crafting-recipe.html">miencraft-crafting-recipe</a></li>
-            <li><a href="miencraft-smelting-recipe.html">miencraft-smelting-recipe.html</a></li>
+            <li><a class="button" href="rotation.html">回転</a></li>
+            <li><a class="button" href="pythagorean-theorem.html">三平方の定理</a></li>
+            <li><a class="button" href="canvas-arc.html">円弧</a></li>
+            <li><a class="button" href="3dgraphics.html">3D図形</a></li>
         </ul>
-
+        </div>
+        </div>
+        </nav>
+    </header>
+    <div id="controls">
         <label for="width">幅 (Width):</label>
         <input type="number" id="width" value="2" step="0.1" min="0.1">
 
@@ -215,5 +244,14 @@
         // アニメーション開始
         animate();
     </script>
+       <div class="omake">
+          <h2>おまけ</h2>
+          <ul>
+            <li><a class="button" href="miencraft-blasting-smoking-campfire-cooking-recipe.html">blasting-smoking-campfire-cooking</a></li>
+            <li><a class="button" href="miencraft-crafting-recipe.html">minecraft-crafting-recipe</a></li>
+            <li><a class="button" href="miencraft-smelting-recipe.html">minecraft-smelting-recipe</a></li>
+          </ul>
+        </div>
+    <footer><small>2024年9月4日現在最新版</small></footer>
 </body>
 </html>

@@ -5,58 +5,74 @@
     <title>hrmc.ngs.computer</title>
     <link rel="stylesheet" type="text/css" href="styles.css"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
   </head>
   <body>
-    <p>minecraft craft</p>
+  <header>
+         <div class="link">
+  <a id="twitterLink" href="https://x.com/0526ngs" target="_blank">
+      <img src="image/iconTwitterhrmcngsHtml.png" alt="Twitter Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://Instagram.com/0526ngs" target="_blank">
+      <img src="image/iconInstagramhrmcngsHtml.png" alt="Instagram Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://github.com/hrmcngs" target="_blank">
+      <img src="image/iconGithubhrmcngsHtml.png" alt="Github Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://x.com/RenkonUmauma65" target="_blank">
+      <img src="image/iconTwitterrenkonHtml.png" alt="Twitter Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://github.com/Renkon65" target="_blank">
+      <img src="image/iconGithubrenkonHtml.png" alt="github Link Image" width="100">
+    </a>
+        </div>
+        </nav>
+    </header>
+    <div class="craft_main">
+    <h2>マイクラ | クラフト レシピ生成</h2>
     <!-- <input type="range" min="-2" max="2" step="0.01" id="start-angle">
     <input type="range" min="-2" max="2" step="0.01" id="end-angle">
      -->
-    <br><br>
     <table>
         <tbody>
           <tr>
             <th><label for="id-block-or-item-0">item id:</label></th>
-            <td><input placeholder="Enter item id" id="id-block-or-item-0"/></td>
+            <td><input placeholder="アイテムのidを入力" id="id-block-or-item-0"/></td>
             <th><label for="id-block-or-item-3">item id:</label></th>
-            <td><input placeholder="Enter item id" id="id-block-or-item-3"></td>
+            <td><input placeholder="アイテムのidを入力" id="id-block-or-item-3"></td>
             <th><label for="id-block-or-item-6">item id:</label></th>
-            <td><input placeholder="Enter item id" id="id-block-or-item-6"></td>
+            <td><input placeholder="アイテムのidを入力" id="id-block-or-item-6"></td>
           </tr>
           <tr>
             <th><label for="id-block-or-item-1">item id:</label></th>
-            <td><input placeholder="Enter item id" id="id-block-or-item-1"/></td>
+            <td><input placeholder="アイテムのidを入力" id="id-block-or-item-1"/></td>
             <th><label for="id-block-or-item-4">item id:</label></th>
-            <td><input placeholder="Enter item id" id="id-block-or-item-4"></td>
+            <td><input placeholder="アイテムのidを入力" id="id-block-or-item-4"></td>
             <th><label for="id-block-or-item-7">item id:</label></th>
-            <td><input placeholder="Enter item id" id="id-block-or-item-7"></td>
+            <td><input placeholder="アイテムのidを入力" id="id-block-or-item-7"></td>
           </tr>
           <tr>
             <th><label for="id-block-or-item-2">item id:</label></th>
-            <td><input placeholder="Enter item id" id="id-block-or-item-2"/></td>
+            <td><input placeholder="アイテムのidを入力" id="id-block-or-item-2"/></td>
             <th><label for="id-block-or-item-5">item id:</label></th>
-            <td><input placeholder="Enter item id" id="id-block-or-item-5"></td>
+            <td><input placeholder="アイテムのidを入力" id="id-block-or-item-5"></td>
             <th><label for="id-block-or-item-8">item id:</label></th>
-            <td><input placeholder="Enter item id" id="id-block-or-item-8"></td>
+            <td><input placeholder="アイテムのidを入力" id="id-block-or-item-8"></td>
           </tr>
           <tr>
             <th><label for="id-block-or-item-9">item id:</label></th>
-            <td><input placeholder="Enter item id" id="id-block-or-item-9"/></td>
+            <td><input placeholder="アイテムのidを入力" id="id-block-or-item-9"/></td>
           </tr>
         </tbody>
       </table>
-      <input type="number" id="item-count" placeholder="Enter count" min="1" max="64">
-      <button id="submitButton">Submit</button>
-      <button id="copyButton">Copy</button>
+      <input type="number" id="item-count" placeholder="数値を入力" min="1" max="64">
+      <button id="submitButton">了承</button>
+      <button id="copyButton">コピー</button>
       <p id="log">Existing text</p>
-      <ul>
-        <li><a class="button" href="index.html">home</a></li>
-        <li><a class="button" href="rotation.html">rotation</a></li>
-        <li><a class="button" href="pythagorean-theorem.html">pythagorean-theorem</a></li>
-        <li> <a class="button" href="canvas-arc.html">canvas-arc</a></li>
-        <li><a class="button" href="3dgraphics.html">3D graphics</a></li>
-        <li><a class="button" href="miencraft-smelting-recipe.html">miencraft-smelting-recipe</a></li>
-        <li><a class="button" href="miencraft-blasting-smoking-campfire-cooking-recipe.html">blasting-smoking-campfire-cooking</a></li>
-    </ul>
     <canvas id="myCanvas" width="578" height="250"></canvas>
     <script>
       // const mql = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
@@ -122,5 +138,15 @@
         });
       // mql.addEventListener('change', update);
     </script>
+    </div>
+        <div class="omake">
+          <h2>おまけ</h2>
+          <ul>
+            <li><a class="button" href="miencraft-blasting-smoking-campfire-cooking-recipe.html">blasting-smoking-campfire-cooking</a></li>
+            <li><a class="button" href="miencraft-crafting-recipe.html">minecraft-crafting-recipe</a></li>
+            <li><a class="button" href="miencraft-smelting-recipe.html">minecraft-smelting-recipe</a></li>
+          </ul>
+        </div>
+    <footer><small>2024年9月4日現在最新版</small></footer>
     </body>
 </html>      

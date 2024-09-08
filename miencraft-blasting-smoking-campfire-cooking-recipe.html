@@ -2,32 +2,57 @@
 <html lang="en">
 <head>
     <link rel="icon" type="image/x-icon" href="image/icontestHtml.png"> 
-    <title>hrmc.ngs.computer</title>
+    <title>Minecraft cooking</title>
     <link rel="stylesheet" type="text/css" href="styles.css"/> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=noto+sans+jp&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=noto+sans+jp:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <p>minecraft blasting-smoking-campfire-cooking</p>
-  <br><br>
+   <header>
+         <div class="link">
+  <a id="twitterLink" href="https://x.com/0526ngs" target="_blank">
+      <img src="image/iconTwitterhrmcngsHtml.png" alt="Twitter Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://Instagram.com/0526ngs" target="_blank">
+      <img src="image/iconInstagramhrmcngsHtml.png" alt="Instagram Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://github.com/hrmcngs" target="_blank">
+      <img src="image/iconGithubhrmcngsHtml.png" alt="Github Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://x.com/RenkonUmauma65" target="_blank">
+      <img src="image/iconTwitterrenkonHtml.png" alt="Twitter Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://github.com/Renkon65" target="_blank">
+      <img src="image/iconGithubrenkonHtml.png" alt="github Link Image" width="100">
+    </a>
+        </div>
+        </nav>
+    </header>
+    <div class="cook_main">
+  <h2>マイクラ | 溶鉱炉-燻製器-焚き火 レシピ生成</h2>
   <table>
     <tbody>
   <tr>
     <th><label for="id-block-or-item-0">item id:</label></th>
-    <td><input placeholder="Enter item id" id="id-block-or-item-0"/></td>
+    <td><input placeholder="アイテムのidを入力" id="id-block-or-item-0"/></td>
     <th><label for="id-block-or-item-3">item id:</label></th>
-    <td><input placeholder="Enter item id" id="id-block-or-item-1"></td>
+    <td><input placeholder="アイテムのidを入力" id="id-block-or-item-1"></td>
   </tr>
 </tbody>
   </table>
   <select id="type-selector">
-    <option value="minecraft:smoking">smoking</option>
-    <option value="minecraft:blasting">blasting</option>
-    <option value="minecraft:campfire_cooking">campfire_cooking</option>
+    <option value="minecraft:smoking">燻製器</option>
+    <option value="minecraft:blasting">溶鉱炉</option>
+    <option value="minecraft:campfire_cooking">焚き火</option>
 </select>
-  <input type="number" id="experience" placeholder="Enter experience" min="1">
-  <input type="number" id="cookingtime" placeholder="Enter cooking time" min="1">
-  <button id="submitButton">Submit</button>
-  <button id="copyButton">Copy</button>
+  <input type="number" id="experience" placeholder="得られる経験値を入力" min="1">
+  <input type="number" id="cookingtime" placeholder="精錬時間を入力" min="1">
+  <button id="submitButton">了承</button>
+  <button id="copyButton">コピー</button>
   <script>
       // Changeイベントリスナーを追加
       document.getElementById('type-selector').addEventListener('change', function() {
@@ -80,14 +105,15 @@
       });
   </script>
   <pre id="log">Existing</pre>
-  <ul>
-    <li><a class="button" href="index.html">home</a></li>
-    <li><a class="button" href="rotation.html">rotation</a></li>
-    <li><a class="button" href="pythagorean-theorem.html">pythagorean-theorem</a></li>
-    <li> <a class="button" href="canvas-arc.html">canvas-arc</a></li>
-    <li><a class="button" href="3dgraphics.html">3D graphics</a></li>
-    <li><a class="button" href="miencraft-crafting-recipe.html">miencraft-crafting-recipe</a></li>
-    <li><a class="button" href="miencraft-smelting-recipe.html">miencraft-smelting-recipe</a></li>
-</ul>
+    </div>
+        <div class="omake">
+          <h2>おまけ</h2>
+          <ul>
+            <li><a class="button" href="miencraft-blasting-smoking-campfire-cooking-recipe.html">blasting-smoking-campfire-cooking</a></li>
+            <li><a class="button" href="miencraft-crafting-recipe.html">minecraft-crafting-recipe</a></li>
+            <li><a class="button" href="miencraft-smelting-recipe.html">minecraft-smelting-recipe</a></li>
+          </ul>
+        </div>
+    <footer><small>2024年9月4日現在最新版</small></footer>
 </body>
 </html>

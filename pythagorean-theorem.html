@@ -1,31 +1,66 @@
 
 <html>
 <head lang="en">
+   <meta charset="utf-8">
     <link rel="icon" type="image/x-icon" href="image/icontestHtml.png"> 
-    <title>hrmc.ngs.computer</title>
+    <title>図形生成アプリ | 三角関数</title>
     <link rel="stylesheet" type="text/css" href="styles.css"/> 
-    <style>
-       
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
 </head>
-
-<body>
-<br><br>
+   <header>
+        <div class="logo">
+        <a href="index.html"><img src="image/図形生成アプリlogo.png" alt=
+        "図形生成アプリ" width="200">
+        </a>
+        </div>
+        <nav>
+        <!-- 画像をクリックするとツイッターに飛ぶリンク -->
+         <div class="link">
+  <a id="twitterLink" href="https://x.com/0526ngs" target="_blank">
+      <img src="image/iconTwitterhrmcngsHtml.png" alt="Twitter Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://Instagram.com/0526ngs" target="_blank">
+      <img src="image/iconInstagramhrmcngsHtml.png" alt="Instagram Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://github.com/hrmcngs" target="_blank">
+      <img src="image/iconGithubhrmcngsHtml.png" alt="Github Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://x.com/RenkonUmauma65" target="_blank">
+      <img src="image/iconTwitterrenkonHtml.png" alt="Twitter Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://github.com/Renkon65" target="_blank">
+      <img src="image/iconGithubrenkonHtml.png" alt="github Link Image" width="100">
+    </a>
+        </div>
+        <div class="global-nav">
+        <ul>
+            <li><a class="button" href="rotation.html">回転</a></li>
+            <li><a class="button" href="pythagorean-theorem.html">三平方の定理</a></li>
+            <li><a class="button" href="canvas-arc.html">円弧</a></li>
+            <li><a class="button" href="3dgraphics.html">3D図形</a></li>
+        </ul>
+        </div>
+        </div>
+        </nav>
+    </header>
+<body id="py-th">
+  <div class="py-th_main">
 <table>
-  <tbody>
-  </tbody>
 </table>
-    <h1>Pythagorean Theorem</h1>
-    <h2>Enter the sides of the triangle</h2>
+    <h1>三角関数</h1>
+    <h2>三角の対辺、隣辺を入力ください</h2>
     <p>A:<input type="number" id="a" min="1"></p>
     <p>B:<input type="number" id="b" min="1"></p>
     
-    <button onclick="update()">Press button to find the hypotenuse!</button>
+    <button onclick="update()">このボタンを押すと斜辺がでます！</button>
     
     <p>A<sup>2</sup> = <span id="aSqu"></span>
     <p>B<sup>2</sup> = <span id="bSqu"></span>
     <p>A<sup>2</sup> + B<sup>2</sup>  = <span id="aAndB"></span>
-    <p>Hypotenuse = <span id="sqrtC"></span>
+    <p>斜辺 = <span id="sqrtC"></span>
       
       
     <div id="triangle"></div>
@@ -40,7 +75,7 @@ function update(){
  
 
   if(sideA<1 || sideB<1){
-     alert("Please enter in a valid number!");
+     alert("数値を入力してください！");
      }else{
   //get a squared and b squared
   document.getElementById("aSqu").innerHTML = sideA * sideA;
@@ -70,14 +105,15 @@ function update(){
 aInput.addEventListener('a', update);
 bInput.addEventListener('b', update);
 </script>
-<ul>
-  <li><a class="button" href="index.html">home</a></li>
-  <li><a class="button" href="rotation.html">rotation</a></li>
-  <li><a class="button" href="canvas-arc.html">canvas-arc</a></li>
-  <li><a class="button" href="3dgraphics.html">3D graphics</a></li>
-  <li><a class="button" href="miencraft-blasting-smoking-campfire-cooking-recipe.html">blasting-smoking-campfire-cooking</a></li>
-  <li><a class="button" href="miencraft-crafting-recipe.html">miencraft-crafting-recipe</a></li>
-  <li><a class="button" href="miencraft-smelting-recipe.html">miencraft-smelting-recipe</a></li>
-</ul>
+</div>
+      <div class="omake">
+          <h2>おまけ</h2>
+          <ul>
+            <li><a class="button" href="miencraft-blasting-smoking-campfire-cooking-recipe.html">blasting-smoking-campfire-cooking</a></li>
+            <li><a class="button" href="miencraft-crafting-recipe.html">minecraft-crafting-recipe</a></li>
+            <li><a class="button" href="miencraft-smelting-recipe.html">minecraft-smelting-recipe</a></li>
+          </ul>
+        </div>
+    <footer><small>2024年9月4日現在最新版</small></footer>
 </body>
 </html>

@@ -5,14 +5,40 @@
     <title>hrmc.ngs.computer</title>
     <link rel="stylesheet" type="text/css" href="styles.css"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=noto+sans+jp&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=noto+sans+jp:wght@700&display=swap" rel="stylesheet">
   </head>
 <body>
-    <p>minecraft smelting</p>
-    <input type="text" id="id-block-or-item-0" placeholder="Base item">
-    <input type="text" id="id-block-or-item-1" placeholder="Addition item/tag">
-    <input type="text" id="id-block-or-item-2" placeholder="Result item">
-    <button id="submitButton">Submit</button>
-    <button id="copyButton">Copy</button>
+   <header>
+         <div class="link">
+  <a id="twitterLink" href="https://x.com/0526ngs" target="_blank">
+      <img src="image/iconTwitterhrmcngsHtml.png" alt="Twitter Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://Instagram.com/0526ngs" target="_blank">
+      <img src="image/iconInstagramhrmcngsHtml.png" alt="Instagram Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://github.com/hrmcngs" target="_blank">
+      <img src="image/iconGithubhrmcngsHtml.png" alt="Github Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://x.com/RenkonUmauma65" target="_blank">
+      <img src="image/iconTwitterrenkonHtml.png" alt="Twitter Link Image" width="100">
+    </a>
+    <a id="twitterLink" href="https://github.com/Renkon65" target="_blank">
+      <img src="image/iconGithubrenkonHtml.png" alt="github Link Image" width="100">
+    </a>
+        </div>
+        </nav>
+    </header>
+    <div class="smelting_main">
+    <h2>マイクラ | 精錬 レシピ生成</h2>
+    <input type="text" id="id-block-or-item-0" placeholder="元のアイテム">
+    <input type="text" id="id-block-or-item-1" placeholder="アイテムのタグ">
+    <input type="text" id="id-block-or-item-2" placeholder="精錬後のアイテム">
+    <button id="submitButton">了承</button>
+    <button id="copyButton">コピー</button>
     <pre id="log">Existing text</pre>
 
     <script>
@@ -55,14 +81,15 @@
             alert('Copied to clipboard');
         });
     </script>
-    <ul>
-        <li><a class="button" href="index.html">home</a></li>
-        <li><a class="button" href="rotation.html">rotation</a></li>
-        <li><a class="button" href="pythagorean-theorem.html">pythagorean-theorem</a></li>
-        <li><a class="button" href="canvas-arc.html">canvas-arc</a></li>
-        <li><a class="button" href="3dgraphics.html">3D graphics</a></li>
-        <li><a class="button" href="miencraft-crafting-recipe.html">miencraft-crafting-recipe</a></li>
-        <li><a class="button" href="miencraft-blasting-smoking-campfire-cooking-recipe.html">blasting-smoking-campfire-cooking</a></li>
-    </ul>
+    </div>
+        <div class="omake">
+          <h2>おまけ</h2>
+          <ul>
+            <li><a class="button" href="miencraft-blasting-smoking-campfire-cooking-recipe.html">blasting-smoking-campfire-cooking</a></li>
+            <li><a class="button" href="miencraft-crafting-recipe.html">minecraft-crafting-recipe</a></li>
+            <li><a class="button" href="miencraft-smelting-recipe.html">minecraft-smelting-recipe</a></li>
+          </ul>
+        </div>
+    <footer><small>2024年9月4日現在最新版</small></footer>
 </body>
 </html>
