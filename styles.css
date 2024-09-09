@@ -25,7 +25,7 @@ table {
     text-decoration: underline;
   }
 
-  /* @media (prefers-color-scheme: dark) { */
+  @media (prefers-color-scheme: dark) {
     body,tbody {
         margin: 0;
       padding: 0;
