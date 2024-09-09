@@ -25,7 +25,7 @@ table {
     text-decoration: underline;
   }
 
-  @media (prefers-color-scheme: dark) {
+/*   @media (prefers-color-scheme: dark) {
     body,tbody {
         margin: 0;
       padding: 0;
@@ -48,7 +48,7 @@ table {
       font-optical-sizing: auto;
       font-weight: 400;
       font-style: normal;
-    }
+    } */
     body{background-color: #ccc;
         }
 
