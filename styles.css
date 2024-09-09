@@ -41,6 +41,9 @@ table {
   padding: 40px 20px;
   background-color:#76767166;
 }
+body{background-color: #696969;
+        }
+
   }
         
     
@@ -64,9 +67,11 @@ th {
   padding: 40px 20px;
   background-color:#76767166;
 }
- } 
-    body{background-color: #ccc;
+body {
+    background-color: #ccc;
         }
+
+ } 
 
   p,h1,h2,h3,h4,h5,h6 {
       margin-top: 0;
