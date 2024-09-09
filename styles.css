@@ -7,10 +7,6 @@ table {
     border: 1px solid #000;
     padding: 0.5em;
   }
-  th {
-    text-align: right;
-    width: 10em;
-  }
 
   a {
     color: #3583aa;
@@ -25,30 +21,50 @@ table {
     text-decoration: underline;
   }
 
-/*   @media (prefers-color-scheme: dark) {
-    body,tbody {
-        margin: 0;
-      padding: 0;
-      font-size: 15px;
-      line-height: 2;
-      color: #f3f3f3;
-      font-family: "Noto Sans JP", sans-serif;
-      font-optical-sizing: auto;
-      font-weight: 400;
-      font-style: normal;
-    }
-        @media (prefers-color-scheme: right) {
-    body,tbody {
-        margin: 0;
-      padding: 0;
-      font-size: 15px;
-      line-height: 2;
-      color: #f3f3f3;
-      font-family: "Noto Sans JP", sans-serif;
-      font-optical-sizing: auto;
-      font-weight: 400;
-      font-style: normal;
-    } */
+  @media (prefers-color-scheme: dark) {
+  th {
+    text-align: dark;
+    width: 10em;
+  }
+  .global-nav {
+    float: dark;
+    margin-top: 80px;
+}
+      .link {
+    float: dark;
+    margin-top: 50px;
+}
+.py-th_main, .canvas-arc_main, .cook_main, .craft_main, .smelting_main {
+  margin-dark:30px;
+  margin-left: 30px;
+  margin-bottom: 300px;
+  padding: 40px 20px;
+  background-color:#76767166;
+}
+  }
+        
+    
+@media (prefers-color-scheme: right) {
+th {
+    text-align: right;
+    width: 10em;
+  }
+.global-nav {
+    float: right;
+    margin-top: 80px;
+}
+    .link {
+    float: right;
+    margin-top: 50px;
+}
+    .py-th_main, .canvas-arc_main, .cook_main, .craft_main, .smelting_main {
+  margin-right:30px;
+  margin-left: 30px;
+  margin-bottom: 300px;
+  padding: 40px 20px;
+  background-color:#76767166;
+}
+ } 
     body{background-color: #ccc;
         }
 
@@ -85,15 +101,21 @@ header {
   margin-left: 30px;
 } */
 
+
+/* th {
+    text-align: right;
+    width: 10em;
+  }
 .global-nav {
     float: right;
     margin-top: 80px;
-}
+} */
 
-.link {
+
+/* .link {
     float: right;
     margin-top: 50px;
-}
+} */
 .global-nav li {
     float: left;
     margin: 0 20px;
@@ -213,13 +235,13 @@ tbody {
   padding: 0 0 200px 30px;
 }
 
-.py-th_main, .canvas-arc_main, .cook_main, .craft_main, .smelting_main {
+/* .py-th_main, .canvas-arc_main, .cook_main, .craft_main, .smelting_main {
   margin-right:30px;
   margin-left: 30px;
   margin-bottom: 300px;
   padding: 40px 20px;
   background-color:#76767166;
-}
+} */
 
 #py-th {
   padding-left: 0;
