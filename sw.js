@@ -18,6 +18,10 @@ document.querySelectorAll('.weapon').forEach(item => {
             document.getElementById('tooltip-name').style.color = "#ffffff";  // White for Iron Katana
         } else if (name === "Darkness Katana") {
             document.getElementById('tooltip-name').style.color = "#AA00AA";  // Purple for Darkness Katana
+        } else if (name === "Katana Nigu Humerus") {
+            document.getElementById('tooltip-name').style.color = "#FFFF55";  // Purple for Darkness Katana
+        } else if (name === "Sword of Night") {
+            document.getElementById('tooltip-name').style.color = "#FFAA00";  // Purple for Darkness Katana
         }
 
         tooltip.style.display = 'block';
@@ -34,3 +38,4 @@ document.querySelectorAll('.weapon').forEach(item => {
         tooltip.style.display = 'none';
     });
 });
+
