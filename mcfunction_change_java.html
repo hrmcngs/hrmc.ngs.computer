@@ -1,8 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <title>MCFunction to Java Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #output {
+            white-space: pre-wrap; 
+            background-color: #f1f1f1;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
 </head>
 <body>
     <h1>MCFunction to Java Converter</h1>
@@ -24,13 +36,37 @@
         }
 
         function convertToJava(mcfunctionContent) {
-            // ここにmcfunction内容をJavaコードに変換するロジックを実装
             let javaCode = "// Converted Java Code\n";
             const commands = mcfunctionContent.split('\n');
             commands.forEach(command => {
-                javaCode += `// ${command}\n`;  // ここに変換ロジックを追加
+                if (command.trim() !== "") {
+                    if (command.startsWith('summon')) {
+                        javaCode += convertSummonCommand(command) + "\n";
+                    } else if (command.startsWith('playsound')) {
+                        javaCode += convertPlaysoundCommand(command) + "\n";
+                    } else if (command.startsWith('particle')) {
+                        javaCode += convertParticleCommand(command) + "\n";
+                    } else {
+                        javaCode += `// ${command}\n`;  // 未知のコマンドはコメントとして追加
+                    }
+                }
             });
             return javaCode;
+        }
+
+        function convertSummonCommand(command) {
+            // summonコマンドの変換ロジックを実装
+            return `// ${command}  // ここにsummonコマンドのJavaコードを追加`;
+        }
+
+        function convertPlaysoundCommand(command) {
+            // playsoundコマンドの変換ロジックを実装
+            return `// ${command}  // ここにplaysoundコマンドのJavaコードを追加`;
+        }
+
+        function convertParticleCommand(command) {
+            // particleコマンドの変換ロジックを実装
+            return `// ${command}  // ここにparticleコマンドのJavaコードを追加`;
         }
     </script>
 </body>
