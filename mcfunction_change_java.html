@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MCFunction to Java Converter</title>
+</head>
+<body>
+    <h1>MCFunction to Java Converter</h1>
+    <input type="file" id="mcfunctionFile" accept=".mcfunction">
+    <button onclick="convertFile()">Convert</button>
+    <pre id="output"></pre>
+
+    <script>
+        function convertFile() {
+            const fileInput = document.getElementById('mcfunctionFile');
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const contents = event.target.result;
+                const javaCode = convertToJava(contents);
+                document.getElementById('output').textContent = javaCode;
+            };
+            reader.readAsText(file);
+        }
+
+        function convertToJava(mcfunctionContent) {
+            // ここにmcfunction内容をJavaコードに変換するロジックを実装
+            let javaCode = "// Converted Java Code\n";
+            const commands = mcfunctionContent.split('\n');
+            commands.forEach(command => {
+                javaCode += `// ${command}\n`;  // ここに変換ロジックを追加
+            });
+            return javaCode;
+        }
+    </script>
+</body>
+</html>
