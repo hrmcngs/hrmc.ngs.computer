@@ -1,73 +1,17 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MCFunction to Java Converter</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        #output {
-            white-space: pre-wrap; 
-            background-color: #f1f1f1;
-            padding: 10px;
-            border: 1px solid #ccc;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1>MCFunction to Java Converter</h1>
-    <input type="file" id="mcfunctionFile" accept=".mcfunction">
-    <button onclick="convertFile()">Convert</button>
-    <pre id="output"></pre>
-
-    <script>
-        function convertFile() {
-            const fileInput = document.getElementById('mcfunctionFile');
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const contents = event.target.result;
-                const javaCode = convertToJava(contents);
-                document.getElementById('output').textContent = javaCode;
-            };
-            reader.readAsText(file);
-        }
-
-        function convertToJava(mcfunctionContent) {
-            let javaCode = "// Converted Java Code\n";
-            const commands = mcfunctionContent.split('\n');
-            commands.forEach(command => {
-                if (command.trim() !== "") {
-                    if (command.startsWith('summon')) {
-                        javaCode += convertSummonCommand(command) + "\n";
-                    } else if (command.startsWith('playsound')) {
-                        javaCode += convertPlaysoundCommand(command) + "\n";
-                    } else if (command.startsWith('particle')) {
-                        javaCode += convertParticleCommand(command) + "\n";
-                    } else {
-                        javaCode += `// ${command}\n`;  // 未知のコマンドはコメントとして追加
-                    }
-                }
-            });
-            return javaCode;
-        }
-
-        function convertSummonCommand(command) {
-            // summonコマンドの変換ロジックを実装
-            return `// ${command}  // ここにsummonコマンドのJavaコードを追加`;
-        }
-
-        function convertPlaysoundCommand(command) {
-            // playsoundコマンドの変換ロジックを実装
-            return `// ${command}  // ここにplaysoundコマンドのJavaコードを追加`;
-        }
-
-        function convertParticleCommand(command) {
-            // particleコマンドの変換ロジックを実装
-            return `// ${command}  // ここにparticleコマンドのJavaコードを追加`;
-        }
-    </script>
+    <textarea id="mcfunctionInput" rows="10" cols="50" placeholder="Paste your mcfunction code here..."></textarea>
+    <br>
+    <button id="convertButton">Convert to Java</button>
+    <pre id="javaOutput"></pre>
+    <script src="scripts.js"></script>
 </body>
 </html>
