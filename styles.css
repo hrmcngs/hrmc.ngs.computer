@@ -102,25 +102,6 @@ header {
     margin: 40px 30px 50px 30px;
 }
 
-/* .link {
-  margin-left: 30px;
-} */
-
-
-/* th {
-    text-align: right;
-    width: 10em;
-  }
-.global-nav {
-    float: right;
-    margin-top: 80px;
-} */
-
-
-/* .link {
-    float: right;
-    margin-top: 50px;
-} */
 .global-nav li {
     float: left;
     margin: 0 20px;
@@ -142,13 +123,6 @@ header {
     padding-bottom: 3px;
     text-decoration: none;
 }
-/* .link img {
-  border: solid 1px #777777;
-} */
-
-/* .wrap {
-margin-top: 50px;
-} */
 
 .wrap {
   clear: both;
