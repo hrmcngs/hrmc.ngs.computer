@@ -12,6 +12,31 @@
     <br>
     <button id="convertButton">Convert to Java</button>
     <pre id="javaOutput"></pre>
-    <script src="scripts.js"></script>
+    <script>
+        async function loadScript() {
+            const token = process.env.GITHUB_TOKEN;
+            const repo = 'hrmcngs/hrmc.ngs.computer';
+            const filePath = 'scripts.js';
+            const url = `https://api.github.com/repos/${repo}/contents/${filePath}`;
+
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3.raw'
+                }
+            });
+
+            if (response.ok) {
+                const scriptContent = await response.text();
+                const script = document.createElement('script');
+                script.textContent = scriptContent;
+                document.body.appendChild(script);
+            } else {
+                console.error('Failed to load script:', response.status, response.statusText);
+            }
+        }
+
+        loadScript();
+    </script>
 </body>
 </html>
