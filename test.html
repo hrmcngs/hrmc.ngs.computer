@@ -7,40 +7,14 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="weapon-container">
-        <!-- Katana Iron -->
-        <div class="weapon" data-name="Iron Katana" data-damage="+7" data-speed="+2.6" >
-            <div class="image-frame">
-                <img src="image/katanairon3dfeen.png" alt="Iron Katana">
-            </div>
-        </div>
-        <!-- Katana Darkness -->
-        <!-- <div class="weapon" data-name="Darkness Katana" data-damage="+80" data-speed="1.6" data-lore="A dark enchanted katana." data-rarity="RARE KATANA"> -->
-        <div class="weapon" data-name="Darkness Katana" data-damage="+8" data-speed="+2.6" >  
-            <div class="image-frame">
-                <img src="image/katanadarkness.png" alt="Darkness Katana">
-            </div>
-        </div>
-        <div class="weapon" data-name="Katana Nigu Humerus" data-damage="+11" data-speed="+2.6" >  
-            <div class="image-frame">
-                <img src="image/katananiguzyouwankotu3d.png" alt="Katana Nigu Humerus">
-            </div>
-        </div>
-        <div class="weapon" data-name="Sword of Night" data-damage="+7" data-speed="+1.6" >  
-            <div class="image-frame">
-                <img src="image/swordofnight.png" alt="Sword of Night">
-            </div>
-        </div>
-    </div>
+    <div class="weapon-container" id="weapon-container"></div>
 
     <div id="tooltip" class="tooltip">
         <h3 id="tooltip-name"></h3>
         <p id="tooltip-damage"></p>
         <p id="tooltip-speed"></p>
-        <p id="tooltip-lore"></p>
-        <p id="tooltip-rarity"></p>
     </div>
 
-    <script src="sw.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
