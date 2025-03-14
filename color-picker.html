@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Picker</title>
+    <style>
+        .color-picker {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .color-picker input[type="color"] {
+            width: 14.28%;  /* 7つの色入力を均等に配置 */
+            height: 50px;
+            border: none;
+        }
+        .output {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="colorPickers" class="color-picker">
+        <input type="color" id="color1" value="#FF0000"> <!-- 赤 -->
+        <input type="color" id="color2" value="#800080"> <!-- 紫 -->
+        <input type="color" id="color3" value="#FFC0CB"> <!-- 桃 -->
+        <input type="color" id="color4" value="#FFA500"> <!-- 橙 -->
+        <input type="color" id="color5" value="#FFFF00"> <!-- 黄 -->
+        <input type="color" id="color6" value="#0000FF"> <!-- 青 -->
+        <input type="color" id="color7">
+    </div>
+    <button onclick="findCommonColor()">Find Common Color</button>
+    <div class="output" id="output"></div>
+
+    <script>
+        function findCommonColor() {
+            const colors = [];
+            for (let i = 1; i <= 7; i++) {
+                colors.push(document.getElementById(`color${i}`).value);
+            }
+
+            // 色覚タイプごとの判定ロジック（仮置き）
+            const commonColor = getCommonColor(colors);
+
+            document.getElementById('output').innerText = 'Common color: ' + commonColor;
+        }
+
+        function getCommonColor(colors) {
+            // 共通の色を判定するロジックをここに追加
+            // 以下は仮の実装です
+            // 実際には色覚タイプごとに変換し、共通の色を見つける必要があります
+            return colors[0]; // 仮に最初の色を返す
+        }
+    </script>
+</body>
+</html>
