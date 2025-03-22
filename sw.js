@@ -1,55 +1,71 @@
-async function fetchWeapons() {
+async function fetchDirectoryContents(path) {
+    const repo = 'Drowse-Lab/The-four-primitives-and-Weapons';
+    const branch = 'main'; // ブランチ名の確認
+    const apiUrl = `https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`;
+
     try {
-        const response = await fetch('https://raw.githubusercontent.com/username/repository/branch/data/items.json');
-        const data = await response.json();
-        const container = document.getElementById('weapon-container');
-        
-        data.forEach(item => {
-            const weaponDiv = document.createElement('div');
-            weaponDiv.classList.add('weapon');
-            weaponDiv.dataset.name = item.name;
-            weaponDiv.dataset.damage = item.damage;
-            weaponDiv.dataset.speed = item.speed;
-            
-            const imageFrame = document.createElement('div');
-            imageFrame.classList.add('image-frame');
-            const img = document.createElement('img');
-            img.src = item.image;
-            img.alt = item.name;
-            imageFrame.appendChild(img);
-            
-            weaponDiv.appendChild(imageFrame);
-            container.appendChild(weaponDiv);
-        });
-
-        document.querySelectorAll('.weapon').forEach(item => {
-            item.addEventListener('mouseenter', event => {
-                const tooltip = document.getElementById('tooltip');
-                const name = event.currentTarget.dataset.name;
-                const damage = event.currentTarget.dataset.damage;
-                const speed = event.currentTarget.dataset.speed;
-
-                document.getElementById('tooltip-name').textContent = name;
-                document.getElementById('tooltip-damage').textContent = "Damage: " + damage;
-                document.getElementById('tooltip-speed').textContent = "Attack Speed: " + speed;
-
-                tooltip.style.display = 'block';
-            });
-
-            item.addEventListener('mousemove', event => {
-                const tooltip = document.getElementById('tooltip');
-                tooltip.style.top = event.pageY + 10 + 'px';
-                tooltip.style.left = event.pageX + 10 + 'px';
-            });
-
-            item.addEventListener('mouseleave', () => {
-                const tooltip = document.getElementById('tooltip');
-                tooltip.style.display = 'none';
-            });
-        });
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return await response.json();
     } catch (error) {
-        console.error('Error fetching weapons:', error);
+        console.error('Error fetching directory contents:', error);
+        return [];
     }
 }
 
-fetchWeapons();
+async function fetchFiles(fileUrls) {
+    const files = [];
+    for (const url of fileUrls) {
+        try {
+            const response = await fetch(url);
+            const content = await response.json(); // Assume JSON content
+            files.push(content);
+        } catch (error) {
+            console.error('Error fetching file:', error);
+        }
+    }
+    return files;
+}
+
+async function fetchItems() {
+    const itemPath = 'src/main/resources/assets/minecraft_armor_weapon/model/item/';
+    const customPath = 'src/main/resources/assets/minecraft_armor_weapon/model/custom/';
+
+    const itemContents = await fetchDirectoryContents(itemPath);
+    const customContents = await fetchDirectoryContents(customPath);
+
+    const itemUrls = itemContents.filter(file => file.type === 'file' && file.name.endsWith('.json')).map(file => file.download_url);
+    const customUrls = customContents.filter(file => file.type === 'file' && file.name.endsWith('.json')).map(file => file.download_url);
+
+    const items = await fetchFiles(itemUrls);
+    const customItems = await fetchFiles(customUrls);
+
+    displayItems(items.concat(customItems));
+}
+
+function displayItems(items) {
+    const container = document.getElementById('item-container');
+    container.innerHTML = ''; // Clear the container
+
+    items.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('item');
+        itemDiv.dataset.name = item.name || 'Unknown';
+        itemDiv.dataset.damage = item.damage || 'N/A';
+        itemDiv.dataset.speed = item.speed || 'N/A';
+
+        const imageFrame = document.createElement('div');
+        imageFrame.classList.add('image-frame');
+        const img = document.createElement('img');
+        img.src = item.image || 'path/to/default/image.png';
+        img.alt = item.name || 'Unknown';
+        imageFrame.appendChild(img);
+
+        itemDiv.appendChild(imageFrame);
+        container.appendChild(itemDiv);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', fetchItems);
