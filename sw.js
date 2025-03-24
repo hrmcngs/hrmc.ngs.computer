@@ -56,16 +56,33 @@ function displayItems(items) {
         itemDiv.dataset.damage = item.damage || 'N/A';
         itemDiv.dataset.speed = item.speed || 'N/A';
 
-        const imageFrame = document.createElement('div');
-        imageFrame.classList.add('image-frame');
-        const img = document.createElement('img');
-        img.src = item.image || 'path/to/default/image.png';
-        img.alt = item.name || 'Unknown';
-        imageFrame.appendChild(img);
+        const modelUrl = item.model || 'path/to/default/model.glb'; // Default model path
+        load3DModel(itemDiv, modelUrl);
 
-        itemDiv.appendChild(imageFrame);
         container.appendChild(itemDiv);
     });
+}
+
+function load3DModel(container, modelUrl) {
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
+
+    const loader = new THREE.GLTFLoader();
+    loader.load(modelUrl, function (gltf) {
+        scene.add(gltf.scene);
+        camera.position.z = 5;
+        animate();
+    }, undefined, function (error) {
+        console.error('Error loading 3D model:', error);
+    });
+
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', fetchItems);
