@@ -146,7 +146,7 @@ footer {
     width: 100%; 
     text-align: center;
     color: #ffffff;
-    padding: 20px 0;
+    padding: 1% 0;
     background-color: #767671;
 }
 
@@ -162,7 +162,7 @@ footer {
   font-weight: bold;
 }
 .content_inside {
-  font-size: 30px;
+  font-size: 180%;
   color: #ffffff;
     text-shadow:1px 1px 0 #000, -1px -1px 0 #000,
                 -1px 1px 0 #000, 1px -1px 0 #000,
@@ -185,7 +185,7 @@ footer {
 
 .omake {
   background-color: #767671;
-  padding: 30px;
+  padding: 3%;
 }
 
 .omake li {
@@ -257,7 +257,6 @@ tbody {
 body {
   font-family: Arial, sans-serif;
   margin: 0;
-  padding: 20px;
   background-color: #f4f4f4;
 }
 
