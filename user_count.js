@@ -7,10 +7,16 @@ document.getElementById('countForm').addEventListener('submit', async function(e
   const token = document.getElementById('token').value.trim();
   const headers = token ? { 'Authorization': 'token ' + token } : {};
 
-  const since = `${year}-${month}-01T00:00:00Z`;
-  const endMonth = (month === '12') ? '01' : String(Number(month) + 1).padStart(2, '0');
-  const endYear = (month === '12') ? String(Number(year) + 1) : year;
-  const until = `${endYear}-${endMonth}-01T00:00:00Z`;
+  // 期間指定（年と月が両方空なら全履歴）
+  let since = '', until = '';
+  let createdQ = '';
+  if (year && month) {
+    since = `${year}-${month}-01T00:00:00Z`;
+    const endMonth = (month === '12') ? '01' : String(Number(month) + 1).padStart(2, '0');
+    const endYear = (month === '12') ? String(Number(year) + 1) : year;
+    until = `${endYear}-${endMonth}-01T00:00:00Z`;
+    createdQ = `+created:${since}..${until}`;
+  }
 
   const resultDiv = document.getElementById('result');
   resultDiv.textContent = '読み込み中...';
@@ -20,7 +26,7 @@ document.getElementById('countForm').addEventListener('submit', async function(e
   let prCount = 0;
   try {
     const prRes = await fetch(
-      `https://api.github.com/search/issues?q=type:pr+author:${username}+created:${since}..${until}`,
+      `https://api.github.com/search/issues?q=type:pr+author:${username}${createdQ}`,
       { headers }
     );
     const prData = await prRes.json();
@@ -45,10 +51,10 @@ document.getElementById('countForm').addEventListener('submit', async function(e
       for (const repo of repos) {
         let cPage = 1, cHasNext = true;
         while (cHasNext) {
-          const commitRes = await fetch(
-            `https://api.github.com/repos/${repo.owner.login}/${repo.name}/commits?author=${username}&since=${since}&until=${until}&per_page=100&page=${cPage}`,
-            { headers }
-          );
+          let commitsUrl = `https://api.github.com/repos/${repo.owner.login}/${repo.name}/commits?author=${username}&per_page=100&page=${cPage}`;
+          if (since) commitsUrl += `&since=${since}`;
+          if (until) commitsUrl += `&until=${until}`;
+          const commitRes = await fetch(commitsUrl, { headers });
           const commits = await commitRes.json();
           if (!Array.isArray(commits) || !commits.length) break;
           commitCount += commits.length;
@@ -65,8 +71,12 @@ document.getElementById('countForm').addEventListener('submit', async function(e
     return;
   }
 
+  let periodMsg = (year && month)
+    ? `${year}年${month}月の`
+    : '全期間の';
+
   resultDiv.textContent =
-    `${year}年${month}月の ${username} さんの\n` +
+    `${periodMsg} ${username} さんの\n` +
     `Pull Request数: ${prCount}\n` +
     `コミット数: ${commitCount}`;
   resultDiv.classList.remove('loading');
