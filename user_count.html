@@ -13,13 +13,13 @@
 </head>
 <body>
   <h2>GitHubユーザーのコミット数・Pull Request数をカウント</h2>
-  <form id="countForm">
-    <label>GitHubユーザー名: <input type="text" id="username" required></label>
-    <label>年: <input type="number" id="year" min="2008" max="2100" required></label>
-    <label>月: <input type="number" id="month" min="1" max="12" required></label>
-    <label>GitHubトークン（任意・多量取得用）: <input type="text" id="token"></label>
-    <button type="submit">カウント</button>
-  </form>
+<form id="countForm">
+  <label>GitHubユーザー名: <input type="text" id="username" required></label>
+  <label>年: <input type="number" id="year" min="2008" max="2100"></label>
+  <label>月: <input type="number" id="month" min="1" max="12"></label>
+  <label>GitHubトークン（任意・多量取得用）: <input type="text" id="token"></label>
+  <button type="submit">カウント</button>
+</form>
   <div id="result"></div>
   <script src="user_count.js"></script>
 </body>
