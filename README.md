@@ -18,3 +18,5 @@ https://hrmc.ngs.computer/3dgraphics.html
 https://hrmc.ngs.computer/user_count.html
 
 https://hrmc.ngs.computer/test.html
+
+https://hrmc.ngs.computer/3DSolarSystem.html
