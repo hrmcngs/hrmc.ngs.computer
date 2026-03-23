@@ -77,6 +77,24 @@ fetch('/content.json')
         chipsEl.innerHTML = profile.chips.map(c => `<span class="chip">${c}</span>`).join('');
       }
 
+      const infoEl = document.getElementById('profile-info');
+      if (infoEl) {
+        let infoHtml = '';
+        if (profile.birthday) {
+          const bd = new Date(profile.birthday);
+          const age = Math.floor((new Date() - bd) / (365.25 * 24 * 3600 * 1000));
+          const formatted = `${bd.getFullYear()}.${String(bd.getMonth()+1).padStart(2,'0')}.${String(bd.getDate()).padStart(2,'0')}`;
+          infoHtml += `<p class="info-birthday">生年月日 <strong>${formatted}</strong>（${age}歳）</p>`;
+        }
+        if (profile.education?.length) {
+          const items = profile.education.map(e =>
+            `<div class="edu-item"><span class="edu-date">${e.entered}</span><span class="edu-label">${e.label} 入学</span></div>`
+          ).join('');
+          infoHtml += `<div class="edu-timeline">${items}</div>`;
+        }
+        infoEl.innerHTML = infoHtml;
+      }
+
       setText('code-file-name', profile.codeFile);
 
       const codeEl = document.getElementById('code-block');
