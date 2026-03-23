@@ -20,8 +20,9 @@
     const socialLinks = cfg.socialLinks ?? [];
     const PROMPT      = cfg.prompt      ?? 'reisame256@ngs:~$';
 
-    // State: whether ./build.sh has been run (enables numbered project selection)
+    // State
     let buildActive = false;
+    let activeViewer = null;
 
     const COMMANDS = {
       help: () => [
@@ -35,25 +36,26 @@
         '  <span class="term-cmd">clear</span>         ターミナルをクリア',
       ],
 
-      whoami: () => [
-        '零鮫 / reisame256',
-        'Minecraft 1.20.1 の mod と web を作っています。',
-        '絡んでくる時はラフな感じでいいですよ。',
-        '元 @0526ngs',
-      ],
+      whoami: () => {
+        const lines = [];
+        if (profile.name) lines.push(`${profile.name} / ${(profile.handle ?? '').replace(/^@/, '')}`);
+        (profile.bio ?? []).forEach(b => lines.push(b));
+        const accounts = socialLinks.filter(l => l.url.includes('x.com'));
+        if (accounts.length) {
+          lines.push(accounts.map(l => `<a href="${l.url}" target="_blank" rel="noopener">@${l.url.split('/').pop()}</a>`).join(' · '));
+        }
+        return lines;
+      },
 
-      ls: () => [
-        'RPGish-HPDisplay/',
-        'Drowse-Lab/',
-        'The-four-primitives-and-Weapons/',
-      ],
+      ls: () => build.map(p => `${p.title}/`),
 
       './build.sh': () => {
         buildActive = true;
         const lines = ['<span class="success">▶ Building projects...</span>', ''];
         build.forEach((p, i) => {
           const colorStyle = p.color ? ` style="color:${p.color}"` : '';
-          lines.push(`<span class="term-cmd"${colorStyle}>[${i + 1}] ${p.title}</span>`);
+          const hasReadme = p.readme ? ' ◆' : '';
+          lines.push(`<span class="term-cmd"${colorStyle}>[${i + 1}] ${p.title}${hasReadme}</span>`);
           lines.push(`    ${p.desc}`);
           (p.links ?? []).forEach(url => {
             lines.push(`    → <a href="${url}" target="_blank" rel="noopener">${url}</a>`);
@@ -62,7 +64,7 @@
         });
         lines.push('<span class="success">Done.</span>');
         lines.push('');
-        lines.push('<span style="opacity:0.45">番号を入力 → README を表示 &nbsp;|&nbsp; 0 → リセット</span>');
+        lines.push('<span style="opacity:0.45">◆ のある番号を入力 → README を表示 &nbsp;|&nbsp; 0 → リセット</span>');
         return lines;
       },
 
@@ -92,15 +94,17 @@
       clear: () => '__clear__',
     };
 
+    const wrap  = document.getElementById('term-wrap');
     const body  = document.getElementById('term-body');
     const input = document.getElementById('term-input');
-    if (!body || !input) return;
+    const inputRow = document.querySelector('.term-input-row');
+    if (!body || !input || !wrap) return;
 
     const history = [];
     let histIdx = -1;
 
-    // Output lines without a prompt echo (used for async continuation like README)
-    function appendLines(lines, baseDelay = 0) {
+    // Output lines
+    function appendLines(lines, container, baseDelay = 0) {
       lines.forEach((line, i) => {
         const div = document.createElement('div');
         div.className = 'term-line';
@@ -116,9 +120,9 @@
           out.appendChild(errSpan);
         }
         div.appendChild(out);
-        body.appendChild(div);
+        container.appendChild(div);
       });
-      body.scrollTop = body.scrollHeight;
+      container.scrollTop = container.scrollHeight;
     }
 
     function print(lines, typed) {
@@ -139,10 +143,10 @@
         return;
       }
 
-      appendLines(lines, 0.06);
+      appendLines(lines, body, 0.06);
     }
 
-    // --- Markdown parser (for README display) ---
+    // --- Markdown parser ---
 
     function escHtml(s) {
       return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -165,7 +169,6 @@
       let inCode = false;
 
       for (const line of rawLines) {
-        // Fenced code block toggle
         if (line.startsWith('```')) {
           inCode = !inCode;
           out.push('<span style="opacity:0.3">' + (inCode ? '┌─────' : '└─────') + '</span>');
@@ -183,14 +186,11 @@
         const h3 = line.match(/^### (.+)/);
         if (h3) { out.push(`<span style="opacity:0.8">${escHtml(h3[1])}</span>`); continue; }
 
-        // Horizontal rule
         if (/^[-*_]{3,}$/.test(line.trim())) { out.push('<span style="opacity:0.2">──────────────────────</span>'); continue; }
 
-        // Unordered list
         const li = line.match(/^[ \t]*[-*+] (.+)/);
         if (li) { out.push(`  • ${inlineMd(li[1])}`); continue; }
 
-        // Ordered list
         const ol = line.match(/^[ \t]*\d+\. (.+)/);
         if (ol) { out.push(`  ${inlineMd(ol[0])}`); continue; }
 
@@ -202,28 +202,91 @@
       return out;
     }
 
-    // --- Fetch and display a project README ---
+    // --- README Viewer (app-like overlay) ---
+
+    function closeViewer() {
+      if (!activeViewer) return;
+      activeViewer.classList.add('readme-viewer--closing');
+      activeViewer.addEventListener('animationend', () => {
+        activeViewer.remove();
+        activeViewer = null;
+        body.style.display = '';
+        if (inputRow) inputRow.style.display = '';
+        input.focus();
+      });
+    }
 
     async function showReadme(project, cmd) {
-      print(['<span style="opacity:0.45">Loading README...</span>'], cmd);
+      // Echo the command in terminal
+      const echo = document.createElement('div');
+      echo.className = 'term-line';
+      const promptSpan = document.createElement('span');
+      promptSpan.className = 'term-prompt-echo';
+      promptSpan.textContent = PROMPT;
+      const typedSpan = document.createElement('span');
+      typedSpan.className = 'term-typed';
+      typedSpan.textContent = cmd;
+      echo.appendChild(promptSpan);
+      echo.appendChild(typedSpan);
+      body.appendChild(echo);
+
       if (!project.readme) {
-        appendLines([{ type: 'error', message: 'README URL が設定されていません。' }]);
+        appendLines([{ type: 'error', message: 'README URL が設定されていません。' }], body);
         return;
       }
+
+      // Hide terminal body & input, show viewer
+      body.style.display = 'none';
+      if (inputRow) inputRow.style.display = 'none';
+
+      const viewer = document.createElement('div');
+      viewer.className = 'readme-viewer';
+
+      // Viewer bar
+      const bar = document.createElement('div');
+      bar.className = 'readme-viewer-bar';
+
+      const titleEl = document.createElement('span');
+      titleEl.className = 'readme-viewer-title';
+      if (project.color) titleEl.style.color = project.color;
+      titleEl.textContent = `${project.title} / README.md`;
+
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'readme-viewer-close';
+      closeBtn.textContent = '✕ 閉じる';
+      closeBtn.addEventListener('click', closeViewer);
+
+      bar.appendChild(titleEl);
+      bar.appendChild(closeBtn);
+
+      // Content area
+      const content = document.createElement('div');
+      content.className = 'readme-viewer-content';
+
+      // Loading indicator
+      const loadingDiv = document.createElement('div');
+      loadingDiv.className = 'term-line';
+      loadingDiv.innerHTML = '<span class="term-out" style="opacity:0.45">Loading README...</span>';
+      content.appendChild(loadingDiv);
+
+      viewer.appendChild(bar);
+      viewer.appendChild(content);
+
+      // Insert viewer into term-wrap (between term-bar and the hidden body)
+      wrap.appendChild(viewer);
+      activeViewer = viewer;
+
+      // Fetch and render
       try {
         const res = await fetch(project.readme);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const text = await res.text();
-        const colorStyle = project.color ? ` style="color:${project.color}"` : '';
-        appendLines([
-          `<span class="term-cmd"${colorStyle}>── ${project.title} / README ──</span>`,
-          '',
-          ...parseMarkdown(text),
-          '',
-          '<span style="opacity:0.45">0 → リセット</span>',
-        ]);
+        content.innerHTML = '';
+        const lines = parseMarkdown(text);
+        appendLines(lines, content, 0.08);
       } catch (e) {
-        appendLines([{ type: 'error', message: `README の取得に失敗しました。(${e.message})` }]);
+        content.innerHTML = '';
+        appendLines([{ type: 'error', message: `README の取得に失敗しました。(${e.message})` }], content);
       }
     }
 
@@ -235,6 +298,12 @@
       history.unshift(cmd);
       histIdx = -1;
 
+      // Close viewer with 0
+      if (activeViewer && cmd === '0') {
+        closeViewer();
+        return;
+      }
+
       // Numbered project selection (active after ./build.sh)
       if (buildActive && /^\d+$/.test(cmd)) {
         const n = parseInt(cmd, 10);
@@ -245,7 +314,11 @@
         }
         const project = build[n - 1];
         if (project) {
-          showReadme(project, cmd);
+          if (project.readme) {
+            showReadme(project, cmd);
+          } else {
+            print([{ type: 'error', message: `${project.title}: README が設定されていません。` }], cmd);
+          }
           return;
         }
         print([{ type: 'error', message: `${n}: 存在しないプロジェクト番号です。` }], cmd);
@@ -273,6 +346,8 @@
         if (histIdx > 0) histIdx--;
         else { histIdx = -1; input.value = ''; return; }
         input.value = history[histIdx] ?? '';
+      } else if (e.key === 'Escape' && activeViewer) {
+        closeViewer();
       }
     });
 
@@ -292,7 +367,9 @@
       input.focus();
     });
 
-    document.getElementById('term-wrap')?.addEventListener('click', () => input.focus());
+    wrap.addEventListener('click', e => {
+      if (!activeViewer) input.focus();
+    });
   }
 
   fetch('/content.json')

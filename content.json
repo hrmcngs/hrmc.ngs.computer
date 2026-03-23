@@ -96,8 +96,8 @@
   },
   "profile": {
     "label": "// ngs.computer",
-    "name": "零鮫",
-    "handle": "@reisame256 \u00a0·\u00a0 元 @0526ngs",
+    "name": "Hiromichi Nagase",
+    "handle": "@hrmcngs \u00a0·\u00a0 @0526ngs",
     "bio": [
       "Minecraft 1.20.1のmodとwebを作っています。",
       "絡んでくる時はラフな感じでいいですよ。",
@@ -111,8 +111,8 @@
       { "key": "juniorHighSchool",    "label": "中学校",   "entered": "2023-04" },
       { "key": "sakuramatiHighSchool","label": "桜町高校", "entered": "2026-04" }
     ],
-    "codeFile": "reisame256.js",
-    "codeBlock": "// @reisame256\n\nconst reisame = {\n  name: \"零鮫\",\n  handle: \"@reisame256\",\n  formerly: \"@0526ngs\",\n  making: [\"Minecraft1.20.1mod\", \"Web\"],\n  note: \"絡んでくる時はラフな感じでいいですよ\",\n};\n\n// sub account\n\nconst hrmcngs = {\n  handle: \"@hrmcngs\",\n  role: \"sub\",\n};\n\n// community\n\nconst drowseLab = {\n  handle: \"@Drowse_Lab\",\n  role: \"同好会\",\n};"
+    "codeFile": "hrmcngs.js",
+    "codeBlock": "// @hrmcngs\n\nconst hrmcngs = {\n  name: \"Hiromichi Nagase\",\n  handle: \"@hrmcngs\",\n  formerly: \"@0526ngs\",\n  making: [\"Minecraft1.20.1mod\", \"Web\"],\n  note: \"絡んでくる時はラフな感じでいいですよ\",\n};\n\n// alt account\n\nconst ngs0526 = {\n  handle: \"@0526ngs\",\n  url: \"https://x.com/0526ngs\",\n};\n\n// community\n\nconst drowseLab = {\n  handle: \"@Drowse_Lab\",\n  role: \"同好会\",\n};"
   },
   "works": [
     {
