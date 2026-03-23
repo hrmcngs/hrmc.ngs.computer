@@ -280,10 +280,12 @@
     print(COMMANDS.help(), 'help');
 
     // term-cmd クリックでコマンドを入力欄に貼り付け
+    // [N] title 形式の場合は番号だけ抽出
     body.addEventListener('click', e => {
       const cmd = e.target.closest('.term-cmd');
       if (cmd) {
-        input.value = cmd.textContent;
+        const bracketNum = cmd.textContent.match(/^\[(\d+)\]/);
+        input.value = bracketNum ? bracketNum[1] : cmd.textContent;
         input.focus();
         return;
       }
