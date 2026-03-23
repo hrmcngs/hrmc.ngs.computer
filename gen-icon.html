@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Icon Generator</title>
+  <style>
+    body { background: #111; color: #eee; font-family: monospace; display: flex; flex-direction: column; align-items: center; padding: 2rem; gap: 1rem; }
+    canvas { image-rendering: pixelated; border: 1px solid #333; }
+    button { padding: .5rem 1.5rem; background: #7c6af7; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; }
+    label { display: flex; gap: .5rem; align-items: center; }
+  </style>
+</head>
+<body>
+  <h2>Katana Icon Generator</h2>
+  <canvas id="c" width="256" height="256" style="width:256px;height:256px;"></canvas>
+
+  <label>BG <input type="checkbox" id="bg" checked></label>
+  <button id="dl">Download icon.png</button>
+
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.168.0/build/three.module.js" } }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+
+    // ── model elements from cutomkatanairon3d.json ──
+    const elements = [
+      { from: [-0.5, 5.65,15.8 ], to: [0.3, 6.05, 16.4 ] }, // 0  handle lower
+      { from: [-0.5, 4.05,15.8 ], to: [0.3, 5.65, 16.6 ] }, // 1  handle lower
+      { from: [-0.5, 6.05,15.6 ], to: [0.3, 7.8,  16.4 ] }, // 2  handle upper
+      { from: [-0.2,13,  15.8 ], to: [0,   16,   16.1 ] }, // 3  blade
+      { from: [-0.3,13,  16.1 ], to: [0.1, 16,   16.6 ] }, // 4  blade
+      { from: [-0.2, 8,  15.6 ], to: [0,   13,   15.9 ] }, // 5  blade
+      { from: [-0.3, 8,  15.9 ], to: [0.1, 13,   16.4 ] }, // 6  blade
+      { from: [-0.2,16,  16.05], to: [0,   17,   16.35] }, // 7  blade tip
+      { from: [-0.3,16,  16.35], to: [0.1, 17,   16.85] }, // 8  blade tip
+      { from: [-0.2,17,  16.3 ], to: [0,   18,   16.6 ] }, // 9  blade tip
+      { from: [-0.3,17,  16.6 ], to: [0.1, 18,   17.1 ] }, // 10 blade tip
+      { from: [-0.2,18,  16.55], to: [0,   18.5, 16.85] }, // 11 blade tip
+      { from: [-0.2,18.5,16.8 ], to: [0,   19,   17.1 ] }, // 12 blade tip
+      { from: [-0.2,19,  17.05], to: [0,   19.25,17.35] }, // 13 blade tip
+      { from: [-0.3,18,  16.85], to: [0.1, 18.5, 17.35] }, // 14 blade tip
+      { from: [-0.3,18.5,17.1 ], to: [0.1, 19,   17.35] }, // 15 blade tip
+      { from: [-0.9, 7.8,14.95], to: [0.7,  8.05, 17.05] }, // 16 guard (tsuba)
+    ];
+
+    // ── color per element ──
+    function getColors(el) {
+      const midY  = (el.from[1] + el.to[1]) / 2;
+      const zSpan = el.to[2] - el.from[2];
+      if (zSpan > 1.5)  return [0x8b5e1a, 0x5c3808]; // guard  brown
+      if (midY < 8)     return [0x1e2d88, 0x101860]; // handle blue
+      return [0x9898a8, 0x606070];                    // blade  silver
+    }
+
+    // ── highlight color multiplier per face ──
+    // BoxGeometry face order: +X, -X, +Y, -Y, +Z, -Z
+    const faceShade = [0.75, 0.55, 1.0, 0.6, 0.85, 0.7];
+
+    function shadedMats(base) {
+      const c = new THREE.Color(base);
+      return faceShade.map(f => new THREE.MeshBasicMaterial({
+        color: new THREE.Color(c.r * f, c.g * f, c.b * f),
+        side: THREE.FrontSide
+      }));
+    }
+
+    // ── scene ──
+    const canvas = document.getElementById('c');
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+    renderer.setSize(256, 256);
+    renderer.setClearColor(0x000000, 0);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-8, 8, 8, -8, -200, 200);
+    camera.position.set(0, 0, 100);
+
+    // center of model bounding box
+    const CX = (-0.9 + 0.7) / 2;
+    const CY = (4 + 19.25) / 2;
+    const CZ = (14.95 + 17.35) / 2;
+
+    const modelGroup = new THREE.Group();
+
+    elements.forEach(el => {
+      const w = el.to[0] - el.from[0];
+      const h = el.to[1] - el.from[1];
+      const d = el.to[2] - el.from[2];
+
+      const geo = new THREE.BoxGeometry(w, h, d);
+      const [base] = getColors(el);
+      const mesh = new THREE.Mesh(geo, shadedMats(base));
+
+      mesh.position.set(
+        (el.from[0] + el.to[0]) / 2 - CX,
+        (el.from[1] + el.to[1]) / 2 - CY,
+        (el.from[2] + el.to[2]) / 2 - CZ,
+      );
+      modelGroup.add(mesh);
+    });
+
+    // GUI display transform: rotation [-90, 130, 90] XYZ, scale [1, 1.3, 1]
+    modelGroup.rotation.order = 'XYZ';
+    modelGroup.rotation.set(
+      THREE.MathUtils.degToRad(-90),
+      THREE.MathUtils.degToRad(130),
+      THREE.MathUtils.degToRad(90),
+    );
+    modelGroup.scale.set(0.6, 0.6 * 1.3, 0.6);
+    scene.add(modelGroup);
+
+    function render() {
+      renderer.render(scene, camera);
+    }
+
+    // ── background toggle ──
+    const bgEl = document.getElementById('bg');
+    bgEl.addEventListener('change', () => {
+      renderer.setClearColor(0x000000, bgEl.checked ? 0 : 0);
+      render();
+    });
+
+    render();
+
+    // ── download with rounded dark bg ──
+    document.getElementById('dl').addEventListener('click', () => {
+      const out = document.createElement('canvas');
+      out.width = 64; out.height = 64;
+      const ctx = out.getContext('2d');
+
+      if (bgEl.checked) {
+        ctx.beginPath();
+        ctx.roundRect(0, 0, 64, 64, 12);
+        ctx.fillStyle = '#0d0d0f';
+        ctx.fill();
+      }
+
+      // downscale rendered canvas into out
+      ctx.drawImage(canvas, 0, 0, 64, 64);
+
+      const link = document.createElement('a');
+      link.download = 'icon.png';
+      link.href = out.toDataURL('image/png');
+      link.click();
+    });
+  </script>
+</body>
+</html>
