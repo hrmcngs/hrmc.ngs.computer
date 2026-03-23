@@ -46,7 +46,6 @@
         "title": "The-four-primitives-and-Weapons",
         "desc": "Minecraft mod / Drowse-Lab",
         "color": "#f87171",
-        "readme": "https://raw.githubusercontent.com/Drowse-Lab/The-four-primitives-and-Weapons/1.20.1/README.md",
         "links": [
           "https://github.com/Drowse-Lab/The-four-primitives-and-Weapons",
           "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons"
@@ -157,6 +156,14 @@
       "憂鬱な時は変なポストをしていますが許してください。"
     ],
     "chips": ["Minecraft Mod", "Web", "JavaScript", "Canvas", "3D Graphics", "Java"],
+    "chipLinks": {
+      "Minecraft Mod": ["RPGish-HPDisplay", "The-four-primitives-and-Weapons"],
+      "Web": ["Drowse-Lab"],
+      "JavaScript": ["Drowse-Lab"],
+      "Java": ["The-four-primitives-and-Weapons"],
+      "Canvas": ["RPGish-HPDisplay"],
+      "3D Graphics": ["RPGish-HPDisplay"]
+    },
     "birthday": "2010-05-26",
     "education": [
       { "key": "kindergarten",        "label": "幼稚園",   "entered": "2014-04" },

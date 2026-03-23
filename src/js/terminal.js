@@ -54,8 +54,8 @@
         const lines = ['<span class="success">▶ Building projects...</span>', ''];
         build.forEach((p, i) => {
           const colorStyle = p.color ? ` style="color:${p.color}"` : '';
-          const hasReadme = p.readme ? ' ◆' : '';
-          lines.push(`<span class="term-cmd"${colorStyle}>[${i + 1}] ${p.title}${hasReadme}</span>`);
+          const hasGh = hasGithubLink(p);
+          lines.push(`<span class="term-cmd"${colorStyle}>[${i + 1}] ${p.title}${hasGh ? ' ◆' : ''}</span>`);
           lines.push(`    ${p.desc}`);
           (p.links ?? []).forEach(url => {
             lines.push(`    → <a href="${url}" target="_blank" rel="noopener">${url}</a>`);
@@ -94,10 +94,59 @@
       clear: () => '__clear__',
     };
 
+    // GitHub URL からリポジトリの owner/repo を抽出
+    function parseGithubUrl(links) {
+      for (const url of (links ?? [])) {
+        const m = url.match(/github\.com\/([^/]+)\/([^/]+)/);
+        if (m) return { owner: m[1], repo: m[2] };
+      }
+      return null;
+    }
+
+    function hasGithubLink(project) {
+      return !!parseGithubUrl(project.links);
+    }
+
+    // GitHub API で README の raw content を取得
+    async function fetchReadme(project) {
+      // 明示的な readme URL があればそれを使う
+      if (project.readme) {
+        const res = await fetch(project.readme);
+        if (res.ok) return res.text();
+      }
+      // GitHub リポジトリから自動取得
+      const gh = parseGithubUrl(project.links);
+      if (!gh) throw new Error('GitHub リポジトリが見つかりません');
+      const res = await fetch(`https://api.github.com/repos/${gh.owner}/${gh.repo}/readme`, {
+        headers: { 'Accept': 'application/vnd.github.raw' },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.text();
+    }
+
+    // chip → 関連プロジェクト表示コマンドを動的登録
+    const chipLinks = profile.chipLinks ?? {};
+    Object.entries(chipLinks).forEach(([chip, titles]) => {
+      COMMANDS[chip] = () => {
+        const matched = build.filter(p => titles.includes(p.title));
+        if (!matched.length) return [{ type: 'error', message: `${chip}: 関連プロジェクトが見つかりません。` }];
+        const lines = [`<span class="success">${chip} に関連するプロジェクト:</span>`, ''];
+        matched.forEach(p => {
+          const colorStyle = p.color ? ` style="color:${p.color}"` : '';
+          lines.push(`<span class="term-cmd"${colorStyle}>${p.title}</span>`);
+          lines.push(`    ${p.desc}`);
+          (p.links ?? []).forEach(url => {
+            lines.push(`    → <a href="${url}" target="_blank" rel="noopener">${url}</a>`);
+          });
+          lines.push('');
+        });
+        return lines;
+      };
+    });
+
     const wrap  = document.getElementById('term-wrap');
     const body  = document.getElementById('term-body');
     const input = document.getElementById('term-input');
-    const inputRow = document.querySelector('.term-input-row');
     if (!body || !input || !wrap) return;
 
     const history = [];
@@ -152,18 +201,43 @@
       return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
+    function stripHtml(md) {
+      // ![alt](url) → [画像: alt]
+      md = md.replace(/!\[([^\]]*)\]\([^)]+\)/g, (_, alt) => alt ? `[画像: ${alt}]` : '');
+      // <img ... alt="text" ...> → [画像: text]  or skip
+      md = md.replace(/<img\s[^>]*alt="([^"]*)"[^>]*\/?>/gi, (_, alt) => alt ? `[画像: ${alt}]` : '');
+      md = md.replace(/<img\s[^>]*\/?>/gi, '');
+      // <a href="url">text</a> → [text](url)
+      md = md.replace(/<a\s+href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, '[$2]($1)');
+      // <br> → newline
+      md = md.replace(/<br\s*\/?>/gi, '\n');
+      // Strip remaining HTML tags
+      md = md.replace(/<\/?[^>]+(>|$)/g, '');
+      return md;
+    }
+
     function inlineMd(s) {
       s = escHtml(s);
+      // Bold
       s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      // Italic
       s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      // Inline code
       s = s.replace(/`([^`]+)`/g,
-        '<code style="background:rgba(255,255,255,0.08);padding:0.1em 0.3em;border-radius:3px;font-family:monospace">$1</code>');
+        '<code style="background:rgba(255,255,255,0.08);padding:0.1em 0.3em;border-radius:3px">$1</code>');
+      // [text](url)
       s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g,
         '<a href="$2" target="_blank" rel="noopener">$1</a>');
+      // Auto-link bare URLs (not already inside href="...")
+      s = s.replace(/(^|[\s(])((https?:\/\/)[^\s<)]+)/g,
+        '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
       return s;
     }
 
     function parseMarkdown(md) {
+      // Pre-process: convert HTML to markdown-compatible text
+      md = stripHtml(md);
+
       const rawLines = md.split('\n');
       const out = [];
       let inCode = false;
@@ -180,19 +254,19 @@
         }
 
         const h1 = line.match(/^# (.+)/);
-        if (h1) { out.push(`<span class="success" style="font-weight:700">${escHtml(h1[1])}</span>`); continue; }
+        if (h1) { out.push(''); out.push(`<span class="success" style="font-weight:700;font-size:1.1em">${inlineMd(h1[1])}</span>`); out.push('<span style="opacity:0.15">════════════════════════════</span>'); continue; }
         const h2 = line.match(/^## (.+)/);
-        if (h2) { out.push(`<span style="color:var(--term-link)">${escHtml(h2[1])}</span>`); continue; }
+        if (h2) { out.push(''); out.push(`<span style="color:var(--term-link);font-weight:600">${inlineMd(h2[1])}</span>`); out.push('<span style="opacity:0.12">────────────────────────</span>'); continue; }
         const h3 = line.match(/^### (.+)/);
-        if (h3) { out.push(`<span style="opacity:0.8">${escHtml(h3[1])}</span>`); continue; }
+        if (h3) { out.push(''); out.push(`<span style="color:var(--accent);opacity:0.9">${inlineMd(h3[1])}</span>`); continue; }
 
-        if (/^[-*_]{3,}$/.test(line.trim())) { out.push('<span style="opacity:0.2">──────────────────────</span>'); continue; }
+        if (/^[-*_]{3,}$/.test(line.trim())) { out.push('<span style="opacity:0.15">──────────────────────</span>'); continue; }
 
         const li = line.match(/^[ \t]*[-*+] (.+)/);
         if (li) { out.push(`  • ${inlineMd(li[1])}`); continue; }
 
-        const ol = line.match(/^[ \t]*\d+\. (.+)/);
-        if (ol) { out.push(`  ${inlineMd(ol[0])}`); continue; }
+        const ol = line.match(/^[ \t]*(\d+)\. (.+)/);
+        if (ol) { out.push(`  ${ol[1]}. ${inlineMd(ol[2])}`); continue; }
 
         if (!line.trim()) { out.push(''); continue; }
 
@@ -202,91 +276,60 @@
       return out;
     }
 
-    // --- README Viewer (app-like overlay) ---
+    // --- README Viewer (terminal-style inline) ---
+
+    let savedBodyContent = null;
 
     function closeViewer() {
       if (!activeViewer) return;
-      activeViewer.classList.add('readme-viewer--closing');
-      activeViewer.addEventListener('animationend', () => {
-        activeViewer.remove();
-        activeViewer = null;
-        body.style.display = '';
-        if (inputRow) inputRow.style.display = '';
-        input.focus();
-      });
+      body.innerHTML = savedBodyContent;
+      savedBodyContent = null;
+      activeViewer = null;
+      body.scrollTop = body.scrollHeight;
+      input.focus();
     }
 
     async function showReadme(project, cmd) {
-      // Echo the command in terminal
-      const echo = document.createElement('div');
-      echo.className = 'term-line';
-      const promptSpan = document.createElement('span');
-      promptSpan.className = 'term-prompt-echo';
-      promptSpan.textContent = PROMPT;
-      const typedSpan = document.createElement('span');
-      typedSpan.className = 'term-typed';
-      typedSpan.textContent = cmd;
-      echo.appendChild(promptSpan);
-      echo.appendChild(typedSpan);
-      body.appendChild(echo);
-
-      if (!project.readme) {
-        appendLines([{ type: 'error', message: 'README URL が設定されていません。' }], body);
+      if (!hasGithubLink(project) && !project.readme) {
+        print([{ type: 'error', message: `${project.title}: README が見つかりません。` }], cmd);
         return;
       }
 
-      // Hide terminal body & input, show viewer
-      body.style.display = 'none';
-      if (inputRow) inputRow.style.display = 'none';
+      // Save current terminal content
+      savedBodyContent = body.innerHTML;
 
-      const viewer = document.createElement('div');
-      viewer.className = 'readme-viewer';
+      // Clear body and show README header
+      body.innerHTML = '';
+      const pColor = project.color || 'var(--accent)';
+      appendLines([
+        `<span class="success">cat</span> <span style="color:${pColor}">${project.title}</span>/<span style="color:var(--term-link)">README.md</span>`,
+        '',
+        '<span style="opacity:0.3">════════════════════════════════════════</span>',
+        '',
+      ], body);
 
-      // Viewer bar
-      const bar = document.createElement('div');
-      bar.className = 'readme-viewer-bar';
-
-      const titleEl = document.createElement('span');
-      titleEl.className = 'readme-viewer-title';
-      if (project.color) titleEl.style.color = project.color;
-      titleEl.textContent = `${project.title} / README.md`;
-
-      const closeBtn = document.createElement('button');
-      closeBtn.className = 'readme-viewer-close';
-      closeBtn.textContent = '✕ 閉じる';
-      closeBtn.addEventListener('click', closeViewer);
-
-      bar.appendChild(titleEl);
-      bar.appendChild(closeBtn);
-
-      // Content area
-      const content = document.createElement('div');
-      content.className = 'readme-viewer-content';
-
-      // Loading indicator
+      // Loading
       const loadingDiv = document.createElement('div');
       loadingDiv.className = 'term-line';
-      loadingDiv.innerHTML = '<span class="term-out" style="opacity:0.45">Loading README...</span>';
-      content.appendChild(loadingDiv);
+      loadingDiv.innerHTML = '<span class="term-out" style="opacity:0.35">fetching...</span>';
+      body.appendChild(loadingDiv);
 
-      viewer.appendChild(bar);
-      viewer.appendChild(content);
-
-      // Insert viewer into term-wrap (between term-bar and the hidden body)
-      wrap.appendChild(viewer);
-      activeViewer = viewer;
+      activeViewer = true;
 
       // Fetch and render
       try {
-        const res = await fetch(project.readme);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const text = await res.text();
-        content.innerHTML = '';
+        const text = await fetchReadme(project);
+        loadingDiv.remove();
         const lines = parseMarkdown(text);
-        appendLines(lines, content, 0.08);
+        appendLines([
+          ...lines,
+          '',
+          '<span style="opacity:0.3">════════════════════════════════════════</span>',
+          '<span style="opacity:0.35">q → 戻る</span>',
+        ], body, 0.03);
       } catch (e) {
-        content.innerHTML = '';
-        appendLines([{ type: 'error', message: `README の取得に失敗しました。(${e.message})` }], content);
+        loadingDiv.remove();
+        appendLines([{ type: 'error', message: `README の取得に失敗しました。(${e.message})` }], body);
       }
     }
 
@@ -298,8 +341,8 @@
       history.unshift(cmd);
       histIdx = -1;
 
-      // Close viewer with 0
-      if (activeViewer && cmd === '0') {
+      // Close viewer with q or 0
+      if (activeViewer && (cmd === 'q' || cmd === '0')) {
         closeViewer();
         return;
       }
@@ -314,11 +357,7 @@
         }
         const project = build[n - 1];
         if (project) {
-          if (project.readme) {
-            showReadme(project, cmd);
-          } else {
-            print([{ type: 'error', message: `${project.title}: README が設定されていません。` }], cmd);
-          }
+          showReadme(project, cmd);
           return;
         }
         print([{ type: 'error', message: `${n}: 存在しないプロジェクト番号です。` }], cmd);
@@ -367,9 +406,7 @@
       input.focus();
     });
 
-    wrap.addEventListener('click', e => {
-      if (!activeViewer) input.focus();
-    });
+    wrap.addEventListener('click', () => input.focus());
   }
 
   fetch('/content.json')
