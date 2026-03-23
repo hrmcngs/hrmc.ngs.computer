@@ -1,5 +1,5 @@
 (() => {
-  function init(cfg) {
+  function init(cfg, profile) {
     // Apply terminal colors as CSS custom properties
     if (cfg.colors) {
       const r = document.documentElement;
@@ -27,7 +27,7 @@
         '  <span class="term-cmd">whoami</span>        自己紹介',
         '  <span class="term-cmd">ls</span>            作ったものを一覧表示',
         '  <span class="term-cmd">./build.sh</span>    プロジェクト詳細を表示',
-        '  <span class="term-cmd">./about.sh</span>    aboutページへ移動',
+        '  <span class="term-cmd">./about.sh</span>    プロフィールを表示',
         '  <span class="term-cmd">cat links.txt</span> リンク一覧',
         '  <span class="term-cmd">clear</span>         ターミナルをクリア',
       ],
@@ -61,8 +61,18 @@
       },
 
       './about.sh': () => {
-        window.location.href = '/about';
-        return ['<span class="success">Redirecting to /about ...</span>'];
+        const lines = [];
+        if (profile.name)   lines.push(`<span class="success">${profile.name}</span>`);
+        if (profile.handle) lines.push(`<span style="opacity:0.6">${profile.handle}</span>`);
+        if (lines.length)   lines.push('');
+        (profile.bio ?? []).forEach(b => lines.push(b));
+        if (profile.chips?.length) {
+          lines.push('');
+          lines.push(profile.chips.map(c => `<span class="term-cmd">${c}</span>`).join('  '));
+        }
+        lines.push('');
+        lines.push(`→ <a href="/about" target="_blank" rel="noopener">/about</a>`);
+        return lines;
       },
 
       'cat links.txt': () => {
@@ -171,6 +181,6 @@
 
   fetch('/content.json')
     .then(r => r.json())
-    .then(data => init(data.terminal ?? {}))
-    .catch(() => init({}));
+    .then(data => init(data.terminal ?? {}, data.profile ?? {}))
+    .catch(() => init({}, {}));
 })();
