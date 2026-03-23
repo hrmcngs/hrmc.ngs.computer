@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="image/icontestHtml.png">
+  <link rel="icon" type="image/svg+xml" href="image/icon.svg">
   <title>hrmc.ngs.computer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,7 +25,7 @@
     <div class="hero-content">
       <p class="hero-tag">// ngs.computer</p>
       <h1 class="hero-title">hrmc</h1>
-      <p class="hero-sub">Web・図形・ゲーム・刀</p>
+      <p class="hero-sub">Web・minecraft mod</p>
       <a href="#about" class="scroll-btn">
         <span>scroll</span>
         <svg width="16" height="24" viewBox="0 0 16 24"><path d="M8 0v20M1 13l7 7 7-7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -39,18 +39,7 @@
     <div class="container">
       <h2 class="section-title"><span class="tag">01</span> About</h2>
       <div class="about-grid">
-        <div class="about-text">
-          <p>はじめまして、<strong>hrmc</strong> です。</p>
-          <p>WebやJavaScript、図形生成、Minecraftのレシピジェネレーターなど、気になったものを作って遊んでいます。</p>
-          <p>刀が好きです。</p>
-          <div class="tags">
-            <span class="chip">HTML / CSS</span>
-            <span class="chip">JavaScript</span>
-            <span class="chip">Canvas</span>
-            <span class="chip">3D Graphics</span>
-            <span class="chip">Minecraft</span>
-          </div>
-        </div>
+        <div class="about-text" id="about-text"></div>
         <a href="/about" class="about-more">About me →</a>
       </div>
     </div>
@@ -86,27 +75,7 @@
   <section class="section" id="works">
     <div class="container">
       <h2 class="section-title"><span class="tag">03</span> Works</h2>
-      <div class="works-grid">
-
-        <a class="work-card" href="https://github.com/hrmcngs/RPGish-HPDisplay" target="_blank" rel="noopener">
-          <div class="work-icon">⚔️</div>
-          <h3>RPGish-HPDisplay</h3>
-          <p>RPG風HP表示、ダメージ表示データパック</p>
-        </a>
-
-        <a class="work-card" href="https://github.com/Drowse-Lab/Drowse-Lab" target="_blank" rel="noopener">
-          <div class="work-icon">🌐</div>
-          <h3>Drowse-Lab</h3>
-          <p>なんとなく作っているweb</p>
-        </a>
-
-        <a class="work-card" href="https://github.com/Drowse-Lab/The-four-primitives-and-Weapons" target="_blank" rel="noopener">
-          <div class="work-icon">🗡️</div>
-          <h3>The-four-primitives-and-Weapons</h3>
-          <p>Drowse-Lab / Minecraft mod</p>
-        </a>
-
-      </div>
+      <div class="works-grid" id="works-grid"></div>
 
     </div>
   </section>
@@ -140,6 +109,7 @@
     </div>
   </footer>
 
+  <script src="src/js/content.js"></script>
   <script src="src/js/index.js"></script>
   <script src="src/js/terminal.js"></script>
 </body>

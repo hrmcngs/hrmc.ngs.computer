@@ -1,0 +1,30 @@
+{
+  "about": {
+    "name": "hrmcngs",
+    "bio": [
+      "Minecraft1.20.1のmodとwebを作っています。",
+      "刀が好きです。"
+    ],
+    "chips": ["Minecraft Mod", "Web", "JavaScript"]
+  },
+  "works": [
+    {
+      "icon": "https://raw.githubusercontent.com/hrmcngs/RPGish-HPDisplay/1.20.1/pack.png",
+      "title": "RPGish-HPDisplay",
+      "desc": "RPG風HP表示、ダメージ表示データパック",
+      "url": "https://github.com/hrmcngs/RPGish-HPDisplay"
+    },
+    {
+      "icon": "https://raw.githubusercontent.com/Drowse-Lab/Drowse-Lab/main/assets/image/DrowseLabIcon.jpg",
+      "title": "Drowse-Lab",
+      "desc": "なんとなく作っているweb",
+      "url": "https://github.com/Drowse-Lab/Drowse-Lab"
+    },
+    {
+      "icon": "https://raw.githubusercontent.com/Drowse-Lab/The-four-primitives-and-Weapons/1.20.1/src/main/resources/logo.png",
+      "title": "The-four-primitives-and-Weapons",
+      "desc": "Drowse-Lab / Minecraft mod",
+      "url": "https://github.com/Drowse-Lab/The-four-primitives-and-Weapons"
+    }
+  ]
+}

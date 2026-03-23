@@ -376,6 +376,18 @@ body {
   font-size: 2rem;
   margin-bottom: 1rem;
   line-height: 1;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.work-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
 }
 
 .work-card h3 {
