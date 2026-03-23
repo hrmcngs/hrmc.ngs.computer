@@ -9,8 +9,8 @@
     "copy": "© 2024 hrmc — All rights reserved."
   },
   "terminal": {
-    "title": "reisame256@ngs: ~",
-    "prompt": "reisame256@ngs:~$",
+    "title": "hrmc@ngs: ~",
+    "prompt": "hrmc@ngs:~$",
     "colors": {
       "bg":         "#0d0d10",
       "bar":        "#1e1e28",
