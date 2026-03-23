@@ -152,25 +152,13 @@
 
       <!-- Left: profile -->
       <div class="profile-left">
-        <p class="profile-label">// ngs.computer</p>
-        <h1 class="profile-name">零鮫</h1>
-        <p class="profile-handle">@reisame256 &nbsp;·&nbsp; 元 @0526ngs</p>
+        <p class="profile-label" id="profile-label"></p>
+        <h1 class="profile-name" id="profile-name"></h1>
+        <p class="profile-handle" id="profile-handle"></p>
 
-        <p class="profile-bio">
-          Minecraft 1.20.1のmodとwebを作っています。<br>
-          絡んでくる時はラフな感じでいいですよ。<br>
-          憂鬱な時は変なポストをしていますが許してください。
-        </p>
+        <p class="profile-bio" id="profile-bio"></p>
 
-        <div class="profile-chips">
-          <span class="chip">Minecraft Mod</span>
-          <span class="chip">Web</span>
-          <span class="chip">JavaScript</span>
-          <span class="chip">Canvas</span>
-          <span class="chip">3D Graphics</span>
-          <span class="chip">Java</span>
-          <!-- <span class="chip"></span> -->
-        </div>
+        <div class="profile-chips" id="profile-chips"></div>
 
         <a class="profile-back" href="/">← Back</a>
       </div>
@@ -181,37 +169,14 @@
           <span class="code-dot red"></span>
           <span class="code-dot yellow"></span>
           <span class="code-dot green"></span>
-          reisame256.js
+          <span id="code-file-name"></span>
         </div>
-        <pre><code class="language-javascript">// @reisame256
-
-const reisame = {
-  name: "零鮫",
-  handle: "@reisame256",
-  formerly: "@0526ngs",
-  making: ["Minecraft1.20.1mod", "Web"],
-  note: "絡んでくる時はラフな感じでいいですよ",
-};
-
-// sub account
-
-const hrmcngs = {
-  handle: "@hrmcngs",
-  role: "sub",
-};
-
-// community
-
-const drowseLab = {
-  handle: "@Drowse_Lab",
-  role: "同好会",
-};
-</code></pre>
+        <pre><code class="language-javascript" id="code-block"></code></pre>
       </div>
 
     </div>
   </section>
 
-  <script>hljs.highlightAll();</script>
+  <script src="../src/js/content.js"></script>
 </body>
 </html>
