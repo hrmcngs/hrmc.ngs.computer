@@ -67,17 +67,17 @@
     "items": [
       {
         "platform": "x",
-        "label": "X / Twitter",
-        "handle": "@reisame256",
-        "url": "https://x.com/reisame256",
+        "label": "X / Twitter (main)",
+        "handle": "@hrmcngs",
+        "url": "https://x.com/hrmcngs",
         "color": "#ffffff"
       },
       {
-        "platform": "instagram",
-        "label": "Instagram",
-        "handle": "reisame.256",
-        "url": "https://instagram.com/reisame.256",
-        "color": "#e1306c"
+        "platform": "x",
+        "label": "X / Twitter (sub)",
+        "handle": "@0526ngs",
+        "url": "https://x.com/0526ngs",
+        "color": "#ffffff"
       },
       {
         "platform": "github",
@@ -85,6 +85,41 @@
         "handle": "hrmcngs",
         "url": "https://github.com/hrmcngs",
         "color": "#7c6af7"
+      },
+      {
+        "platform": "instagram",
+        "label": "Instagram",
+        "handle": "hrmcngs",
+        "url": "https://instagram.com/hrmcngs",
+        "color": "#e1306c"
+      },
+      {
+        "platform": "instagram",
+        "label": "Instagram",
+        "handle": "@0526ngs",
+        "url": "https://instagram.com/0526ngs",
+        "color": "#e1306c"
+      },
+      {
+        "platform": "x",
+        "label": "Drowse Lab",
+        "handle": "@Drowse_Lab",
+        "url": "https://x.com/Drowse_Lab",
+        "color": "#ffffff"
+      },
+      {
+        "platform": "pixiv",
+        "label": "Pixiv",
+        "handle": "83520943",
+        "url": "https://www.pixiv.net/users/83520943",
+        "color": "#0096fa"
+      },
+      {
+        "platform": "bluesky",
+        "label": "Bluesky",
+        "handle": "@hrmcngs",
+        "url": "https://bsky.app/profile/hrmcngs.bsky.social",
+        "color": "#0085ff"
       }
     ]
   },
