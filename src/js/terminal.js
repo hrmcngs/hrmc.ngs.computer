@@ -18,7 +18,7 @@
 
     const build       = cfg.build       ?? [];
     const socialLinks = cfg.socialLinks ?? [];
-    const PROMPT      = cfg.prompt      ?? 'reisame256@ngs:~$';
+    const PROMPT      = cfg.prompt      ?? 'hrmc@ngs:~$';
 
     // State
     let buildActive = false;
