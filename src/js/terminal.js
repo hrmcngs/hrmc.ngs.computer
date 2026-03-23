@@ -40,7 +40,22 @@
         const lines = [];
         if (profile.name) lines.push(`${profile.name} / ${(profile.handle ?? '').replace(/^@/, '')}`);
         (profile.bio ?? []).forEach(b => lines.push(b));
-        const accounts = socialLinks.filter(l => l.url.includes('x.com'));
+        const allowedXHosts = new Set([
+          'x.com',
+          'www.x.com',
+          'twitter.com',
+          'www.twitter.com',
+          'mobile.twitter.com'
+        ]);
+        const accounts = socialLinks.filter(l => {
+          if (!l || !l.url) return false;
+          try {
+            const u = new URL(l.url, window.location.origin);
+            return allowedXHosts.has(u.hostname);
+          } catch (e) {
+            return false;
+          }
+        });
         if (accounts.length) {
           lines.push(accounts.map(l => `<a href="${l.url}" target="_blank" rel="noopener">@${l.url.split('/').pop()}</a>`).join(' · '));
         }
