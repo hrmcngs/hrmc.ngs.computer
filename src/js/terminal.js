@@ -202,21 +202,29 @@
     }
 
     function stripHtml(md) {
-      // ![alt](url) → [画像: alt]
-      md = md.replace(/!\[([^\]]*)\]\([^)]+\)/g, (_, alt) => alt ? `[画像: ${alt}]` : '');
-      // <img ... alt="text" ...> → [画像: text]  or skip
-      md = md.replace(/<img\s[^>]*alt="([^"]*)"[^>]*\/?>/gi, (_, alt) => alt ? `[画像: ${alt}]` : '');
-      md = md.replace(/<img\s[^>]*\/?>/gi, '');
+      // ![alt](url) → <img> tag (keep as real image)
+      md = md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,
+        '<img src="$2" alt="$1" class="readme-img">');
+      // <img> tags → keep but add class for styling
+      md = md.replace(/<img\s[^>]*src="([^"]*)"[^>]*\/?>/gi, (match, src) => {
+        const altMatch = match.match(/alt="([^"]*)"/i);
+        const alt = altMatch ? altMatch[1] : '';
+        return `<img src="${src}" alt="${alt}" class="readme-img">`;
+      });
       // <a href="url">text</a> → [text](url)
       md = md.replace(/<a\s+href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, '[$2]($1)');
       // <br> → newline
       md = md.replace(/<br\s*\/?>/gi, '\n');
-      // Strip remaining HTML tags
-      md = md.replace(/<\/?[^>]+(>|$)/g, '');
+      // Strip remaining HTML tags (but NOT <img>)
+      md = md.replace(/<(?!\/?img)[^>]+(>|$)/gi, '');
       return md;
     }
 
     function inlineMd(s) {
+      // Preserve <img> tags before escaping
+      const imgs = [];
+      s = s.replace(/<img\s[^>]+>/gi, m => { imgs.push(m); return `\x00IMG${imgs.length - 1}\x00`; });
+
       s = escHtml(s);
       // Bold
       s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
@@ -228,9 +236,12 @@
       // [text](url)
       s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g,
         '<a href="$2" target="_blank" rel="noopener">$1</a>');
-      // Auto-link bare URLs (not already inside href="...")
+      // Auto-link bare URLs
       s = s.replace(/(^|[\s(])((https?:\/\/)[^\s<)]+)/g,
         '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
+
+      // Restore <img> tags
+      s = s.replace(/\x00IMG(\d+)\x00/g, (_, i) => imgs[i]);
       return s;
     }
 

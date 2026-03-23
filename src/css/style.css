@@ -600,6 +600,16 @@ body {
 .term-out.success { color: var(--term-success, var(--accent2)); }
 .term-out.error   { color: var(--term-error, #f87171); }
 
+.readme-img {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 6px;
+  margin: 0.3rem 0;
+  display: block;
+  object-fit: contain;
+  opacity: 0.9;
+}
+
 /* README Viewer (app-like overlay) */
 .readme-viewer {
   display: flex;
