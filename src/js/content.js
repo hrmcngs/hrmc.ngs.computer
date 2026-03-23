@@ -27,7 +27,7 @@ fetch('/content.json')
       const linksEl = document.getElementById('links-row');
       if (linksEl) {
         linksEl.innerHTML = links.items.map(l => `
-          <a class="link-card" href="${l.url}" target="_blank" rel="noopener" data-platform="${l.platform}">
+          <a class="link-card" href="${l.url}" target="_blank" rel="noopener" data-platform="${l.platform}"${l.color ? ` style="--link-color:${l.color}"` : ''}>
             <span class="link-icon">${PLATFORM_ICONS[l.platform] ?? ''}</span>
             <span class="link-info">
               <span class="link-platform">${l.label}</span>
@@ -94,7 +94,7 @@ fetch('/content.json')
           ? `<img src="${w.icon}" alt="${w.title}">`
           : w.icon;
         return `
-          <a class="work-card" href="${w.url}" target="_blank" rel="noopener">
+          <a class="work-card" href="${w.url}" target="_blank" rel="noopener"${w.color ? ` style="--work-color:${w.color}"` : ''}>
             <div class="work-icon">${icon}</div>
             <h3>${w.title}</h3>
             <p>${w.desc}</p>

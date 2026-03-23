@@ -63,19 +63,22 @@
         "platform": "x",
         "label": "X / Twitter",
         "handle": "@reisame256",
-        "url": "https://x.com/reisame256"
+        "url": "https://x.com/reisame256",
+        "color": "#ffffff"
       },
       {
         "platform": "instagram",
         "label": "Instagram",
         "handle": "reisame.256",
-        "url": "https://instagram.com/reisame.256"
+        "url": "https://instagram.com/reisame.256",
+        "color": "#e1306c"
       },
       {
         "platform": "github",
         "label": "GitHub",
         "handle": "hrmcngs",
-        "url": "https://github.com/hrmcngs"
+        "url": "https://github.com/hrmcngs",
+        "color": "#7c6af7"
       }
     ]
   },
@@ -105,19 +108,24 @@
       "icon": "https://raw.githubusercontent.com/hrmcngs/RPGish-HPDisplay/1.20.1/pack.png",
       "title": "RPGish-HPDisplay",
       "desc": "RPG風HP表示、ダメージ表示データパック",
-      "url": "https://github.com/hrmcngs/RPGish-HPDisplay"
+      "url": "https://github.com/hrmcngs/RPGish-HPDisplay",
+      "url": "https://planetminecraft.com/data-pack/rpgish-hpdisplay/",
+      "color": "#3ecfcf"
     },
     {
       "icon": "https://raw.githubusercontent.com/Drowse-Lab/Drowse-Lab/main/assets/image/DrowseLabIcon.jpg",
       "title": "Drowse-Lab",
       "desc": "なんとなく作っているweb",
-      "url": "https://github.com/Drowse-Lab/Drowse-Lab"
+      "url": "https://github.com/Drowse-Lab/Drowse-Lab",
+      "color": "#7c6af7"
     },
     {
       "icon": "https://raw.githubusercontent.com/Drowse-Lab/The-four-primitives-and-Weapons/1.20.1/src/main/resources/logo.png",
       "title": "The-four-primitives-and-Weapons",
       "desc": "Drowse-Lab / Minecraft mod",
-      "url": "https://github.com/Drowse-Lab/The-four-primitives-and-Weapons"
+      "url": "https://github.com/Drowse-Lab/The-four-primitives-and-Weapons",
+      "url": "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons",
+      "color": "#f87171"
     }
   ]
 }

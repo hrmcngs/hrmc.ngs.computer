@@ -382,8 +382,8 @@ body {
 
 .link-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(255,255,255,0.18);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  border-color: color-mix(in srgb, var(--link-color, #ffffff) 30%, transparent);
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--link-color, #000000) 10%, transparent);
 }
 
 .link-card:hover .link-arrow {
@@ -395,33 +395,9 @@ body {
   opacity: 1;
 }
 
-.link-card[data-platform="x"]:hover {
-  border-color: rgba(255,255,255,0.3);
-  box-shadow: 0 8px 32px rgba(255,255,255,0.06);
-}
-
-.link-card[data-platform="x"]:hover .link-icon {
-  background: rgba(255,255,255,0.1);
-}
-
-.link-card[data-platform="instagram"]:hover {
-  border-color: rgba(225,48,108,0.4);
-  box-shadow: 0 8px 32px rgba(225,48,108,0.1);
-}
-
-.link-card[data-platform="instagram"]:hover .link-icon {
-  background: rgba(225,48,108,0.15);
-  color: #e1306c;
-}
-
-.link-card[data-platform="github"]:hover {
-  border-color: rgba(124,106,247,0.4);
-  box-shadow: 0 8px 32px rgba(124,106,247,0.12);
-}
-
-.link-card[data-platform="github"]:hover .link-icon {
-  background: rgba(124,106,247,0.15);
-  color: var(--accent);
+.link-card:hover .link-icon {
+  background: color-mix(in srgb, var(--link-color, #ffffff) 15%, transparent);
+  color: var(--link-color, inherit);
 }
 
 /* ===== Works ===== */
@@ -444,9 +420,9 @@ body {
 }
 
 .work-card:hover {
-  border-color: var(--accent2);
+  border-color: color-mix(in srgb, var(--work-color, var(--accent2)) 60%, transparent);
   transform: translateY(-4px);
-  box-shadow: 0 8px 30px rgba(62,207,207,0.12);
+  box-shadow: 0 8px 30px color-mix(in srgb, var(--work-color, var(--accent2)) 12%, transparent);
 }
 
 .work-icon {
