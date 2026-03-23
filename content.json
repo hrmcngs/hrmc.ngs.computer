@@ -10,7 +10,51 @@
   },
   "terminal": {
     "title": "reisame256@ngs: ~",
-    "prompt": "reisame256@ngs:~$"
+    "prompt": "reisame256@ngs:~$",
+    "colors": {
+      "bg":         "#0d0d10",
+      "bar":        "#1e1e28",
+      "text":       "#aaaabc",
+      "typed":      "#e8e8f0",
+      "success":    "#3ecfcf",
+      "error":      "#f87171",
+      "link":       "#7c6af7",
+      "dotRed":     "#ff5f57",
+      "dotYellow":  "#febc2e",
+      "dotGreen":   "#28c840"
+    },
+    "build": [
+      {
+        "title": "RPGish-HPDisplay",
+        "desc": "RPG風HP表示、ダメージ表示データパック",
+        "links": [
+          "https://github.com/hrmcngs/RPGish-HPDisplay",
+          "https://planetminecraft.com/data-pack/rpgish-hpdisplay/"
+        ]
+      },
+      {
+        "title": "Drowse-Lab",
+        "desc": "なんとなく作っているweb",
+        "links": [
+          "https://github.com/Drowse-Lab/Drowse-Lab"
+        ]
+      },
+      {
+        "title": "The-four-primitives-and-Weapons",
+        "desc": "Minecraft mod / Drowse-Lab",
+        "links": [
+          "https://github.com/Drowse-Lab/The-four-primitives-and-Weapons",
+          "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons"
+        ]
+      }
+    ],
+    "socialLinks": [
+      { "label": "Twitter (main)", "url": "https://x.com/reisame256" },
+      { "label": "Twitter (sub)",  "url": "https://x.com/hrmcngs" },
+      { "label": "GitHub",         "url": "https://github.com/hrmcngs" },
+      { "label": "Instagram",      "url": "https://instagram.com/reisame.256" },
+      { "label": "Drowse Lab",     "url": "https://x.com/Drowse_Lab" }
+    ]
   },
   "links": {
     "groupName": "hrmc",
