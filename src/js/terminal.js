@@ -201,29 +201,48 @@
       return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
+    // GitHub blob URL → raw URL (blob URLs don't serve images directly)
+    function ghRawUrl(url) {
+      return url.replace(
+        /github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)/,
+        'raw.githubusercontent.com/$1/$2/$3'
+      );
+    }
+
     function stripHtml(md) {
-      // ![alt](url) → <img> tag (keep as real image)
+      // [![alt](img_url)](link_url) → linked image
+      md = md.replace(/\[!\[([^\]]*)\]\(([^)]+)\)\]\(([^)]+)\)/g,
+        (_, alt, img, href) => `<a href="${href}" target="_blank" rel="noopener"><img src="${ghRawUrl(img)}" alt="${alt}" class="readme-img"></a>`);
+      // ![alt](url) → <img> tag
       md = md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,
-        '<img src="$2" alt="$1" class="readme-img">');
-      // <img> tags → keep but add class for styling
+        (_, alt, src) => `<img src="${ghRawUrl(src)}" alt="${alt}" class="readme-img">`);
+      // <a ...> ... <img ...> ... </a> (multiline) → linked image
+      md = md.replace(/<a\s+href="([^"]*)"[^>]*>[\s\S]*?<img\s[^>]*src="([^"]*)"[^>]*\/?>[\s\S]*?<\/a>/gi,
+        (_, href, src) => `<a href="${href}" target="_blank" rel="noopener"><img src="${ghRawUrl(src)}" class="readme-img"></a>`);
+      // <img> tags → normalize with class
       md = md.replace(/<img\s[^>]*src="([^"]*)"[^>]*\/?>/gi, (match, src) => {
+        if (match.includes('readme-img')) return match;
         const altMatch = match.match(/alt="([^"]*)"/i);
         const alt = altMatch ? altMatch[1] : '';
-        return `<img src="${src}" alt="${alt}" class="readme-img">`;
+        return `<img src="${ghRawUrl(src)}" alt="${alt}" class="readme-img">`;
       });
       // <a href="url">text</a> → [text](url)
-      md = md.replace(/<a\s+href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, '[$2]($1)');
+      md = md.replace(/<a\s+href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, (match, href, inner) => {
+        if (inner.includes('<img')) return match;
+        return `[${inner.trim()}](${href})`;
+      });
       // <br> → newline
       md = md.replace(/<br\s*\/?>/gi, '\n');
-      // Strip remaining HTML tags (but NOT <img>)
-      md = md.replace(/<(?!\/?img)[^>]+(>|$)/gi, '');
+      // Strip remaining HTML tags (but NOT <img> and <a> wrapping images)
+      md = md.replace(/<(?!img\s|a\s[^>]*><img|\/a>)[^>]+(>|$)/gi, '');
       return md;
     }
 
     function inlineMd(s) {
-      // Preserve <img> tags before escaping
-      const imgs = [];
-      s = s.replace(/<img\s[^>]+>/gi, m => { imgs.push(m); return `\x00IMG${imgs.length - 1}\x00`; });
+      // Preserve HTML blocks (<a><img></a> and standalone <img>) before escaping
+      const preserved = [];
+      s = s.replace(/<a\s[^>]*>\s*<img\s[^>]+>\s*<\/a>/gi, m => { preserved.push(m); return `\x00P${preserved.length - 1}\x00`; });
+      s = s.replace(/<img\s[^>]+>/gi, m => { preserved.push(m); return `\x00P${preserved.length - 1}\x00`; });
 
       s = escHtml(s);
       // Bold
@@ -240,8 +259,8 @@
       s = s.replace(/(^|[\s(])((https?:\/\/)[^\s<)]+)/g,
         '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
 
-      // Restore <img> tags
-      s = s.replace(/\x00IMG(\d+)\x00/g, (_, i) => imgs[i]);
+      // Restore preserved HTML
+      s = s.replace(/\x00P(\d+)\x00/g, (_, i) => preserved[i]);
       return s;
     }
 
