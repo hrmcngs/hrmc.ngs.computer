@@ -100,10 +100,11 @@
     let histIdx = -1;
 
     // Output lines without a prompt echo (used for async continuation like README)
-    function appendLines(lines) {
-      lines.forEach(line => {
+    function appendLines(lines, baseDelay = 0) {
+      lines.forEach((line, i) => {
         const div = document.createElement('div');
         div.className = 'term-line';
+        div.style.animationDelay = `${baseDelay + Math.min(i * 0.03, 0.45)}s`;
         const out = document.createElement('span');
         out.className = 'term-out';
         if (typeof line === 'string') {
@@ -138,7 +139,7 @@
         return;
       }
 
-      appendLines(lines);
+      appendLines(lines, 0.06);
     }
 
     // --- Markdown parser (for README display) ---
