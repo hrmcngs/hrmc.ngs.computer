@@ -31,6 +31,7 @@
         "links": [
           "https://github.com/hrmcngs/RPGish-HPDisplay",
           "https://planetminecraft.com/data-pack/rpgish-hpdisplay/"
+          "https://curseforge.com/minecraft/data-packs/r-p-g-ish-hp-display/"
         ]
       },
       {
@@ -59,7 +60,8 @@
       { "label": "Instagram",      "url": "https://instagram.com/hrmcngs" },
       { "label": "Pixiv",          "url": "https://www.pixiv.net/users/83520943" },
       { "label": "Bluesky",        "url": "https://bsky.app/profile/hrmcngs.bsky.social" },
-      { "label": "Drowse Lab",     "url": "https://x.com/Drowse_Lab" }
+      { "label": "Drowse Lab(Twitter)",     "url": "https://x.com/Drowse_Lab" },
+      { "label": "Drowse Lab (Instagram)",     "url": "https://instagram.com/drowse_lab/" }
     ]
   },
   "links": {
@@ -68,14 +70,14 @@
       {
         "platform": "x",
         "label": "X / Twitter (main)",
-        "handle": "@hrmcngs",
+        "handle": "hrmcngs",
         "url": "https://x.com/hrmcngs",
         "color": "#ffffff"
       },
       {
         "platform": "x",
         "label": "X / Twitter (sub)",
-        "handle": "@0526ngs",
+        "handle": "0526ngs",
         "url": "https://x.com/0526ngs",
         "color": "#ffffff"
       },
@@ -96,30 +98,44 @@
       {
         "platform": "instagram",
         "label": "Instagram",
-        "handle": "@0526ngs",
+        "handle": "0526ngs",
         "url": "https://instagram.com/0526ngs",
         "color": "#e1306c"
       },
       {
-        "platform": "x",
-        "label": "Drowse Lab",
-        "handle": "@Drowse_Lab",
-        "url": "https://x.com/Drowse_Lab",
-        "color": "#ffffff"
-      },
-      {
         "platform": "pixiv",
         "label": "Pixiv",
-        "handle": "83520943",
+        "handle": "hiromichi ngs",
         "url": "https://www.pixiv.net/users/83520943",
         "color": "#0096fa"
       },
       {
         "platform": "bluesky",
         "label": "Bluesky",
-        "handle": "@hrmcngs",
+        "handle": "hrmcngs",
         "url": "https://bsky.app/profile/hrmcngs.bsky.social",
         "color": "#0085ff"
+      },
+      {
+        "platform": "x",
+        "label": "Drowse Lab(X)",
+        "handle": "@Drowse_Lab",
+        "url": "https://x.com/Drowse_Lab",
+        "color": "#ffffff"
+      },
+      {
+        "platform": "instagram",
+        "label": "Drowse Lab(Instagram)",
+        "handle": "@drowse_lab",
+        "url": "https://instagram.com/drowse_lab/",
+        "color": "#e1306c"
+      },
+      {
+        "platform": "github",
+        "label": "Drowse Lab (GitHub)",
+        "handle": "Drowse-Lab",
+        "url": "https://github.com/Drowse-Lab",
+        "color": "#7c6af7"
       }
     ]
   },
