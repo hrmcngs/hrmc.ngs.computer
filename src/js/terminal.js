@@ -201,30 +201,34 @@
       return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
-    // GitHub blob URL → raw URL (blob URLs don't serve images directly)
-    function ghRawUrl(url) {
-      return url.replace(
+    // Clean markdown-escaped URL characters and convert GitHub blob → raw
+    function cleanUrl(url) {
+      // Remove backslash escapes (\& → &, \( → (, etc.)
+      url = url.replace(/\\([&()[\]#*_!])/g, '$1');
+      // GitHub blob URL → raw URL (blob URLs don't serve images)
+      url = url.replace(
         /github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)/,
         'raw.githubusercontent.com/$1/$2/$3'
       );
+      return url;
     }
 
     function stripHtml(md) {
       // [![alt](img_url)](link_url) → linked image
       md = md.replace(/\[!\[([^\]]*)\]\(([^)]+)\)\]\(([^)]+)\)/g,
-        (_, alt, img, href) => `<a href="${href}" target="_blank" rel="noopener"><img src="${ghRawUrl(img)}" alt="${alt}" class="readme-img"></a>`);
+        (_, alt, img, href) => `<a href="${href}" target="_blank" rel="noopener"><img src="${cleanUrl(img)}" alt="${alt}" class="readme-img"></a>`);
       // ![alt](url) → <img> tag
       md = md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,
-        (_, alt, src) => `<img src="${ghRawUrl(src)}" alt="${alt}" class="readme-img">`);
+        (_, alt, src) => `<img src="${cleanUrl(src)}" alt="${alt}" class="readme-img">`);
       // <a ...> ... <img ...> ... </a> (multiline) → linked image
       md = md.replace(/<a\s+href="([^"]*)"[^>]*>[\s\S]*?<img\s[^>]*src="([^"]*)"[^>]*\/?>[\s\S]*?<\/a>/gi,
-        (_, href, src) => `<a href="${href}" target="_blank" rel="noopener"><img src="${ghRawUrl(src)}" class="readme-img"></a>`);
+        (_, href, src) => `<a href="${href}" target="_blank" rel="noopener"><img src="${cleanUrl(src)}" class="readme-img"></a>`);
       // <img> tags → normalize with class
       md = md.replace(/<img\s[^>]*src="([^"]*)"[^>]*\/?>/gi, (match, src) => {
         if (match.includes('readme-img')) return match;
         const altMatch = match.match(/alt="([^"]*)"/i);
         const alt = altMatch ? altMatch[1] : '';
-        return `<img src="${ghRawUrl(src)}" alt="${alt}" class="readme-img">`;
+        return `<img src="${cleanUrl(src)}" alt="${alt}" class="readme-img">`;
       });
       // <a href="url">text</a> → [text](url)
       md = md.replace(/<a\s+href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, (match, href, inner) => {
