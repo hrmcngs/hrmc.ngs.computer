@@ -72,7 +72,14 @@ const COMMANDS = {
     // echo typed command
     const echo = document.createElement('div');
     echo.className = 'term-line';
-    echo.innerHTML = `<span class="term-prompt-echo">${PROMPT}</span><span class="term-typed">${typed}</span>`;
+    const promptSpan = document.createElement('span');
+    promptSpan.className = 'term-prompt-echo';
+    promptSpan.textContent = PROMPT;
+    const typedSpan = document.createElement('span');
+    typedSpan.className = 'term-typed';
+    typedSpan.textContent = typed;
+    echo.appendChild(promptSpan);
+    echo.appendChild(typedSpan);
     body.appendChild(echo);
 
     if (lines === '__clear__') {
