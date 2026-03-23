@@ -7,7 +7,7 @@
   <title>hrmc.ngs.computer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Noto+Sans+JP:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="src/css/style.css">
 </head>
 <body>
@@ -88,44 +88,45 @@
       <h2 class="section-title"><span class="tag">03</span> Works</h2>
       <div class="works-grid">
 
-        <a class="work-card" href="rotation.html">
-          <div class="work-icon">⟳</div>
-          <h3>回転</h3>
-          <p>三角関数で円を描く</p>
+        <a class="work-card" href="https://github.com/hrmcngs/RPGish-HPDisplay" target="_blank" rel="noopener">
+          <div class="work-icon">⚔️</div>
+          <h3>RPGish-HPDisplay</h3>
+          <p>RPG風HP表示、ダメージ表示データパック</p>
         </a>
 
-        <a class="work-card" href="pythagorean-theorem.html">
-          <div class="work-icon">△</div>
-          <h3>三平方の定理</h3>
-          <p>斜辺を求める</p>
+        <a class="work-card" href="https://github.com/Drowse-Lab/Drowse-Lab" target="_blank" rel="noopener">
+          <div class="work-icon">🌐</div>
+          <h3>Drowse-Lab</h3>
+          <p>なんとなく作っているweb</p>
         </a>
 
-        <a class="work-card" href="canvas-arc.html">
-          <div class="work-icon">◔</div>
-          <h3>円弧</h3>
-          <p>Canvasで円弧を描く</p>
-        </a>
-
-        <a class="work-card" href="3dgraphics.html">
-          <div class="work-icon">◻</div>
-          <h3>3D図形</h3>
-          <p>箱の大きさを可視化</p>
-        </a>
-
-        <a class="work-card" href="3DSolarSystem.html">
-          <div class="work-icon">🪐</div>
-          <h3>3D太陽系</h3>
-          <p>太陽系シミュレーション</p>
+        <a class="work-card" href="https://github.com/Drowse-Lab/The-four-primitives-and-Weapons" target="_blank" rel="noopener">
+          <div class="work-icon">🗡️</div>
+          <h3>The-four-primitives-and-Weapons</h3>
+          <p>Drowse-Lab / Minecraft mod</p>
         </a>
 
       </div>
 
-      <div class="omake-section">
-        <h3 class="omake-title">おまけ — Minecraft レシピジェネレーター</h3>
-        <div class="omake-list">
-          <a class="omake-link" href="miencraft-blasting-smoking-campfire-cooking-recipe.html">燻製器 / 溶鉱炉 / 焚き火</a>
-          <a class="omake-link" href="miencraft-crafting-recipe.html">クラフト</a>
-          <a class="omake-link" href="miencraft-smelting-recipe.html">精錬</a>
+    </div>
+  </section>
+
+  <!-- Terminal -->
+  <section class="section section--dark" id="terminal">
+    <div class="container">
+      <h2 class="section-title"><span class="tag">04</span> Terminal</h2>
+      <div class="term-wrap">
+        <div class="term-bar">
+          <span class="term-dot red"></span>
+          <span class="term-dot yellow"></span>
+          <span class="term-dot green"></span>
+          <span class="term-title">reisame256@ngs: ~</span>
+        </div>
+        <div class="term-body" id="term-body">
+        </div>
+        <div class="term-input-row">
+          <span class="term-prompt">reisame256@ngs:~$</span>
+          <input class="term-input" id="term-input" type="text" autocomplete="off" spellcheck="false" autofocus>
         </div>
       </div>
     </div>
@@ -140,5 +141,6 @@
   </footer>
 
   <script src="src/js/index.js"></script>
+  <script src="src/js/terminal.js"></script>
 </body>
 </html>
