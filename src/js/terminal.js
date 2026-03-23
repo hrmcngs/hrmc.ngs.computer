@@ -20,6 +20,9 @@
     const socialLinks = cfg.socialLinks ?? [];
     const PROMPT      = cfg.prompt      ?? 'reisame256@ngs:~$';
 
+    // State: whether ./build.sh has been run (enables numbered project selection)
+    let buildActive = false;
+
     const COMMANDS = {
       help: () => [
         '使えるコマンド:',
@@ -46,6 +49,7 @@
       ],
 
       './build.sh': () => {
+        buildActive = true;
         const lines = ['<span class="success">▶ Building projects...</span>', ''];
         build.forEach((p, i) => {
           const colorStyle = p.color ? ` style="color:${p.color}"` : '';
@@ -57,6 +61,8 @@
           lines.push('');
         });
         lines.push('<span class="success">Done.</span>');
+        lines.push('');
+        lines.push('<span style="opacity:0.45">番号を入力 → README を表示 &nbsp;|&nbsp; 0 → リセット</span>');
         return lines;
       },
 
@@ -93,6 +99,27 @@
     const history = [];
     let histIdx = -1;
 
+    // Output lines without a prompt echo (used for async continuation like README)
+    function appendLines(lines) {
+      lines.forEach(line => {
+        const div = document.createElement('div');
+        div.className = 'term-line';
+        const out = document.createElement('span');
+        out.className = 'term-out';
+        if (typeof line === 'string') {
+          out.innerHTML = line;
+        } else if (line && line.type === 'error') {
+          const errSpan = document.createElement('span');
+          errSpan.className = 'error';
+          errSpan.textContent = line.message;
+          out.appendChild(errSpan);
+        }
+        div.appendChild(out);
+        body.appendChild(div);
+      });
+      body.scrollTop = body.scrollHeight;
+    }
+
     function print(lines, typed) {
       const echo = document.createElement('div');
       echo.className = 'term-line';
@@ -111,33 +138,119 @@
         return;
       }
 
-      lines.forEach(line => {
-        const div = document.createElement('div');
-        div.className = 'term-line';
-        const out = document.createElement('span');
-        out.className = 'term-out';
-        if (typeof line === 'string') {
-          // Static lines may contain trusted HTML markup.
-          out.innerHTML = line;
-        } else if (line && line.type === 'error') {
-          // Render error message safely without interpreting user input as HTML.
-          const errSpan = document.createElement('span');
-          errSpan.className = 'error';
-          errSpan.textContent = line.message;
-          out.appendChild(errSpan);
-        }
-        div.appendChild(out);
-        body.appendChild(div);
-      });
-
-      body.scrollTop = body.scrollHeight;
+      appendLines(lines);
     }
+
+    // --- Markdown parser (for README display) ---
+
+    function escHtml(s) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function inlineMd(s) {
+      s = escHtml(s);
+      s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      s = s.replace(/`([^`]+)`/g,
+        '<code style="background:rgba(255,255,255,0.08);padding:0.1em 0.3em;border-radius:3px;font-family:monospace">$1</code>');
+      s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g,
+        '<a href="$2" target="_blank" rel="noopener">$1</a>');
+      return s;
+    }
+
+    function parseMarkdown(md) {
+      const rawLines = md.split('\n');
+      const out = [];
+      let inCode = false;
+
+      for (const line of rawLines) {
+        // Fenced code block toggle
+        if (line.startsWith('```')) {
+          inCode = !inCode;
+          out.push('<span style="opacity:0.3">' + (inCode ? '┌─────' : '└─────') + '</span>');
+          continue;
+        }
+        if (inCode) {
+          out.push(`<span style="font-family:monospace;opacity:0.75">${escHtml(line)}</span>`);
+          continue;
+        }
+
+        const h1 = line.match(/^# (.+)/);
+        if (h1) { out.push(`<span class="success" style="font-weight:700">${escHtml(h1[1])}</span>`); continue; }
+        const h2 = line.match(/^## (.+)/);
+        if (h2) { out.push(`<span style="color:var(--term-link)">${escHtml(h2[1])}</span>`); continue; }
+        const h3 = line.match(/^### (.+)/);
+        if (h3) { out.push(`<span style="opacity:0.8">${escHtml(h3[1])}</span>`); continue; }
+
+        // Horizontal rule
+        if (/^[-*_]{3,}$/.test(line.trim())) { out.push('<span style="opacity:0.2">──────────────────────</span>'); continue; }
+
+        // Unordered list
+        const li = line.match(/^[ \t]*[-*+] (.+)/);
+        if (li) { out.push(`  • ${inlineMd(li[1])}`); continue; }
+
+        // Ordered list
+        const ol = line.match(/^[ \t]*\d+\. (.+)/);
+        if (ol) { out.push(`  ${inlineMd(ol[0])}`); continue; }
+
+        if (!line.trim()) { out.push(''); continue; }
+
+        out.push(inlineMd(line));
+      }
+
+      return out;
+    }
+
+    // --- Fetch and display a project README ---
+
+    async function showReadme(project, cmd) {
+      print(['<span style="opacity:0.45">Loading README...</span>'], cmd);
+      if (!project.readme) {
+        appendLines([{ type: 'error', message: 'README URL が設定されていません。' }]);
+        return;
+      }
+      try {
+        const res = await fetch(project.readme);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+        const colorStyle = project.color ? ` style="color:${project.color}"` : '';
+        appendLines([
+          `<span class="term-cmd"${colorStyle}>── ${project.title} / README ──</span>`,
+          '',
+          ...parseMarkdown(text),
+          '',
+          '<span style="opacity:0.45">0 → リセット</span>',
+        ]);
+      } catch (e) {
+        appendLines([{ type: 'error', message: `README の取得に失敗しました。(${e.message})` }]);
+      }
+    }
+
+    // --- Command runner ---
 
     function run(raw) {
       const cmd = raw.trim();
       if (!cmd) return;
       history.unshift(cmd);
       histIdx = -1;
+
+      // Numbered project selection (active after ./build.sh)
+      if (buildActive && /^\d+$/.test(cmd)) {
+        const n = parseInt(cmd, 10);
+        if (n === 0) {
+          buildActive = false;
+          print(['<span style="opacity:0.45">リセットしました。</span>'], cmd);
+          return;
+        }
+        const project = build[n - 1];
+        if (project) {
+          showReadme(project, cmd);
+          return;
+        }
+        print([{ type: 'error', message: `${n}: 存在しないプロジェクト番号です。` }], cmd);
+        return;
+      }
+
       const fn = COMMANDS[cmd];
       if (fn) {
         print(fn(), cmd);
