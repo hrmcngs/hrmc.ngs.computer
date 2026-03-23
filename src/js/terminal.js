@@ -125,7 +125,16 @@ const COMMANDS = {
   // 起動時に help を表示
   print(COMMANDS.help(), 'help');
 
-  // クリックでフォーカス
+  // term-cmd クリックでコマンドを入力欄に貼り付け
+  body.addEventListener('click', e => {
+    const cmd = e.target.closest('.term-cmd');
+    if (cmd) {
+      input.value = cmd.textContent;
+      input.focus();
+      return;
+    }
+    input.focus();
+  });
+
   document.getElementById('term-wrap')?.addEventListener('click', () => input.focus());
-  body.addEventListener('click', () => input.focus());
 })();
