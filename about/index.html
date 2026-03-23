@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../image/icontestHtml.png">
+  <title>About — hrmc.ngs.computer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Noto+Sans+JP:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <!-- highlight.js -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <link rel="stylesheet" href="../src/css/style.css">
+  <style>
+    /* ===== About page extras ===== */
+    .about-page {
+      min-height: 100dvh;
+      padding: 8rem 0 6rem;
+    }
+
+    .about-page .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    /* ---- Left: profile ---- */
+    .profile-header {
+      margin-bottom: 0.4rem;
+    }
+
+    .profile-label {
+      font-family: var(--font-en);
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      color: var(--accent2);
+      margin-bottom: 0.8rem;
+    }
+
+    .profile-name {
+      font-family: var(--font-en);
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+      line-height: 1.1;
+      margin-bottom: 0.6rem;
+    }
+
+    .profile-handle {
+      font-family: var(--font-en);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      margin-bottom: 2rem;
+    }
+
+    .profile-bio {
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+
+    .profile-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .profile-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-en);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-decoration: none;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.5em 1em;
+      border-radius: 100px;
+      transition: border-color 0.3s, color 0.3s;
+    }
+
+    .profile-back:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ---- Right: code block ---- */
+    .code-wrap {
+      position: sticky;
+      top: 7rem;
+    }
+
+    .code-file {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: #161b22;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-bottom: none;
+      border-radius: 12px 12px 0 0;
+      padding: 0.7rem 1.2rem;
+      font-family: var(--font-en);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .code-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .code-dot.red    { background: #ff5f57; }
+    .code-dot.yellow { background: #febc2e; }
+    .code-dot.green  { background: #28c840; }
+
+    .hljs {
+      background: #0d1117 !important;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 0 0 12px 12px;
+      padding: 1.8rem !important;
+      font-family: 'JetBrains Mono', monospace !important;
+      font-size: 0.82rem !important;
+      line-height: 1.75 !important;
+      overflow-x: auto;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 750px) {
+      .about-page .container {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+      }
+      .code-wrap {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="noise"></div>
+
+  <section class="about-page">
+    <div class="container">
+
+      <!-- Left: profile -->
+      <div class="profile-left">
+        <p class="profile-label">// ngs.computer</p>
+        <h1 class="profile-name">hrmc</h1>
+        <p class="profile-handle">@reisame256</p>
+
+        <p class="profile-bio">
+          WebやJavaScript、図形生成、Minecraftのレシピジェネレーターなど、<br>
+          気になったものを作って遊んでいます。<br>
+          刀が好きです。
+        </p>
+
+        <div class="profile-chips">
+          <span class="chip">HTML / CSS</span>
+          <span class="chip">JavaScript</span>
+          <span class="chip">Canvas</span>
+          <span class="chip">3D Graphics</span>
+          <span class="chip">Minecraft</span>
+          <span class="chip">刀</span>
+        </div>
+
+        <a class="profile-back" href="index.html">← Back</a>
+      </div>
+
+      <!-- Right: code block -->
+      <div class="code-wrap">
+        <div class="code-file">
+          <span class="code-dot red"></span>
+          <span class="code-dot yellow"></span>
+          <span class="code-dot green"></span>
+          hrmc.js
+        </div>
+        <pre><code class="language-javascript">// profile
+
+const hrmc = {
+  name: "hrmc",
+  location: "Japan",
+  favoriteThings: [
+    "HTML / CSS",
+    "JavaScript",
+    "Canvas",
+    "3D Graphics",
+    "刀",
+  ],
+  works: [
+    "回転",
+    "三平方の定理",
+    "円弧",
+    "3D図形",
+    "3D太陽系",
+    "Minecraftレシピジェネレーター",
+  ],
+};
+
+// log
+
+const log = {
+  // ここに年表を書く
+};
+</code></pre>
+      </div>
+
+    </div>
+  </section>
+
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

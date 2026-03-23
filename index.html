@@ -1,75 +1,144 @@
+<!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="utf-8">
-    <link rel="icon" type="image/x-icon" href="image/icontestHtml.png"> 
-    <title>iroiroweb</title>
-    <link rel="stylesheet" type="text/css" href="styles.css"/>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
-  </head>
-  <body id="index">
-     <script>
-       window.onload = function() {
-           document.getElementById('index').style.backgroundImage = "url('./image/zukei_background.jpg')";
-       };
-   </script>
-    <header>
-        <div class="logo">
-        <a href="index.html"><img src="./image/zukeiapplogo.png" alt=
-        "iroiroweb" width="200">
-        </a>
-        </div>
-        <nav>
-        <!-- 画像をクリックするとツイッターに飛ぶリンク -->
-         <div class="link">
-  <a id="twitterLink" href="https://x.com/reisame256" target="_blank">
-      <img src="image/iconTwitterhrmcngsHtml.png" alt="Twitter Link Image" width="100">
-    </a>
-    <a id="twitterLink" href="https://Instagram.com/reisame.256" target="_blank">
-      <img src="image/iconInstagramhrmcngsHtml.png" alt="Instagram Link Image" width="100">
-    </a>
-    <a id="twitterLink" href="https://github.com/hrmcngs" target="_blank">
-      <img src="image/iconGithubhrmcngsHtml.png" alt="Github Link Image" width="100">
-    </a>
-    <a id="twitterLink" href="https://x.com/RenkonUmauma65" target="_blank">
-      <img src="image/iconTwitterrenkonHtml.png" alt="Twitter Link Image" width="100">
-    </a>
-    <a id="twitterLink" href="https://github.com/Renkon65" target="_blank">
-      <img src="image/iconGithubrenkonHtml.png" alt="github Link Image" width="100">
-    </a>
-        </div>
-        <div class="global-nav">
-        <ul>
-            <li><a class="button" href="rotation.html">回転</a></li>
-            <li><a class="button" href="pythagorean-theorem.html">三平方の定理</a></li>
-            <li><a class="button" href="canvas-arc.html">円弧</a></li>
-            <li><a class="button" href="3dgraphics.html">3D図形</a></li>
-        </ul>
-        </div>
-        </div>
-        </nav>
-    </header>
-    <div class="wrap">
-    <div class="content">
-    <h1>Hello world.</h1>
-    <p class="content_inside"><nobr>こちらは、</nobr><wbr><nobr>図形生成アプリです。</nobr><wbr><nobr>三角関数で円を</nobr><<wbr>nobr>表示するもよし、</nobr><wbr><nobr>円弧で遊ぶのもよし、</nobr><wbr>
-      <nobr>3D図形で箱の大体の</nobr><wbr><nobr>大きさを見てみたり</nobr><wbr><nobr>三平方の定理の斜辺</nobr><wbr><nobr>を求めてみるのもよし、</nobr><wbr><nobr>下にあるおまけで</nobr><wbr><nobr>色々生成して遊んでもよし、</nobr>
-      <wbr><nobr>自由に使っていってください。</nobr><wbr><nobr>また何かありましたら、</nobr><wbr><nobr>上のSNSの方でご連絡ください。</nobr>
-    </p>
-  </div>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="image/icontestHtml.png">
+  <title>hrmc.ngs.computer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/css/style.css">
+</head>
+<body>
+
+  <!-- ノイズオーバーレイ -->
+  <div class="noise"></div>
+
+  <!-- ヒーロー -->
+  <section class="hero">
+    <div class="hero-bg">
+      <img src="image/zukei_background.jpg" alt="" class="hero-bg-img">
+      <div class="hero-overlay"></div>
     </div>
-        <div class="omake">
-          <h2>おまけ</h2>
-          <ul>
-            <li><a class="button" href="miencraft-blasting-smoking-campfire-cooking-recipe.html">マイクラ | 燻製器-溶鉱炉-焚き火 レシピ生成</a></li>
-            <li><a class="button" href="miencraft-crafting-recipe.html">マイクラ | クラフト レシピ生成</a></li>
-            <li><a class="button" href="miencraft-smelting-recipe.html">マイクラ | 精錬 レシピ生成</a></li>
-          </ul>
+
+    <div class="hero-content">
+      <p class="hero-tag">// ngs.computer</p>
+      <h1 class="hero-title">hrmc</h1>
+      <p class="hero-sub">Web・図形・ゲーム・刀</p>
+      <a href="#about" class="scroll-btn">
+        <span>scroll</span>
+        <svg width="16" height="24" viewBox="0 0 16 24"><path d="M8 0v20M1 13l7 7 7-7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+  </section>
+
+  <!-- About -->
+  <section class="section" id="about">
+    <div class="container">
+      <h2 class="section-title"><span class="tag">01</span> About</h2>
+      <div class="about-grid">
+        <div class="about-text">
+          <p>はじめまして、<strong>hrmc</strong> です。</p>
+          <p>WebやJavaScript、図形生成、Minecraftのレシピジェネレーターなど、気になったものを作って遊んでいます。</p>
+          <p>刀が好きです。</p>
+          <div class="tags">
+            <span class="chip">HTML / CSS</span>
+            <span class="chip">JavaScript</span>
+            <span class="chip">Canvas</span>
+            <span class="chip">3D Graphics</span>
+            <span class="chip">Minecraft</span>
+          </div>
         </div>
-    <footer><small>2024年9月9日現在最新版</small></footer>
-  </body>
+        <a href="/about" class="about-more">About me →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Links -->
+  <section class="section section--dark" id="links">
+    <div class="container">
+      <h2 class="section-title"><span class="tag">02</span> Links</h2>
+
+      <div class="links-group">
+        <h3 class="links-name">hrmc</h3>
+        <div class="links-row">
+          <a class="link-card" href="https://x.com/reisame256" target="_blank" rel="noopener">
+            <img src="image/iconTwitterhrmcngsHtml.png" alt="Twitter / X">
+            <span>@reisame256</span>
+          </a>
+          <a class="link-card" href="https://instagram.com/reisame.256" target="_blank" rel="noopener">
+            <img src="image/iconInstagramhrmcngsHtml.png" alt="Instagram">
+            <span>reisame.256</span>
+          </a>
+          <a class="link-card" href="https://github.com/hrmcngs" target="_blank" rel="noopener">
+            <img src="image/iconGithubhrmcngsHtml.png" alt="GitHub">
+            <span>hrmcngs</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Works -->
+  <section class="section" id="works">
+    <div class="container">
+      <h2 class="section-title"><span class="tag">03</span> Works</h2>
+      <div class="works-grid">
+
+        <a class="work-card" href="rotation.html">
+          <div class="work-icon">⟳</div>
+          <h3>回転</h3>
+          <p>三角関数で円を描く</p>
+        </a>
+
+        <a class="work-card" href="pythagorean-theorem.html">
+          <div class="work-icon">△</div>
+          <h3>三平方の定理</h3>
+          <p>斜辺を求める</p>
+        </a>
+
+        <a class="work-card" href="canvas-arc.html">
+          <div class="work-icon">◔</div>
+          <h3>円弧</h3>
+          <p>Canvasで円弧を描く</p>
+        </a>
+
+        <a class="work-card" href="3dgraphics.html">
+          <div class="work-icon">◻</div>
+          <h3>3D図形</h3>
+          <p>箱の大きさを可視化</p>
+        </a>
+
+        <a class="work-card" href="3DSolarSystem.html">
+          <div class="work-icon">🪐</div>
+          <h3>3D太陽系</h3>
+          <p>太陽系シミュレーション</p>
+        </a>
+
+      </div>
+
+      <div class="omake-section">
+        <h3 class="omake-title">おまけ — Minecraft レシピジェネレーター</h3>
+        <div class="omake-list">
+          <a class="omake-link" href="miencraft-blasting-smoking-campfire-cooking-recipe.html">燻製器 / 溶鉱炉 / 焚き火</a>
+          <a class="omake-link" href="miencraft-crafting-recipe.html">クラフト</a>
+          <a class="omake-link" href="miencraft-smelting-recipe.html">精錬</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p class="footer-logo">hrmc.ngs.computer</p>
+      <p class="footer-copy">&copy; 2024 hrmc — All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="src/js/index.js"></script>
+</body>
 </html>
-
-
