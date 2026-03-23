@@ -48,7 +48,8 @@
       './build.sh': () => {
         const lines = ['<span class="success">▶ Building projects...</span>', ''];
         build.forEach((p, i) => {
-          lines.push(`<span class="term-cmd">[${i + 1}] ${p.title}</span>`);
+          const colorStyle = p.color ? ` style="color:${p.color}"` : '';
+          lines.push(`<span class="term-cmd"${colorStyle}>[${i + 1}] ${p.title}</span>`);
           lines.push(`    ${p.desc}`);
           (p.links ?? []).forEach(url => {
             lines.push(`    → <a href="${url}" target="_blank" rel="noopener">${url}</a>`);

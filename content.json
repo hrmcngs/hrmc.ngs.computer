@@ -27,6 +27,7 @@
       {
         "title": "RPGish-HPDisplay",
         "desc": "RPG風HP表示、ダメージ表示データパック",
+        "color": "#3ecfcf",
         "links": [
           "https://github.com/hrmcngs/RPGish-HPDisplay",
           "https://planetminecraft.com/data-pack/rpgish-hpdisplay/"
@@ -35,6 +36,7 @@
       {
         "title": "Drowse-Lab",
         "desc": "なんとなく作っているweb",
+        "color": "#7c6af7",
         "links": [
           "https://github.com/Drowse-Lab/Drowse-Lab"
         ]
@@ -42,6 +44,7 @@
       {
         "title": "The-four-primitives-and-Weapons",
         "desc": "Minecraft mod / Drowse-Lab",
+        "color": "#f87171",
         "links": [
           "https://github.com/Drowse-Lab/The-four-primitives-and-Weapons",
           "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons"
@@ -109,7 +112,6 @@
       "title": "RPGish-HPDisplay",
       "desc": "RPG風HP表示、ダメージ表示データパック",
       "url": "https://github.com/hrmcngs/RPGish-HPDisplay",
-      "url": "https://planetminecraft.com/data-pack/rpgish-hpdisplay/",
       "color": "#3ecfcf"
     },
     {
@@ -124,7 +126,6 @@
       "title": "The-four-primitives-and-Weapons",
       "desc": "Drowse-Lab / Minecraft mod",
       "url": "https://github.com/Drowse-Lab/The-four-primitives-and-Weapons",
-      "url": "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons",
       "color": "#f87171"
     }
   ]
