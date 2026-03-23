@@ -53,10 +53,12 @@
       }
     ],
     "socialLinks": [
-      { "label": "Twitter (main)", "url": "https://x.com/reisame256" },
-      { "label": "Twitter (sub)",  "url": "https://x.com/hrmcngs" },
+      { "label": "Twitter (main)", "url": "https://x.com/hrmcngs" },
+      { "label": "Twitter (sub)",  "url": "https://x.com/0526ngs" },
       { "label": "GitHub",         "url": "https://github.com/hrmcngs" },
-      { "label": "Instagram",      "url": "https://instagram.com/reisame.256" },
+      { "label": "Instagram",      "url": "https://instagram.com/hrmcngs" },
+      { "label": "Pixiv",          "url": "https://www.pixiv.net/users/83520943" },
+      { "label": "Bluesky",        "url": "https://bsky.app/profile/hrmcngs.bsky.social" },
       { "label": "Drowse Lab",     "url": "https://x.com/Drowse_Lab" }
     ]
   },
