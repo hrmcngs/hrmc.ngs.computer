@@ -85,7 +85,16 @@ const COMMANDS = {
       div.className = 'term-line';
       const out = document.createElement('span');
       out.className = 'term-out';
-      out.innerHTML = line;
+      if (typeof line === 'string') {
+        // Static lines may contain trusted HTML markup.
+        out.innerHTML = line;
+      } else if (line && line.type === 'error') {
+        // Render error message safely without interpreting user input as HTML.
+        const errSpan = document.createElement('span');
+        errSpan.className = 'error';
+        errSpan.textContent = line.message;
+        out.appendChild(errSpan);
+      }
       div.appendChild(out);
       body.appendChild(div);
     });
@@ -104,7 +113,7 @@ const COMMANDS = {
     if (fn) {
       print(fn(), cmd);
     } else {
-      print([`<span class="error">command not found: ${cmd}</span>`], cmd);
+      print([{ type: 'error', message: `command not found: ${cmd}` }], cmd);
     }
   }
 
