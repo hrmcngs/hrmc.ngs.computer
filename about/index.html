@@ -305,12 +305,88 @@
 
     /* ===== Responsive ===== */
     @media (max-width: 750px) {
+      .about-page {
+        padding: 4rem 0 3rem;
+      }
+
       .about-page .container {
         grid-template-columns: 1fr;
-        gap: 2.5rem;
+        gap: 2rem;
+        padding: 0 1.2rem;
       }
+
+      .about-page::before {
+        width: 300px;
+        height: 300px;
+        top: -60px;
+        left: -80px;
+      }
+      .about-page::after {
+        width: 250px;
+        height: 250px;
+      }
+
+      .profile-name {
+        font-size: clamp(1.8rem, 8vw, 2.6rem);
+      }
+
+      .profile-handle {
+        font-size: 0.8rem;
+        margin-bottom: 1.4rem;
+      }
+
+      .profile-bio {
+        font-size: 0.9rem;
+        line-height: 1.7;
+        margin-bottom: 1.4rem;
+      }
+
+      .profile-chips {
+        gap: 0.4rem;
+        margin-bottom: 1.8rem;
+      }
+
+      .profile-chips .chip {
+        font-size: 0.68rem;
+        padding: 0.25em 0.7em;
+      }
+
+      .edu-item {
+        font-size: 0.75rem;
+        gap: 0.5rem;
+      }
+
+      .edu-date {
+        font-size: 0.68rem;
+        min-width: 4.5rem;
+      }
+
+      .info-birthday {
+        font-size: 0.78rem;
+      }
+
       .code-wrap {
         position: static;
+      }
+
+      .code-file {
+        padding: 0.5rem 0.9rem;
+        font-size: 0.68rem;
+      }
+
+      .code-dot {
+        width: 8px;
+        height: 8px;
+      }
+
+      .hljs {
+        padding: 1.2rem !important;
+        font-size: 0.7rem !important;
+        line-height: 1.6 !important;
+      }
+
+      .profile-back {
+        font-size: 0.75rem;
       }
     }
 
