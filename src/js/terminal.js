@@ -292,8 +292,14 @@
     async function fetchReadme(project){
       if(project.readme){const r=await fetch(project.readme);if(r.ok)return r.text();}
       const gh=parseGithubUrl(project.links);if(!gh)throw new Error('GitHub リポジトリが見つかりません');
-      const r=await fetch(`https://api.github.com/repos/${gh.owner}/${gh.repo}/readme`,{headers:{Accept:'application/vnd.github.raw'}});
-      if(!r.ok)throw new Error(`HTTP ${r.status}`);return r.text();
+      // API を使わず raw.githubusercontent.com から直接取得（レート制限なし）
+      for(const branch of ['main','master','1.20.1','1.21']){
+        try{
+          const r=await fetch(`https://raw.githubusercontent.com/${gh.owner}/${gh.repo}/${branch}/README.md`);
+          if(r.ok)return r.text();
+        }catch{}
+      }
+      throw new Error('README が見つかりませんでした');
     }
     async function showReadme(project,cmd){
       if(!hasGithubLink(project)&&!project.readme){print([{type:'error',message:`${project.title}: README が見つかりません。`}],cmd);return;}
