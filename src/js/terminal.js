@@ -20,20 +20,26 @@
     const socialLinks = cfg.socialLinks ?? [];
     const PROMPT      = cfg.prompt      ?? 'hrmc@ngs:~$';
 
-    // State
-    let buildActive = false;
-    let activeViewer = null;
+    // ── State ──────────────────────────────────────────
+    let buildActive    = false;
+    let activeViewer   = null;
+    let userCountState = null;
+    // userCountState: null
+    //   | { step: 'input' }
+    //   | { step: 'token', username, year, month }
 
+    // ── Commands ───────────────────────────────────────
     const COMMANDS = {
       help: () => [
         '使えるコマンド:',
-        '  <span class="term-cmd">help</span>          このヘルプを表示',
-        '  <span class="term-cmd">whoami</span>        自己紹介',
-        '  <span class="term-cmd">ls</span>            作ったものを一覧表示',
-        '  <span class="term-cmd">./build.sh</span>    プロジェクト詳細を表示',
-        '  <span class="term-cmd">./about.sh</span>    プロフィールを表示',
-        '  <span class="term-cmd">cat links.txt</span> リンク一覧',
-        '  <span class="term-cmd">clear</span>         ターミナルをクリア',
+        '  <span class="term-cmd">help</span>               このヘルプを表示',
+        '  <span class="term-cmd">whoami</span>             自己紹介',
+        '  <span class="term-cmd">ls</span>                 作ったものを一覧表示',
+        '  <span class="term-cmd">./build.sh</span>         プロジェクト詳細を表示',
+        '  <span class="term-cmd">./about.sh</span>         プロフィールを表示',
+        '  <span class="term-cmd">./user-count.sh</span>    GitHub PR・コミット数を集計',
+        '  <span class="term-cmd">cat links.txt</span>      リンク一覧',
+        '  <span class="term-cmd">clear</span>              ターミナルをクリア',
       ],
 
       whoami: () => {
@@ -41,23 +47,19 @@
         if (profile.name) lines.push(`${profile.name} / ${(profile.handle ?? '').replace(/^@/, '')}`);
         (profile.bio ?? []).forEach(b => lines.push(b));
         const allowedXHosts = new Set([
-          'x.com',
-          'www.x.com',
-          'twitter.com',
-          'www.twitter.com',
-          'mobile.twitter.com'
+          'x.com', 'www.x.com', 'twitter.com', 'www.twitter.com', 'mobile.twitter.com'
         ]);
         const accounts = socialLinks.filter(l => {
           if (!l || !l.url) return false;
           try {
             const u = new URL(l.url, window.location.origin);
             return allowedXHosts.has(u.hostname);
-          } catch (e) {
-            return false;
-          }
+          } catch { return false; }
         });
         if (accounts.length) {
-          lines.push(accounts.map(l => `<a href="${l.url}" target="_blank" rel="noopener">@${l.url.split('/').pop()}</a>`).join(' · '));
+          lines.push(accounts.map(l =>
+            `<a href="${l.url}" target="_blank" rel="noopener">@${l.url.split('/').pop()}</a>`
+          ).join(' · '));
         }
         return lines;
       },
@@ -81,8 +83,6 @@
           lines.push('');
         });
         lines.push('<span class="success">Done.</span>');
-        lines.push('');
-        // lines.push('<span style="opacity:0.45">◆ のある番号を入力 → README を表示 &nbsp;|&nbsp; 0 → リセット</span>');
         return lines;
       },
 
@@ -109,40 +109,26 @@
         });
       },
 
+      // ── ./user-count.sh ─────────────────────────────
+      './user-count.sh': () => {
+        userCountState = { step: 'input' };
+        return [
+          '<span class="success">▶ GitHub Contribution Counter</span>',
+          '',
+          '  書式: <span class="term-cmd">ユーザーID [年 月]</span>',
+          '  例:   <span style="opacity:0.7">hrmcngs</span>',
+          '  例:   <span style="opacity:0.7">hrmcngs 2024 05</span>',
+          '',
+          '<span style="opacity:0.45">キャンセル: ./stop</span>',
+          '',
+          'ユーザーID を入力してください:',
+        ];
+      },
+
       clear: () => '__clear__',
     };
 
-    // GitHub URL からリポジトリの owner/repo を抽出
-    function parseGithubUrl(links) {
-      for (const url of (links ?? [])) {
-        const m = url.match(/github\.com\/([^/]+)\/([^/]+)/);
-        if (m) return { owner: m[1], repo: m[2] };
-      }
-      return null;
-    }
-
-    function hasGithubLink(project) {
-      return !!parseGithubUrl(project.links);
-    }
-
-    // GitHub API で README の raw content を取得
-    async function fetchReadme(project) {
-      // 明示的な readme URL があればそれを使う
-      if (project.readme) {
-        const res = await fetch(project.readme);
-        if (res.ok) return res.text();
-      }
-      // GitHub リポジトリから自動取得
-      const gh = parseGithubUrl(project.links);
-      if (!gh) throw new Error('GitHub リポジトリが見つかりません');
-      const res = await fetch(`https://api.github.com/repos/${gh.owner}/${gh.repo}/readme`, {
-        headers: { 'Accept': 'application/vnd.github.raw' },
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.text();
-    }
-
-    // chip → build の tags から自動マッチングでコマンド登録
+    // chip → build tags から自動マッチング
     (profile.chips ?? []).forEach(chip => {
       COMMANDS[chip] = () => {
         const chipLower = chip.toLowerCase();
@@ -165,6 +151,7 @@
       };
     });
 
+    // ── DOM refs ───────────────────────────────────────
     const wrap  = document.getElementById('term-wrap');
     const body  = document.getElementById('term-body');
     const input = document.getElementById('term-input');
@@ -173,7 +160,7 @@
     const history = [];
     let histIdx = -1;
 
-    // Output lines
+    // ── Output helpers ─────────────────────────────────
     function appendLines(lines, container, baseDelay = 0) {
       lines.forEach((line, i) => {
         const div = document.createElement('div');
@@ -195,6 +182,10 @@
       container.scrollTop = container.scrollHeight;
     }
 
+    function appendLine(html) {
+      appendLines([html], body, 0);
+    }
+
     function print(lines, typed) {
       const echo = document.createElement('div');
       echo.className = 'term-line';
@@ -212,21 +203,158 @@
         body.innerHTML = '';
         return;
       }
-
       appendLines(lines, body, 0.06);
     }
 
-    // --- Markdown parser ---
+    // ── user-count ─────────────────────────────────────
+    function handleUserCountInput(raw) {
+      const parts = raw.trim().split(/\s+/).filter(Boolean);
+      if (!parts.length) {
+        print(['<span class="error">ユーザーID を入力してください。</span>', 'ユーザーID を入力してください:'], raw);
+        return;
+      }
 
+      const username = parts[0];
+      const year     = parts[1] ?? '';
+      const month    = parts[2] ? parts[2].padStart(2, '0') : '';
+
+      if (year && !month) {
+        print([
+          '<span class="error">月も指定してください (例: 2024 05)</span>',
+          'ユーザーID [年 月] を入力してください:',
+        ], raw);
+        return;
+      }
+
+      userCountState = { step: 'token', username, year, month };
+      print([
+        `対象: <strong>${username}</strong> / ${year && month ? `${year}年${month}月` : '全期間'}`,
+        '',
+        'GitHub Token を入力してください (Enterでスキップ / API制限を避けるため推奨):',
+      ], raw);
+    }
+
+    async function runUserCount(username, year, month, token) {
+      const headers = token ? { Authorization: `token ${token}` } : {};
+
+      let since = '', until = '', createdQ = '';
+      if (year && month) {
+        since    = `${year}-${month}-01T00:00:00Z`;
+        const em = month === '12' ? '01' : String(Number(month) + 1).padStart(2, '0');
+        const ey = month === '12' ? String(Number(year) + 1) : year;
+        until    = `${ey}-${em}-01T00:00:00Z`;
+        createdQ = `+created:${since.slice(0, 10)}..${until.slice(0, 10)}`;
+      }
+
+      const periodLabel = year && month ? `${year}年${month}月` : '全期間';
+
+      appendLines([
+        '',
+        `<span class="success">▶ 集計開始</span>  <span style="opacity:0.6">${username} / ${periodLabel}</span>`,
+        '<span style="opacity:0.3">────────────────────────────────────</span>',
+      ], body);
+
+      // ── PR 数 ──────────────────────────────────────
+      appendLine('<span style="opacity:0.4">Pull Requests を取得中...</span>');
+      let prCount = 0;
+      try {
+        const res  = await fetch(
+          `https://api.github.com/search/issues?q=type:pr+author:${encodeURIComponent(username)}${createdQ}`,
+          { headers }
+        );
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        prCount    = data.total_count ?? 0;
+        body.lastChild?.remove(); // remove "取得中..." line
+        appendLine(`  Pull Requests : <span class="success" style="font-weight:700">${prCount}</span>`);
+      } catch (e) {
+        body.lastChild?.remove();
+        appendLine(`<span class="error">  PR取得エラー: ${e.message}</span>`);
+      }
+
+      // ── コミット数 ─────────────────────────────────
+      appendLine('<span style="opacity:0.4">コミット数を集計中 (リポジトリ数によっては少し時間がかかります)...</span>');
+      let commitCount = 0;
+      let repoCount   = 0;
+      let rateLimited = false;
+
+      try {
+        let page = 1, hasNext = true;
+
+        while (hasNext) {
+          const repoRes = await fetch(
+            `https://api.github.com/users/${encodeURIComponent(username)}/repos?per_page=100&page=${page}`,
+            { headers }
+          );
+          if (!repoRes.ok) throw new Error(`HTTP ${repoRes.status}`);
+          const repos = await repoRes.json();
+          if (!Array.isArray(repos) || !repos.length) break;
+
+          for (const repo of repos) {
+            repoCount++;
+            // progress update (every 5 repos)
+            if (repoCount % 5 === 0) {
+              const last = body.lastChild;
+              if (last?.textContent?.includes('集計中')) {
+                last.querySelector('.term-out').innerHTML =
+                  `<span style="opacity:0.4">コミット数を集計中... (${repoCount} repos / ${commitCount} commits)</span>`;
+              }
+            }
+
+            let cPage = 1, cHasNext = true;
+            while (cHasNext) {
+              let url = `https://api.github.com/repos/${repo.owner.login}/${repo.name}/commits`
+                + `?author=${encodeURIComponent(username)}&per_page=100&page=${cPage}`;
+              if (since) url += `&since=${since}`;
+              if (until) url += `&until=${until}`;
+              const cRes = await fetch(url, { headers });
+              if (cRes.status === 409) break; // empty repo
+              if (cRes.status === 403) { rateLimited = true; break; }
+              if (!cRes.ok) break;
+              const commits = await cRes.json();
+              if (!Array.isArray(commits) || !commits.length) break;
+              commitCount += commits.length;
+              cHasNext     = commits.length === 100;
+              cPage++;
+            }
+            if (rateLimited) break;
+          }
+
+          hasNext = repos.length === 100;
+          page++;
+          if (rateLimited) break;
+        }
+
+        body.lastChild?.remove();
+        appendLine(`  Commits       : <span class="success" style="font-weight:700">${commitCount}</span>`
+          + `  <span style="opacity:0.4">(${repoCount} repos checked)</span>`);
+        if (rateLimited) {
+          appendLine('<span class="error">  ⚠ API レート制限に達しました。Token を指定すると制限が緩和されます。</span>');
+        }
+      } catch (e) {
+        body.lastChild?.remove();
+        appendLine(`<span class="error">  コミット取得エラー: ${e.message}</span>`);
+      }
+
+      // ── 結果サマリ ─────────────────────────────────
+      appendLines([
+        '',
+        '<span style="opacity:0.3">────────────────────────────────────</span>',
+        `<span class="success">完了!</span>  `
+          + `<strong>${username}</strong> / ${periodLabel}  `
+          + `PR: <span class="success">${prCount}</span>  `
+          + `Commits: <span class="success">${commitCount}</span>`,
+        '',
+      ], body);
+    }
+
+    // ── Markdown parser ────────────────────────────────
     function escHtml(s) {
       return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
-    // Clean markdown-escaped URL characters and convert GitHub blob → raw
     function cleanUrl(url) {
-      // Remove backslash escapes (\& → &, \( → (, etc.)
       url = url.replace(/\\([&()[\]#*_!])/g, '$1');
-      // GitHub blob URL → raw URL (blob URLs don't serve images)
       url = url.replace(
         /github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)/,
         'raw.githubusercontent.com/$1/$2/$3'
@@ -235,104 +363,74 @@
     }
 
     function stripHtml(md) {
-      // [![alt](img_url)](link_url) → linked image
       md = md.replace(/\[!\[([^\]]*)\]\(([^)]+)\)\]\(([^)]+)\)/g,
         (_, alt, img, href) => `<a href="${href}" target="_blank" rel="noopener"><img src="${cleanUrl(img)}" alt="${alt}" class="readme-img"></a>`);
-      // ![alt](url) → <img> tag
       md = md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,
         (_, alt, src) => `<img src="${cleanUrl(src)}" alt="${alt}" class="readme-img">`);
-      // <a ...> ... <img ...> ... </a> (multiline) → linked image
       md = md.replace(/<a\s+href="([^"]*)"[^>]*>[\s\S]*?<img\s[^>]*src="([^"]*)"[^>]*\/?>[\s\S]*?<\/a>/gi,
         (_, href, src) => `<a href="${href}" target="_blank" rel="noopener"><img src="${cleanUrl(src)}" class="readme-img"></a>`);
-      // <img> tags → normalize with class
       md = md.replace(/<img\s[^>]*src="([^"]*)"[^>]*\/?>/gi, (match, src) => {
         if (match.includes('readme-img')) return match;
         const altMatch = match.match(/alt="([^"]*)"/i);
         const alt = altMatch ? altMatch[1] : '';
         return `<img src="${cleanUrl(src)}" alt="${alt}" class="readme-img">`;
       });
-      // <a href="url">text</a> → [text](url)
       md = md.replace(/<a\s+href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, (match, href, inner) => {
         if (inner.includes('<img')) return match;
         return `[${inner.trim()}](${href})`;
       });
-      // <br> → newline
       md = md.replace(/<br\s*\/?>/gi, '\n');
-      // Strip remaining HTML tags (but NOT <img> and <a> wrapping images)
       md = md.replace(/<(?!img\s|a\s[^>]*><img|\/a>)[^>]+(>|$)/gi, '');
       return md;
     }
 
     function inlineMd(s) {
-      // Preserve HTML blocks (<a><img></a> and standalone <img>) before escaping
       const preserved = [];
       s = s.replace(/<a\s[^>]*>\s*<img\s[^>]+>\s*<\/a>/gi, m => { preserved.push(m); return `\x00P${preserved.length - 1}\x00`; });
       s = s.replace(/<img\s[^>]+>/gi, m => { preserved.push(m); return `\x00P${preserved.length - 1}\x00`; });
-
       s = escHtml(s);
-      // Bold
       s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-      // Italic
       s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
-      // Inline code
       s = s.replace(/`([^`]+)`/g,
         '<code style="background:rgba(255,255,255,0.08);padding:0.1em 0.3em;border-radius:3px">$1</code>');
-      // [text](url)
       s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g,
         '<a href="$2" target="_blank" rel="noopener">$1</a>');
-      // Auto-link bare URLs
       s = s.replace(/(^|[\s(])((https?:\/\/)[^\s<)]+)/g,
         '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
-
-      // Restore preserved HTML
       s = s.replace(/\x00P(\d+)\x00/g, (_, i) => preserved[i]);
       return s;
     }
 
     function parseMarkdown(md) {
-      // Pre-process: convert HTML to markdown-compatible text
       md = stripHtml(md);
-
       const rawLines = md.split('\n');
       const out = [];
       let inCode = false;
-
       for (const line of rawLines) {
         if (line.startsWith('```')) {
           inCode = !inCode;
           out.push('<span style="opacity:0.3">' + (inCode ? '┌─────' : '└─────') + '</span>');
           continue;
         }
-        if (inCode) {
-          out.push(`<span style="font-family:monospace;opacity:0.75">${escHtml(line)}</span>`);
-          continue;
-        }
-
+        if (inCode) { out.push(`<span style="font-family:monospace;opacity:0.75">${escHtml(line)}</span>`); continue; }
         const h1 = line.match(/^# (.+)/);
         if (h1) { out.push(''); out.push(`<span class="success" style="font-weight:700;font-size:1.1em">${inlineMd(h1[1])}</span>`); out.push('<span style="opacity:0.15">════════════════════════════</span>'); continue; }
         const h2 = line.match(/^## (.+)/);
         if (h2) { out.push(''); out.push(`<span style="color:var(--term-link);font-weight:600">${inlineMd(h2[1])}</span>`); out.push('<span style="opacity:0.12">────────────────────────</span>'); continue; }
         const h3 = line.match(/^### (.+)/);
         if (h3) { out.push(''); out.push(`<span style="color:var(--accent);opacity:0.9">${inlineMd(h3[1])}</span>`); continue; }
-
         if (/^[-*_]{3,}$/.test(line.trim())) { out.push('<span style="opacity:0.15">──────────────────────</span>'); continue; }
-
         const li = line.match(/^[ \t]*[-*+] (.+)/);
         if (li) { out.push(`  • ${inlineMd(li[1])}`); continue; }
-
         const ol = line.match(/^[ \t]*(\d+)\. (.+)/);
         if (ol) { out.push(`  ${ol[1]}. ${inlineMd(ol[2])}`); continue; }
-
         if (!line.trim()) { out.push(''); continue; }
-
         out.push(inlineMd(line));
       }
-
       return out;
     }
 
-    // --- README Viewer (terminal-style inline) ---
-
+    // ── README Viewer ──────────────────────────────────
     let savedBodyContent = null;
 
     function closeViewer() {
@@ -344,16 +442,38 @@
       input.focus();
     }
 
+    function parseGithubUrl(links) {
+      for (const url of (links ?? [])) {
+        const m = url.match(/github\.com\/([^/]+)\/([^/]+)/);
+        if (m) return { owner: m[1], repo: m[2] };
+      }
+      return null;
+    }
+
+    function hasGithubLink(project) {
+      return !!parseGithubUrl(project.links);
+    }
+
+    async function fetchReadme(project) {
+      if (project.readme) {
+        const res = await fetch(project.readme);
+        if (res.ok) return res.text();
+      }
+      const gh = parseGithubUrl(project.links);
+      if (!gh) throw new Error('GitHub リポジトリが見つかりません');
+      const res = await fetch(`https://api.github.com/repos/${gh.owner}/${gh.repo}/readme`, {
+        headers: { Accept: 'application/vnd.github.raw' },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.text();
+    }
+
     async function showReadme(project, cmd) {
       if (!hasGithubLink(project) && !project.readme) {
         print([{ type: 'error', message: `${project.title}: README が見つかりません。` }], cmd);
         return;
       }
-
-      // Save current terminal content
       savedBodyContent = body.innerHTML;
-
-      // Clear body and show README header
       body.innerHTML = '';
       const pColor = project.color || 'var(--accent)';
       appendLines([
@@ -362,18 +482,13 @@
         '<span style="opacity:0.3">════════════════════════════════════════</span>',
         '',
       ], body);
-
-      // Loading
       const loadingDiv = document.createElement('div');
       loadingDiv.className = 'term-line';
       loadingDiv.innerHTML = '<span class="term-out" style="opacity:0.35">fetching...</span>';
       body.appendChild(loadingDiv);
-
       activeViewer = true;
-
-      // Fetch and render
       try {
-        const text = await fetchReadme(project);
+        const text  = await fetchReadme(project);
         loadingDiv.remove();
         const lines = parseMarkdown(text);
         appendLines([
@@ -388,37 +503,56 @@
       }
     }
 
-    // --- Command runner ---
-
+    // ── Command runner ─────────────────────────────────
     function run(raw) {
       const cmd = raw.trim();
       if (!cmd) return;
       history.unshift(cmd);
       histIdx = -1;
 
-      // Close viewer with ./stop or 0
-      if (activeViewer && (cmd === './stop' || cmd === '0')) {
-        closeViewer();
+      // ─ キャンセル共通 ─
+      if (cmd === './stop' || cmd === '0') {
+        if (activeViewer) { closeViewer(); return; }
+        if (userCountState) {
+          userCountState = null;
+          print(['<span style="opacity:0.45">キャンセルしました。</span>'], cmd);
+          return;
+        }
+      }
+
+      // ─ userCount ウィザード ─
+      if (userCountState) {
+        if (userCountState.step === 'input') {
+          handleUserCountInput(cmd);
+          return;
+        }
+        if (userCountState.step === 'token') {
+          const { username, year, month } = userCountState;
+          const token = cmd === '' ? '' : cmd;
+          userCountState = null;
+          print(['<span style="opacity:0.35">集計を開始します...</span>'], cmd);
+          runUserCount(username, year, month, token);
+          return;
+        }
+      }
+
+      // ─ README ビューア内 ─
+      if (activeViewer) {
+        print([{ type: 'error', message: `command not found: ${cmd}  (./stop で戻る)` }], cmd);
         return;
       }
 
-      // Numbered project selection (active after ./build.sh)
+      // ─ ./build.sh 番号選択 ─
       if (buildActive && /^\d+$/.test(cmd)) {
         const n = parseInt(cmd, 10);
-        if (n === 0) {
-          buildActive = false;
-          print(['<span style="opacity:0.45">リセットしました。</span>'], cmd);
-          return;
-        }
+        if (n === 0) { buildActive = false; print(['<span style="opacity:0.45">リセットしました。</span>'], cmd); return; }
         const project = build[n - 1];
-        if (project) {
-          showReadme(project, cmd);
-          return;
-        }
+        if (project) { showReadme(project, cmd); return; }
         print([{ type: 'error', message: `${n}: 存在しないプロジェクト番号です。` }], cmd);
         return;
       }
 
+      // ─ 通常コマンド ─
       const fn = COMMANDS[cmd];
       if (fn) {
         print(fn(), cmd);
@@ -427,9 +561,12 @@
       }
     }
 
+    // ── Input events ───────────────────────────────────
     input.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
-        run(input.value);
+        // token ステップは空文字 Enter も有効
+        const val = (userCountState?.step === 'token') ? input.value : input.value;
+        run(val);
         input.value = '';
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
@@ -440,16 +577,16 @@
         if (histIdx > 0) histIdx--;
         else { histIdx = -1; input.value = ''; return; }
         input.value = history[histIdx] ?? '';
-      } else if (e.key === 'Escape' && activeViewer) {
-        closeViewer();
+      } else if (e.key === 'Escape') {
+        if (activeViewer) closeViewer();
+        else if (userCountState) {
+          userCountState = null;
+          appendLine('<span style="opacity:0.45">キャンセルしました。</span>');
+        }
       }
     });
 
-    // 起動時に help を表示
-    print(COMMANDS.help(), 'help');
-
     // term-cmd クリックでコマンドを入力欄に貼り付け
-    // [N] title 形式の場合は番号だけ抽出
     body.addEventListener('click', e => {
       const cmd = e.target.closest('.term-cmd');
       if (cmd) {
@@ -462,6 +599,9 @@
     });
 
     wrap.addEventListener('click', () => input.focus());
+
+    // 起動時に help を表示
+    print(COMMANDS.help(), 'help');
   }
 
   fetch('/content.json')
