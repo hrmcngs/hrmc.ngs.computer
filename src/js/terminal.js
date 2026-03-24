@@ -1,5 +1,5 @@
 (() => {
-  function init(cfg, profile) {
+  function init(cfg, profile, data_works) {
     if (cfg.colors) {
       const r = document.documentElement;
       const c = cfg.colors;
@@ -18,6 +18,7 @@
     const build       = cfg.build       ?? [];
     const socialLinks = cfg.socialLinks ?? [];
     const PROMPT      = cfg.prompt      ?? 'hrmc@ngs:~$';
+    const works       = data_works      ?? [];
 
     let buildActive    = false;
     let activeViewer   = null;
@@ -127,7 +128,7 @@
         return lines;
       },
 
-      ls: () => build.map(p => `${p.title}/`),
+      ls: () => (works ?? []).map(p => `${p.title}/`),
 
       './build.sh': () => {
         buildActive = true;
@@ -357,6 +358,6 @@
 
   fetch('/content.json')
     .then(r => r.json())
-    .then(data => init(data.terminal ?? {}, data.profile ?? {}))
+    .then(data => init(data.terminal ?? {}, data.profile ?? {}, data.works ?? []))
     .catch(() => init({}, {}));
 })();
