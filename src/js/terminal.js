@@ -23,147 +23,67 @@
     let activeViewer   = null;
     let userCountState = null;
 
-    // ── GitHub fetch wrapper（エラー詳細を返す） ─────────
-    async function ghFetch(url) {
-      const res  = await fetch(url);
-      const data = await res.json();
-      if (!res.ok) {
-        const msg = data?.message ?? `HTTP ${res.status}`;
-        throw new Error(`${res.status}: ${msg}`);
-      }
-      return data;
-    }
-
-    // ── 全リポジトリ取得（自分 + 参加 org） ──────────────
-    async function fetchAllRepos(username, onProgress) {
-      const repos = [];
-      const seen  = new Set();
-
-      // 1) 自分のリポジトリ
-      let page = 1;
-      while (true) {
-        const data = await ghFetch(
-          `https://api.github.com/users/${username}/repos?per_page=100&page=${page}&type=all`
-        );
-        if (!Array.isArray(data) || !data.length) break;
-        for (const r of data) {
-          if (!seen.has(r.full_name)) { seen.add(r.full_name); repos.push(r); }
-        }
-        onProgress(`リポジトリ列挙中... ${repos.length} repos`);
-        if (data.length < 100) break;
-        page++;
-      }
-
-      // 2) 参加 org を取得
-      let orgs = [];
-      try {
-        orgs = await ghFetch(`https://api.github.com/users/${username}/orgs?per_page=100`);
-        if (!Array.isArray(orgs)) orgs = [];
-      } catch { orgs = []; }
-
-      // 3) 各 org のリポジトリ
-      for (const org of orgs) {
-        onProgress(`リポジトリ列挙中... ${repos.length} repos (org: ${org.login})`);
-        let oPage = 1;
-        while (true) {
-          try {
-            const data = await ghFetch(
-              `https://api.github.com/orgs/${org.login}/repos?per_page=100&page=${oPage}&type=all`
-            );
-            if (!Array.isArray(data) || !data.length) break;
-            for (const r of data) {
-              if (!seen.has(r.full_name)) { seen.add(r.full_name); repos.push(r); }
-            }
-            if (data.length < 100) break;
-            oPage++;
-          } catch { break; }
-        }
-      }
-
-      return repos;
-    }
-
-    // ── コミット集計 ──────────────────────────────────────
+    // ── Search API 2回で完結（レート制限を回避） ─────────
+    // PR:     /search/issues?q=type:pr+author:USERNAME
+    // Commit: /search/commits?q=author:USERNAME
+    // どちらも total_count を返すので repos ループ不要
     async function runUserCount(username, year, month) {
-      let since = '', until = '', createdQ = '';
+      let prDateQ     = '';
+      let commitDateQ = '';
       if (year && month) {
-        since    = `${year}-${month}-01T00:00:00Z`;
-        const em = month === '12' ? '01' : String(Number(month) + 1).padStart(2, '0');
-        const ey = month === '12' ? String(Number(year) + 1) : year;
-        until    = `${ey}-${em}-01T00:00:00Z`;
-        createdQ = `+created:${since.slice(0,10)}..${until.slice(0,10)}`;
+        const start  = `${year}-${month}-01`;
+        const em     = month === '12' ? '01' : String(Number(month) + 1).padStart(2, '0');
+        const ey     = month === '12' ? String(Number(year) + 1) : year;
+        const end    = `${ey}-${em}-01`;
+        prDateQ      = `+created:${start}..${end}`;
+        commitDateQ  = `+committer-date:${start}..${end}`;
       }
       const periodLabel = year && month ? `${year}年${Number(month)}月` : '全期間';
-      const safeUsername = escHtml(username);
 
       appendLines([
         '',
-        `<span class="success">▶ 集計開始</span>  <span style="opacity:0.6">${safeUsername} / ${periodLabel}</span>`,
+        `<span class="success">▶ 集計開始</span>  <span style="opacity:0.6">${username} / ${periodLabel}</span>`,
         '<span style="opacity:0.3">────────────────────────────────────</span>',
       ], body);
 
-      const ld = makeLoadingLine('準備中...');
+      const ld = makeLoadingLine('取得中...');
       body.appendChild(ld); body.scrollTop = body.scrollHeight;
 
       // PR 数
       setLoading(ld, 'Pull Requests を取得中...');
       let prCount = 0;
       try {
-        const data = await ghFetch(
-          `https://api.github.com/search/issues?q=type:pr+author:${username}${createdQ}`
+        const res  = await fetch(
+          `https://api.github.com/search/issues?q=type:pr+author:${username}${prDateQ}`
         );
+        const data = await res.json();
+        if (!res.ok) throw new Error(`${res.status}: ${data?.message ?? ''}`);
         prCount = data.total_count ?? 0;
       } catch (err) {
         setLoading(ld, `<span class="error">PR取得エラー: ${err.message}</span>`);
         return;
       }
 
-      // リポジトリ一覧
-      let repos = [];
-      try {
-        repos = await fetchAllRepos(username, msg => setLoading(ld, msg));
-      } catch (err) {
-        setLoading(ld, `<span class="error">リポジトリ取得エラー: ${err.message}</span>`);
-        return;
-      }
-
-      if (!repos.length) {
-        setLoading(ld, `<span class="error">リポジトリが0件でした。ユーザー名を確認するか、しばらく待ってから再試行してください（APIレート制限の可能性）</span>`);
-        return;
-      }
-
-      // コミット集計
+      // コミット数（Search Commits API、per_page=1 で total_count だけ取得）
+      setLoading(ld, 'コミット数を取得中...');
       let commitCount = 0;
-      for (let i = 0; i < repos.length; i++) {
-        const repo = repos[i];
-        setLoading(ld, `コミット集計中... ${i + 1}/${repos.length} repos / ${commitCount} commits`);
-        let cPage = 1;
-        while (true) {
-          try {
-            let url = `https://api.github.com/repos/${repo.owner.login}/${repo.name}/commits`
-              + `?author=${username}&per_page=100&page=${cPage}`;
-            if (since) url += `&since=${since}`;
-            if (until) url += `&until=${until}`;
-            const res     = await fetch(url);
-            if (res.status === 409) break; // empty repo
-            if (res.status === 403 || res.status === 429) {
-              appendLines([`<span class="error">  ⚠ API レート制限 (${repo.full_name} で発生)。途中結果を表示します。</span>`], body);
-              break;
-            }
-            const commits = await res.json();
-            if (!Array.isArray(commits) || !commits.length) break;
-            commitCount += commits.length;
-            if (commits.length < 100) break;
-            cPage++;
-          } catch { break; }
-        }
+      try {
+        const res  = await fetch(
+          `https://api.github.com/search/commits?q=author:${username}${commitDateQ}&per_page=1`,
+          { headers: { Accept: 'application/vnd.github.cloak-preview' } }
+        );
+        const data = await res.json();
+        if (!res.ok) throw new Error(`${res.status}: ${data?.message ?? ''}`);
+        commitCount = data.total_count ?? 0;
+      } catch (err) {
+        setLoading(ld, `<span class="error">コミット取得エラー: ${err.message}</span>`);
+        return;
       }
 
-      // 結果
       ld.remove();
       appendLines([
         `  Pull Request数: <span class="success" style="font-weight:700">${prCount}</span>`,
-        `  コミット数:     <span class="success" style="font-weight:700">${commitCount}</span>  <span style="opacity:0.4">(${repos.length} repos checked)</span>`,
+        `  コミット数:     <span class="success" style="font-weight:700">${commitCount}</span>`,
         '',
       ], body);
     }
@@ -171,7 +91,7 @@
     function makeLoadingLine(text) {
       const div = document.createElement('div'); div.className = 'term-line';
       const out = document.createElement('span'); out.className = 'term-out';
-      out.innerHTML = `<span style="opacity:0.4">${text}</span>`;
+      out.innerHTML = `<span style="opacity:0.5">${text}</span>`;
       div.appendChild(out); return div;
     }
 
@@ -230,8 +150,12 @@
         if (profile.handle) lines.push(`<span style="opacity:0.6">${profile.handle}</span>`);
         if (lines.length)   lines.push('');
         (profile.bio ?? []).forEach(b => lines.push(b));
-        if (profile.chips?.length) { lines.push(''); lines.push(profile.chips.map(c=>`<span style="color:var(--text-muted)">${c}</span>`).join('  ')); }
-        lines.push(''); lines.push(`→ <a href="/about" target="_blank" rel="noopener">/about</a>`);
+        if (profile.chips?.length) {
+          lines.push('');
+          lines.push(profile.chips.map(c => `<span style="color:var(--text-muted)">${c}</span>`).join('  '));
+        }
+        lines.push('');
+        lines.push(`→ <a href="/about" target="_blank" rel="noopener">/about</a>`);
         return lines;
       },
 
