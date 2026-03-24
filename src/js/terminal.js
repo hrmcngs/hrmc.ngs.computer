@@ -142,16 +142,19 @@
       return res.text();
     }
 
-    // chip → 関連プロジェクト表示コマンドを動的登録
-    const chipLinks = profile.chipLinks ?? {};
-    Object.entries(chipLinks).forEach(([chip, titles]) => {
+    // chip → build の tags から自動マッチングでコマンド登録
+    (profile.chips ?? []).forEach(chip => {
       COMMANDS[chip] = () => {
-        const matched = build.filter(p => titles.includes(p.title));
+        const chipLower = chip.toLowerCase();
+        const matched = build.filter(p =>
+          (p.tags ?? []).some(tag => chipLower.includes(tag.toLowerCase()))
+        );
         if (!matched.length) return [{ type: 'error', message: `${chip}: 関連プロジェクトが見つかりません。` }];
         const lines = [`<span class="success">${chip} に関連するプロジェクト:</span>`, ''];
         matched.forEach(p => {
           const colorStyle = p.color ? ` style="color:${p.color}"` : '';
-          lines.push(`<span class="term-cmd"${colorStyle}>${p.title}</span>`);
+          const tags = (p.tags ?? []).map(t => `<span style="opacity:0.5">[${t}]</span>`).join(' ');
+          lines.push(`<span class="term-cmd"${colorStyle}>${p.title}</span>  ${tags}`);
           lines.push(`    ${p.desc}`);
           (p.links ?? []).forEach(url => {
             lines.push(`    → <a href="${url}" target="_blank" rel="noopener">${url}</a>`);
