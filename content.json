@@ -166,7 +166,7 @@
       "絡んでくる時はラフな感じでいいですよ。",
       "憂鬱な時は変なポストをしていますが許してください。"
     ],
-    "chips": ["Minecraft Mod", "Web", "JavaScript", "Canvas", "3D Graphics", "Java"],
+    "chips": ["mcfunction", "Web", "JavaScript", "CSS", "3D Graphics", "Java"],
     "birthday": "2010-05-26",
     "education": [
       { "key": "kindergarten",        "label": "幼稚園",   "entered": "2014-04" },
@@ -184,7 +184,7 @@
       "desc": "RPG風HP表示、ダメージ表示データパック",
       "url": "https://github.com/hrmcngs/RPGish-HPDisplay",
       "color": "#3ecfcf",
-      "tags": ["Minecraft", "DataPack", "Canvas"]
+      "tags": ["mcfunction", "DataPack",]
     },
     {
       "icon": "https://raw.githubusercontent.com/Drowse-Lab/Drowse-Lab/main/assets/image/DrowseLabIcon.jpg",
@@ -192,7 +192,7 @@
       "desc": "なんとなく作っているweb",
       "url": "https://github.com/Drowse-Lab/Drowse-Lab",
       "color": "#7c6af7",
-      "tags": ["Web", "JavaScript"]
+      "tags": ["Web", "JavaScript","HTML","CSS","JSON","Markdown","YAML"]
     },
     {
       "icon": "https://raw.githubusercontent.com/Drowse-Lab/The-four-primitives-and-Weapons/1.20.1/src/main/resources/logo.png",
@@ -200,7 +200,15 @@
       "desc": "Drowse-Lab / Minecraft mod",
       "url": "https://github.com/Drowse-Lab/The-four-primitives-and-Weapons",
       "color": "#f87171",
-      "tags": ["Minecraft", "Mod", "Java"]
+      "tags": ["Java", "Mod", "mcfunction"]
+    },
+    {
+      "icon": "https://raw.githubusercontent.com/hrmcngs/hrmc.ngs.computer/blob/main/image/icon.svg",
+      "title": "hrmc.ngs.computer",
+      "desc": "Drowse-Lab / Minecraft mod",
+      "url": "https://github.com/hrmcngs/hrmc.ngs.computer",
+      "color": "#f87171",
+      "tags": ["JavaScript", "HTML", "CSS"]
     }
   ]
 }
