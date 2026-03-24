@@ -134,7 +134,7 @@
         const lines = ['<span class="success">▶ Building projects...</span>', ''];
         build.forEach((p, i) => {
           const cs = p.color ? ` style="color:${p.color}"` : '';
-          lines.push(`<span class="term-cmd"${cs}>[${i+1}] ${p.title}${hasGithubLink(p) ? ' ◆' : ''}</span>`);
+          lines.push(`<span class="term-cmd"${cs}>[${i+1}] ${p.title}</span>`);
           lines.push(`    ${p.desc}`);
           if (p.tags?.length) lines.push(`    <span style="opacity:0.5">${p.tags.map(t=>`[${t}]`).join(' ')}</span>`);
           (p.links ?? []).forEach(url => lines.push(`    → <a href="${url}" target="_blank" rel="noopener">${url}</a>`));
