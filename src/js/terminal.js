@@ -380,7 +380,7 @@
           ...lines,
           '',
           '<span style="opacity:0.3">════════════════════════════════════════</span>',
-          '<span style="opacity:0.35">q → 戻る</span>',
+          '<span style="opacity:0.35">./stop → 戻る</span>',
         ], body, 0.03);
       } catch (e) {
         loadingDiv.remove();
@@ -396,8 +396,8 @@
       history.unshift(cmd);
       histIdx = -1;
 
-      // Close viewer with q or 0
-      if (activeViewer && (cmd === 'q' || cmd === '0')) {
+      // Close viewer with ./stop or 0
+      if (activeViewer && (cmd === './stop' || cmd === '0')) {
         closeViewer();
         return;
       }
