@@ -42,8 +42,8 @@
 
       appendLines([
         '',
-        `<span class="success">▶ 集計開始</span>  <span style="opacity:0.6">${username} / ${periodLabel}</span>`,
-        '<span style="opacity:0.3">────────────────────────────────────</span>',
+        { type: 'html', html: `<span class="success">▶ 集計開始</span>  <span style="opacity:0.6">${username} / ${periodLabel}</span>` },
+        { type: 'html', html: '<span style="opacity:0.3">────────────────────────────────────</span>' },
       ], body);
 
       const ld = makeLoadingLine('取得中...');
@@ -211,8 +211,18 @@
         const div = document.createElement('div'); div.className = 'term-line';
         div.style.animationDelay = `${baseDelay + Math.min(i * 0.03, 0.45)}s`;
         const out = document.createElement('span'); out.className = 'term-out';
-        if (typeof line === 'string') { out.innerHTML = line; }
-        else if (line?.type === 'error') { const s=document.createElement('span');s.className='error';s.textContent=line.message;out.appendChild(s); }
+        if (typeof line === 'string') {
+          // Treat plain strings as text to avoid interpreting untrusted input as HTML
+          out.textContent = line;
+        } else if (line?.type === 'html' && typeof line.html === 'string') {
+          // Explicitly marked safe HTML fragment
+          out.innerHTML = line.html;
+        } else if (line?.type === 'error') {
+          const s = document.createElement('span');
+          s.className = 'error';
+          s.textContent = line.message;
+          out.appendChild(s);
+        }
         div.appendChild(out); container.appendChild(div);
       });
       container.scrollTop = container.scrollHeight;
@@ -234,7 +244,10 @@
       const year     = parts[1] ?? '';
       const month    = parts[2] ? parts[2].padStart(2, '0') : '';
       if (year && !month) {
-        print(['<span class="error">月も指定してください (例: 2024 05)</span>', 'ユーザーID [年 月] を入力してください:'], raw);
+        print([
+          { type: 'html', html: '<span class="error">月も指定してください (例: 2024 05)</span>' },
+          'ユーザーID [年 月] を入力してください:'
+        ], raw);
         return;
       }
       userCountState = null;
@@ -319,7 +332,11 @@
 
       if (cmd === './stop' || cmd === '0') {
         if (activeViewer)   { closeViewer(); return; }
-        if (userCountState) { userCountState = null; print(['<span style="opacity:0.45">キャンセルしました。</span>'], cmd); return; }
+        if (userCountState) {
+          userCountState = null;
+          print([{ type: 'html', html: '<span style="opacity:0.45">キャンセルしました。</span>' }], cmd);
+          return;
+        }
       }
       if (userCountState?.step === 'input') { handleUserCountInput(cmd); return; }
       if (activeViewer) { print([{ type: 'error', message: `command not found: ${cmd}  (./stop で戻る)` }], cmd); return; }
@@ -341,7 +358,10 @@
       else if (e.key === 'ArrowDown') { e.preventDefault(); if (histIdx > 0) histIdx--; else { histIdx = -1; input.value = ''; return; } input.value = history[histIdx] ?? ''; }
       else if (e.key === 'Escape') {
         if (activeViewer) closeViewer();
-        else if (userCountState) { userCountState = null; appendLines(['<span style="opacity:0.45">キャンセルしました。</span>'], body); }
+        else if (userCountState) {
+          userCountState = null;
+          appendLines([{ type: 'html', html: '<span style="opacity:0.45">キャンセルしました。</span>' }], body);
+        }
       }
     });
 
