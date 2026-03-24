@@ -229,7 +229,7 @@
         if (profile.handle) lines.push(`<span style="opacity:0.6">${profile.handle}</span>`);
         if (lines.length)   lines.push('');
         (profile.bio ?? []).forEach(b => lines.push(b));
-        if (profile.chips?.length) { lines.push(''); lines.push(profile.chips.map(c=>`<span class="term-cmd">${c}</span>`).join('  ')); }
+        if (profile.chips?.length) { lines.push(''); lines.push(profile.chips.map(c=>`<span style="color:var(--text-muted)">${c}</span>`).join('  ')); }
         lines.push(''); lines.push(`→ <a href="/about" target="_blank" rel="noopener">/about</a>`);
         return lines;
       },
