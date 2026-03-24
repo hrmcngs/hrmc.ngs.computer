@@ -82,7 +82,7 @@
         });
         lines.push('<span class="success">Done.</span>');
         lines.push('');
-        lines.push('<span style="opacity:0.45">◆ のある番号を入力 → README を表示 &nbsp;|&nbsp; 0 → リセット</span>');
+        // lines.push('<span style="opacity:0.45">◆ のある番号を入力 → README を表示 &nbsp;|&nbsp; 0 → リセット</span>');
         return lines;
       },
 
