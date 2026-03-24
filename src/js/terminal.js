@@ -1,6 +1,5 @@
 (() => {
   function init(cfg, profile) {
-    // Apply terminal colors as CSS custom properties
     if (cfg.colors) {
       const r = document.documentElement;
       const c = cfg.colors;
@@ -20,13 +19,94 @@
     const socialLinks = cfg.socialLinks ?? [];
     const PROMPT      = cfg.prompt      ?? 'hrmc@ngs:~$';
 
-    // ── State ──────────────────────────────────────────
+    // State
     let buildActive    = false;
     let activeViewer   = null;
-    let userCountState = null;
-    // userCountState: null
-    //   | { step: 'input' }
-    //   | { step: 'token', username, year, month }
+    let userCountState = null; // null | { step: 'input' }
+
+    // ── user_count.js と完全に同じ取得ロジック ────────
+    async function runUserCount(username, year, month) {
+      // user_count.js と同じ期間計算
+      let since = '', until = '';
+      let createdQ = '';
+      if (year && month) {
+        since    = `${year}-${month}-01T00:00:00Z`;
+        const endMonth = (month === '12') ? '01' : String(Number(month) + 1).padStart(2, '0');
+        const endYear  = (month === '12') ? String(Number(year) + 1) : year;
+        until    = `${endYear}-${endMonth}-01T00:00:00Z`;
+        createdQ = `+created:${since}..${until}`;
+      }
+
+      const periodLabel = year && month ? `${year}年${Number(month)}月` : '全期間';
+
+      appendLines([
+        '',
+        `<span class="success">▶ 集計開始</span>  <span style="opacity:0.6">${username} / ${periodLabel}</span>`,
+        '<span style="opacity:0.3">────────────────────────────────────</span>',
+      ], body);
+
+      // resultDiv.textContent = '読み込み中...' と同等
+      appendLine('<span style="opacity:0.4">読み込み中...</span>');
+
+      let prCount    = 0;
+      let commitCount = 0;
+
+      // ── PR 数取得 ────────────────────────────────────
+      try {
+        const prRes  = await fetch(
+          `https://api.github.com/search/issues?q=type:pr+author:${username}${createdQ}`
+        );
+        const prData = await prRes.json();
+        prCount      = prData.total_count ?? 0;
+      } catch (err) {
+        body.lastChild?.remove();
+        appendLine(`<span class="error">PR取得エラー: ${err.message}</span>`);
+        return;
+      }
+
+      // ── コミット数取得 ───────────────────────────────
+      try {
+        let page = 1, hasNext = true;
+        while (hasNext) {
+          const repoRes = await fetch(
+            `https://api.github.com/users/${username}/repos?per_page=100&page=${page}`
+          );
+          const repos = await repoRes.json();
+          if (!Array.isArray(repos) || !repos.length) break;
+
+          for (const repo of repos) {
+            let cPage = 1, cHasNext = true;
+            while (cHasNext) {
+              let commitsUrl =
+                `https://api.github.com/repos/${repo.owner.login}/${repo.name}/commits` +
+                `?author=${username}&per_page=100&page=${cPage}`;
+              if (since) commitsUrl += `&since=${since}`;
+              if (until) commitsUrl += `&until=${until}`;
+              const commitRes = await fetch(commitsUrl);
+              const commits   = await commitRes.json();
+              if (!Array.isArray(commits) || !commits.length) break;
+              commitCount += commits.length;
+              cHasNext     = commits.length === 100;
+              cPage++;
+            }
+          }
+          hasNext = repos.length === 100;
+          page++;
+        }
+      } catch (err) {
+        body.lastChild?.remove();
+        appendLine(`<span class="error">コミット取得エラー: ${err.message}</span>`);
+        return;
+      }
+
+      // ── 結果表示 ─────────────────────────────────────
+      body.lastChild?.remove(); // "読み込み中..." を除去
+      appendLines([
+        `  Pull Request数: <span class="success" style="font-weight:700">${prCount}</span>`,
+        `  コミット数:     <span class="success" style="font-weight:700">${commitCount}</span>`,
+        '',
+      ], body);
+    }
 
     // ── Commands ───────────────────────────────────────
     const COMMANDS = {
@@ -101,15 +181,6 @@
         return lines;
       },
 
-      'cat links.txt': () => {
-        const maxLen = Math.max(...socialLinks.map(l => l.label.length), 0);
-        return socialLinks.map(l => {
-          const label = l.label.padEnd(maxLen);
-          return `${label} : <a href="${l.url}" target="_blank" rel="noopener">${l.url}</a>`;
-        });
-      },
-
-      // ── ./user-count.sh ─────────────────────────────
       './user-count.sh': () => {
         userCountState = { step: 'input' };
         return [
@@ -125,10 +196,17 @@
         ];
       },
 
+      'cat links.txt': () => {
+        const maxLen = Math.max(...socialLinks.map(l => l.label.length), 0);
+        return socialLinks.map(l => {
+          const label = l.label.padEnd(maxLen);
+          return `${label} : <a href="${l.url}" target="_blank" rel="noopener">${l.url}</a>`;
+        });
+      },
+
       clear: () => '__clear__',
     };
 
-    // chip → build tags から自動マッチング
     (profile.chips ?? []).forEach(chip => {
       COMMANDS[chip] = () => {
         const chipLower = chip.toLowerCase();
@@ -182,9 +260,7 @@
       container.scrollTop = container.scrollHeight;
     }
 
-    function appendLine(html) {
-      appendLines([html], body, 0);
-    }
+    function appendLine(html) { appendLines([html], body, 0); }
 
     function print(lines, typed) {
       const echo = document.createElement('div');
@@ -198,22 +274,17 @@
       echo.appendChild(promptSpan);
       echo.appendChild(typedSpan);
       body.appendChild(echo);
-
-      if (lines === '__clear__') {
-        body.innerHTML = '';
-        return;
-      }
+      if (lines === '__clear__') { body.innerHTML = ''; return; }
       appendLines(lines, body, 0.06);
     }
 
-    // ── user-count ─────────────────────────────────────
+    // ── user-count 入力処理 ────────────────────────────
     function handleUserCountInput(raw) {
       const parts = raw.trim().split(/\s+/).filter(Boolean);
       if (!parts.length) {
-        print(['<span class="error">ユーザーID を入力してください。</span>', 'ユーザーID を入力してください:'], raw);
+        print(['ユーザーID を入力してください:'], raw);
         return;
       }
-
       const username = parts[0];
       const year     = parts[1] ?? '';
       const month    = parts[2] ? parts[2].padStart(2, '0') : '';
@@ -226,129 +297,12 @@
         return;
       }
 
-      userCountState = { step: 'token', username, year, month };
-      print([
-        `対象: <strong>${username}</strong> / ${year && month ? `${year}年${month}月` : '全期間'}`,
-        '',
-        'GitHub Token を入力してください (Enterでスキップ / API制限を避けるため推奨):',
-      ], raw);
+      userCountState = null;
+      print([], raw);
+      runUserCount(username, year, month);
     }
 
-    async function runUserCount(username, year, month, token) {
-      const headers = token ? { Authorization: `token ${token}` } : {};
-
-      let since = '', until = '', createdQ = '';
-      if (year && month) {
-        since    = `${year}-${month}-01T00:00:00Z`;
-        const em = month === '12' ? '01' : String(Number(month) + 1).padStart(2, '0');
-        const ey = month === '12' ? String(Number(year) + 1) : year;
-        until    = `${ey}-${em}-01T00:00:00Z`;
-        createdQ = `+created:${since.slice(0, 10)}..${until.slice(0, 10)}`;
-      }
-
-      const periodLabel = year && month ? `${year}年${month}月` : '全期間';
-
-      appendLines([
-        '',
-        `<span class="success">▶ 集計開始</span>  <span style="opacity:0.6">${username} / ${periodLabel}</span>`,
-        '<span style="opacity:0.3">────────────────────────────────────</span>',
-      ], body);
-
-      // ── PR 数 ──────────────────────────────────────
-      appendLine('<span style="opacity:0.4">Pull Requests を取得中...</span>');
-      let prCount = 0;
-      try {
-        const res  = await fetch(
-          `https://api.github.com/search/issues?q=type:pr+author:${encodeURIComponent(username)}${createdQ}`,
-          { headers }
-        );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        prCount    = data.total_count ?? 0;
-        body.lastChild?.remove(); // remove "取得中..." line
-        appendLine(`  Pull Requests : <span class="success" style="font-weight:700">${prCount}</span>`);
-      } catch (e) {
-        body.lastChild?.remove();
-        appendLine(`<span class="error">  PR取得エラー: ${e.message}</span>`);
-      }
-
-      // ── コミット数 ─────────────────────────────────
-      appendLine('<span style="opacity:0.4">コミット数を集計中 (リポジトリ数によっては少し時間がかかります)...</span>');
-      let commitCount = 0;
-      let repoCount   = 0;
-      let rateLimited = false;
-
-      try {
-        let page = 1, hasNext = true;
-
-        while (hasNext) {
-          const repoRes = await fetch(
-            `https://api.github.com/users/${encodeURIComponent(username)}/repos?per_page=100&page=${page}`,
-            { headers }
-          );
-          if (!repoRes.ok) throw new Error(`HTTP ${repoRes.status}`);
-          const repos = await repoRes.json();
-          if (!Array.isArray(repos) || !repos.length) break;
-
-          for (const repo of repos) {
-            repoCount++;
-            // progress update (every 5 repos)
-            if (repoCount % 5 === 0) {
-              const last = body.lastChild;
-              if (last?.textContent?.includes('集計中')) {
-                last.querySelector('.term-out').innerHTML =
-                  `<span style="opacity:0.4">コミット数を集計中... (${repoCount} repos / ${commitCount} commits)</span>`;
-              }
-            }
-
-            let cPage = 1, cHasNext = true;
-            while (cHasNext) {
-              let url = `https://api.github.com/repos/${repo.owner.login}/${repo.name}/commits`
-                + `?author=${encodeURIComponent(username)}&per_page=100&page=${cPage}`;
-              if (since) url += `&since=${since}`;
-              if (until) url += `&until=${until}`;
-              const cRes = await fetch(url, { headers });
-              if (cRes.status === 409) break; // empty repo
-              if (cRes.status === 403) { rateLimited = true; break; }
-              if (!cRes.ok) break;
-              const commits = await cRes.json();
-              if (!Array.isArray(commits) || !commits.length) break;
-              commitCount += commits.length;
-              cHasNext     = commits.length === 100;
-              cPage++;
-            }
-            if (rateLimited) break;
-          }
-
-          hasNext = repos.length === 100;
-          page++;
-          if (rateLimited) break;
-        }
-
-        body.lastChild?.remove();
-        appendLine(`  Commits       : <span class="success" style="font-weight:700">${commitCount}</span>`
-          + `  <span style="opacity:0.4">(${repoCount} repos checked)</span>`);
-        if (rateLimited) {
-          appendLine('<span class="error">  ⚠ API レート制限に達しました。Token を指定すると制限が緩和されます。</span>');
-        }
-      } catch (e) {
-        body.lastChild?.remove();
-        appendLine(`<span class="error">  コミット取得エラー: ${e.message}</span>`);
-      }
-
-      // ── 結果サマリ ─────────────────────────────────
-      appendLines([
-        '',
-        '<span style="opacity:0.3">────────────────────────────────────</span>',
-        `<span class="success">完了!</span>  `
-          + `<strong>${username}</strong> / ${periodLabel}  `
-          + `PR: <span class="success">${prCount}</span>  `
-          + `Commits: <span class="success">${commitCount}</span>`,
-        '',
-      ], body);
-    }
-
-    // ── Markdown parser ────────────────────────────────
+    // ── Markdown ───────────────────────────────────────
     function escHtml(s) {
       return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
@@ -372,8 +326,7 @@
       md = md.replace(/<img\s[^>]*src="([^"]*)"[^>]*\/?>/gi, (match, src) => {
         if (match.includes('readme-img')) return match;
         const altMatch = match.match(/alt="([^"]*)"/i);
-        const alt = altMatch ? altMatch[1] : '';
-        return `<img src="${cleanUrl(src)}" alt="${alt}" class="readme-img">`;
+        return `<img src="${cleanUrl(src)}" alt="${altMatch ? altMatch[1] : ''}" class="readme-img">`;
       });
       md = md.replace(/<a\s+href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, (match, href, inner) => {
         if (inner.includes('<img')) return match;
@@ -391,12 +344,9 @@
       s = escHtml(s);
       s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
       s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
-      s = s.replace(/`([^`]+)`/g,
-        '<code style="background:rgba(255,255,255,0.08);padding:0.1em 0.3em;border-radius:3px">$1</code>');
-      s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g,
-        '<a href="$2" target="_blank" rel="noopener">$1</a>');
-      s = s.replace(/(^|[\s(])((https?:\/\/)[^\s<)]+)/g,
-        '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
+      s = s.replace(/`([^`]+)`/g, '<code style="background:rgba(255,255,255,0.08);padding:0.1em 0.3em;border-radius:3px">$1</code>');
+      s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+      s = s.replace(/(^|[\s(])((https?:\/\/)[^\s<)]+)/g, '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
       s = s.replace(/\x00P(\d+)\x00/g, (_, i) => preserved[i]);
       return s;
     }
@@ -407,11 +357,7 @@
       const out = [];
       let inCode = false;
       for (const line of rawLines) {
-        if (line.startsWith('```')) {
-          inCode = !inCode;
-          out.push('<span style="opacity:0.3">' + (inCode ? '┌─────' : '└─────') + '</span>');
-          continue;
-        }
+        if (line.startsWith('```')) { inCode = !inCode; out.push('<span style="opacity:0.3">' + (inCode ? '┌─────' : '└─────') + '</span>'); continue; }
         if (inCode) { out.push(`<span style="font-family:monospace;opacity:0.75">${escHtml(line)}</span>`); continue; }
         const h1 = line.match(/^# (.+)/);
         if (h1) { out.push(''); out.push(`<span class="success" style="font-weight:700;font-size:1.1em">${inlineMd(h1[1])}</span>`); out.push('<span style="opacity:0.15">════════════════════════════</span>'); continue; }
@@ -450,9 +396,7 @@
       return null;
     }
 
-    function hasGithubLink(project) {
-      return !!parseGithubUrl(project.links);
-    }
+    function hasGithubLink(project) { return !!parseGithubUrl(project.links); }
 
     async function fetchReadme(project) {
       if (project.readme) {
@@ -478,9 +422,7 @@
       const pColor = project.color || 'var(--accent)';
       appendLines([
         `<span class="success">cat</span> <span style="color:${pColor}">${project.title}</span>/<span style="color:var(--term-link)">README.md</span>`,
-        '',
-        '<span style="opacity:0.3">════════════════════════════════════════</span>',
-        '',
+        '', '<span style="opacity:0.3">════════════════════════════════════════</span>', '',
       ], body);
       const loadingDiv = document.createElement('div');
       loadingDiv.className = 'term-line';
@@ -488,12 +430,10 @@
       body.appendChild(loadingDiv);
       activeViewer = true;
       try {
-        const text  = await fetchReadme(project);
+        const text = await fetchReadme(project);
         loadingDiv.remove();
-        const lines = parseMarkdown(text);
         appendLines([
-          ...lines,
-          '',
+          ...parseMarkdown(text), '',
           '<span style="opacity:0.3">════════════════════════════════════════</span>',
           '<span style="opacity:0.35">./stop → 戻る</span>',
         ], body, 0.03);
@@ -510,39 +450,18 @@
       history.unshift(cmd);
       histIdx = -1;
 
-      // ─ キャンセル共通 ─
       if (cmd === './stop' || cmd === '0') {
-        if (activeViewer) { closeViewer(); return; }
-        if (userCountState) {
-          userCountState = null;
-          print(['<span style="opacity:0.45">キャンセルしました。</span>'], cmd);
-          return;
-        }
+        if (activeViewer)   { closeViewer(); return; }
+        if (userCountState) { userCountState = null; print(['<span style="opacity:0.45">キャンセルしました。</span>'], cmd); return; }
       }
 
-      // ─ userCount ウィザード ─
-      if (userCountState) {
-        if (userCountState.step === 'input') {
-          handleUserCountInput(cmd);
-          return;
-        }
-        if (userCountState.step === 'token') {
-          const { username, year, month } = userCountState;
-          const token = cmd === '' ? '' : cmd;
-          userCountState = null;
-          print(['<span style="opacity:0.35">集計を開始します...</span>'], cmd);
-          runUserCount(username, year, month, token);
-          return;
-        }
-      }
+      if (userCountState?.step === 'input') { handleUserCountInput(cmd); return; }
 
-      // ─ README ビューア内 ─
       if (activeViewer) {
         print([{ type: 'error', message: `command not found: ${cmd}  (./stop で戻る)` }], cmd);
         return;
       }
 
-      // ─ ./build.sh 番号選択 ─
       if (buildActive && /^\d+$/.test(cmd)) {
         const n = parseInt(cmd, 10);
         if (n === 0) { buildActive = false; print(['<span style="opacity:0.45">リセットしました。</span>'], cmd); return; }
@@ -552,21 +471,14 @@
         return;
       }
 
-      // ─ 通常コマンド ─
       const fn = COMMANDS[cmd];
-      if (fn) {
-        print(fn(), cmd);
-      } else {
-        print([{ type: 'error', message: `command not found: ${cmd}` }], cmd);
-      }
+      if (fn) { print(fn(), cmd); }
+      else    { print([{ type: 'error', message: `command not found: ${cmd}` }], cmd); }
     }
 
-    // ── Input events ───────────────────────────────────
     input.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
-        // token ステップは空文字 Enter も有効
-        const val = (userCountState?.step === 'token') ? input.value : input.value;
-        run(val);
+        run(input.value);
         input.value = '';
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
@@ -578,15 +490,11 @@
         else { histIdx = -1; input.value = ''; return; }
         input.value = history[histIdx] ?? '';
       } else if (e.key === 'Escape') {
-        if (activeViewer) closeViewer();
-        else if (userCountState) {
-          userCountState = null;
-          appendLine('<span style="opacity:0.45">キャンセルしました。</span>');
-        }
+        if (activeViewer)   closeViewer();
+        else if (userCountState) { userCountState = null; appendLine('<span style="opacity:0.45">キャンセルしました。</span>'); }
       }
     });
 
-    // term-cmd クリックでコマンドを入力欄に貼り付け
     body.addEventListener('click', e => {
       const cmd = e.target.closest('.term-cmd');
       if (cmd) {
@@ -600,7 +508,6 @@
 
     wrap.addEventListener('click', () => input.focus());
 
-    // 起動時に help を表示
     print(COMMANDS.help(), 'help');
   }
 
