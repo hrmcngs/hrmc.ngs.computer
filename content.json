@@ -28,7 +28,7 @@
         "title": "RPGish-HPDisplay",
         "desc": "RPG風HP表示、ダメージ表示データパック",
         "color": "#3ecfcf",
-        "tags": ["Minecraft", "DataPack", "Canvas"],
+        "tags": ["Minecraft", "DataPack"],
         "links": [
           "https://github.com/hrmcngs/RPGish-HPDisplay",
           "https://planetminecraft.com/data-pack/rpgish-hpdisplay/",
@@ -48,7 +48,7 @@
         "title": "The-four-primitives-and-Weapons",
         "desc": "Minecraft mod / Drowse-Lab",
         "color": "#f87171",
-        "tags": ["Minecraft", "Mod", "Java"],
+        "tags": ["Minecraft", "Mod", "Java", "mcfunction"],
         "links": [
           "https://github.com/Drowse-Lab/The-four-primitives-and-Weapons",
           "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons"
@@ -68,7 +68,7 @@
     ]
   },
   "links": {
-    "groupName": "hrmc",
+    "groupName": "hrmcngs",
     "items": [
       {
         "platform": "x",
@@ -184,7 +184,7 @@
       "desc": "RPG風HP表示、ダメージ表示データパック",
       "url": "https://github.com/hrmcngs/RPGish-HPDisplay",
       "color": "#3ecfcf",
-      "tags": ["mcfunction", "DataPack",]
+      "tags": ["DataPack", "mcfunction"]
     },
     {
       "icon": "https://raw.githubusercontent.com/Drowse-Lab/Drowse-Lab/main/assets/image/DrowseLabIcon.jpg",
@@ -200,7 +200,7 @@
       "desc": "Drowse-Lab / Minecraft mod",
       "url": "https://github.com/Drowse-Lab/The-four-primitives-and-Weapons",
       "color": "#f87171",
-      "tags": ["Java", "Mod", "mcfunction"]
+      "tags": ["Minecraft", "Mod","Java", "mcfunction"]
     },
     {
       "icon": "https://raw.githubusercontent.com/hrmcngs/hrmc.ngs.computer/blob/main/image/icon.svg",
@@ -208,7 +208,7 @@
       "desc": "Drowse-Lab / Minecraft mod",
       "url": "https://github.com/hrmcngs/hrmc.ngs.computer",
       "color": "#f87171",
-      "tags": ["JavaScript", "HTML", "CSS"]
+      "tags": ["Web","JavaScript", "HTML", "CSS"]
     }
   ]
 }
