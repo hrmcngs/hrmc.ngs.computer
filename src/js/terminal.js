@@ -94,10 +94,11 @@
         createdQ = `+created:${since.slice(0,10)}..${until.slice(0,10)}`;
       }
       const periodLabel = year && month ? `${year}年${Number(month)}月` : '全期間';
+      const safeUsername = escHtml(username);
 
       appendLines([
         '',
-        `<span class="success">▶ 集計開始</span>  <span style="opacity:0.6">${username} / ${periodLabel}</span>`,
+        `<span class="success">▶ 集計開始</span>  <span style="opacity:0.6">${safeUsername} / ${periodLabel}</span>`,
         '<span style="opacity:0.3">────────────────────────────────────</span>',
       ], body);
 
