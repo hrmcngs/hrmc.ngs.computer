@@ -28,6 +28,7 @@
         "title": "RPGish-HPDisplay",
         "desc": "RPG風HP表示、ダメージ表示データパック",
         "color": "#3ecfcf",
+        "tags": ["Minecraft", "DataPack", "Canvas"],
         "links": [
           "https://github.com/hrmcngs/RPGish-HPDisplay",
           "https://planetminecraft.com/data-pack/rpgish-hpdisplay/",
@@ -38,6 +39,7 @@
         "title": "Drowse-Lab",
         "desc": "なんとなく作っているweb",
         "color": "#7c6af7",
+        "tags": ["Web", "JavaScript"],
         "links": [
           "https://github.com/Drowse-Lab/Drowse-Lab"
         ]
@@ -46,6 +48,7 @@
         "title": "The-four-primitives-and-Weapons",
         "desc": "Minecraft mod / Drowse-Lab",
         "color": "#f87171",
+        "tags": ["Minecraft", "Mod", "Java"],
         "links": [
           "https://github.com/Drowse-Lab/The-four-primitives-and-Weapons",
           "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons"
@@ -60,7 +63,8 @@
       { "label": "Pixiv",          "url": "https://pixiv.net/users/83520943" },
       { "label": "Bluesky",        "url": "https://bsky.app/profile/hrmcngs.bsky.social" },
       { "label": "Drowse Lab(Twitter)",     "url": "https://x.com/Drowse_Lab" },
-      { "label": "Drowse Lab (Instagram)",     "url": "https://instagram.com/drowse_lab/" }
+      { "label": "Drowse Lab (Instagram)",     "url": "https://instagram.com/drowse_lab/" },
+      { "label": "Buy Me a Coffee",            "url": "https://buymeacoffee.com/hrmcngs" }
     ]
   },
   "links": {
@@ -135,6 +139,13 @@
         "handle": "Drowse-Lab",
         "url": "https://github.com/Drowse-Lab",
         "color": "#7c6af7"
+      },
+      {
+        "platform": "buymeacoffee",
+        "label": "Buy Me a Coffee",
+        "handle": "hrmcngs",
+        "url": "https://buymeacoffee.com/hrmcngs",
+        "color": "#ffdd00"
       }
     ]
   },
@@ -180,21 +191,24 @@
       "title": "RPGish-HPDisplay",
       "desc": "RPG風HP表示、ダメージ表示データパック",
       "url": "https://github.com/hrmcngs/RPGish-HPDisplay",
-      "color": "#3ecfcf"
+      "color": "#3ecfcf",
+      "tags": ["Minecraft", "DataPack", "Canvas"]
     },
     {
       "icon": "https://raw.githubusercontent.com/Drowse-Lab/Drowse-Lab/main/assets/image/DrowseLabIcon.jpg",
       "title": "Drowse-Lab",
       "desc": "なんとなく作っているweb",
       "url": "https://github.com/Drowse-Lab/Drowse-Lab",
-      "color": "#7c6af7"
+      "color": "#7c6af7",
+      "tags": ["Web", "JavaScript"]
     },
     {
       "icon": "https://raw.githubusercontent.com/Drowse-Lab/The-four-primitives-and-Weapons/1.20.1/src/main/resources/logo.png",
       "title": "The-four-primitives-and-Weapons",
       "desc": "Drowse-Lab / Minecraft mod",
       "url": "https://github.com/Drowse-Lab/The-four-primitives-and-Weapons",
-      "color": "#f87171"
+      "color": "#f87171",
+      "tags": ["Minecraft", "Mod", "Java"]
     }
   ]
 }

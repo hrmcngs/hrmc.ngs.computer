@@ -72,6 +72,9 @@
           const hasGh = hasGithubLink(p);
           lines.push(`<span class="term-cmd"${colorStyle}>[${i + 1}] ${p.title}${hasGh ? ' ◆' : ''}</span>`);
           lines.push(`    ${p.desc}`);
+          if (p.tags?.length) {
+            lines.push(`    <span style="opacity:0.5">${p.tags.map(t => `[${t}]`).join(' ')}</span>`);
+          }
           (p.links ?? []).forEach(url => {
             lines.push(`    → <a href="${url}" target="_blank" rel="noopener">${url}</a>`);
           });
