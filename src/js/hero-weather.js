@@ -182,13 +182,13 @@
       ctx.fill();
       ctx.restore();
     }
-    // 上部に切れ込みのある桜の花びら
+    // 上部に切れ込みのある桜の花びら（縦長）
     _path(s) {
-      ctx.moveTo(0, s * 0.9);
-      ctx.bezierCurveTo(-s*0.7, s*0.5, -s*0.95, -s*0.1, -s*0.7, -s*0.55);
-      ctx.bezierCurveTo(-s*0.5, -s*0.9, -s*0.15, -s*0.75, 0, -s*0.45);
-      ctx.bezierCurveTo( s*0.15,-s*0.75,  s*0.5, -s*0.9,  s*0.7, -s*0.55);
-      ctx.bezierCurveTo( s*0.95,-s*0.1,  s*0.7,   s*0.5,  0,      s*0.9);
+      ctx.moveTo(0, s * 1.2);
+      ctx.bezierCurveTo(-s*0.6,  s*0.7,  -s*0.9, -s*0.1, -s*0.65, -s*0.7);
+      ctx.bezierCurveTo(-s*0.45, -s*1.1, -s*0.12, -s*0.95, 0, -s*0.6);
+      ctx.bezierCurveTo( s*0.12, -s*0.95,  s*0.45, -s*1.1,  s*0.65, -s*0.7);
+      ctx.bezierCurveTo( s*0.9,  -s*0.1,   s*0.6,   s*0.7,  0,       s*1.2);
       ctx.closePath();
     }
   }
