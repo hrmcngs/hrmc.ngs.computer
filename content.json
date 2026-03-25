@@ -59,7 +59,8 @@
       { "label": "Twitter (main)", "url": "https://x.com/hrmcngs" },
       { "label": "Twitter (sub)",  "url": "https://x.com/0526ngs" },
       { "label": "GitHub",         "url": "https://github.com/hrmcngs" },
-      { "label": "Instagram",      "url": "https://instagram.com/hrmcngs" },
+      { "label": "Instagram  (main)",      "url": "https://instagram.com/hrmcngs" },
+      { "label": "Instagram  (sub)",      "url": "https://instagram.com/0526ngs" },
       { "label": "Pixiv",          "url": "https://pixiv.net/users/83520943" },
       { "label": "Bluesky",        "url": "https://bsky.app/profile/hrmcngs.bsky.social" },
       { "label": "Drowse Lab(Twitter)",     "url": "https://x.com/Drowse_Lab" },
@@ -92,14 +93,14 @@
         "color": "#7c6af7"
       },
       {
-        "platform": "instagram",
+        "platform": "instagram (main)",
         "label": "Instagram",
         "handle": "hrmcngs",
         "url": "https://instagram.com/hrmcngs",
         "color": "#e1306c"
       },
       {
-        "platform": "instagram",
+        "platform": "instagram (sub)",
         "label": "Instagram",
         "handle": "0526ngs",
         "url": "https://instagram.com/0526ngs",
