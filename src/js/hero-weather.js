@@ -159,7 +159,7 @@
       ctx.translate(this.x, this.y);
       ctx.rotate(this.rot);
 
-      // グリッチ中はRGBずれを薄く重ねる
+      // グリッチ中はRGBずれ
       if (this.glitchTimer > 0) {
         ctx.globalAlpha = 0.25 * bright;
         ctx.translate(4, 0);
@@ -171,15 +171,49 @@
         ctx.translate(4, 0);
       }
 
+      // ── ベース花びら ──
       ctx.globalAlpha = this.alpha * bright;
-      ctx.beginPath();
-      this._path(s);
-      const g = ctx.createRadialGradient(0, -s*0.3, 0, 0, s*0.3, s*1.2);
+      ctx.beginPath(); this._path(s);
+      const g = ctx.createRadialGradient(0, -s*0.3, 0, 0, s*0.3, s*1.3);
       g.addColorStop(0, '#fff8fa');
       g.addColorStop(0.45, '#ffccd8');
       g.addColorStop(1, '#f08098');
       ctx.fillStyle = g;
       ctx.fill();
+
+      // ── デジタルノイズ（花びら内部） ──
+      ctx.beginPath(); this._path(s);
+      ctx.clip(); // 花びら形でクリップ
+
+      // 走査線（横に細いライン）
+      const lineStep = 2 + Math.floor(Math.random() * 2);
+      ctx.globalAlpha = (0.06 + Math.random() * 0.06) * bright;
+      ctx.fillStyle = '#000';
+      for (let ly = -s * 1.3; ly < s * 1.3; ly += lineStep) {
+        if (Math.random() < 0.5) ctx.fillRect(-s, ly, s * 2, 0.8);
+      }
+
+      // チラつくピクセル粒
+      const dotCount = 4 + Math.floor(Math.random() * 6);
+      for (let d = 0; d < dotCount; d++) {
+        const px = (Math.random() - 0.5) * s * 1.6;
+        const py = (Math.random() - 0.9) * s * 2.2;
+        const pw = 1 + Math.random() * 2;
+        ctx.globalAlpha = (0.3 + Math.random() * 0.5) * bright;
+        ctx.fillStyle = Math.random() < 0.5 ? '#fff' : `hsl(${320+Math.random()*40},80%,85%)`;
+        ctx.fillRect(px, py, pw, pw);
+      }
+
+      // カラーチャンネルずれライン（まれに）
+      if (Math.random() < 0.08) {
+        const ly = (Math.random() - 0.5) * s * 2;
+        ctx.globalAlpha = 0.15 * bright;
+        ctx.fillStyle = 'rgba(0,255,200,0.6)';
+        ctx.fillRect(-s, ly, s * 2, 1);
+        ctx.fillStyle = 'rgba(255,0,80,0.6)';
+        ctx.fillRect(-s + 2, ly + 1, s * 2, 1);
+      }
+
       ctx.restore();
     }
     // 上部に切れ込みのある桜の花びら（縦長）
@@ -304,7 +338,7 @@
 
   function rebuildAll() { buildParticles(); if (state.isRaining) buildRain(); else rainDrops=[]; }
 
-  // ── 気象庁API ──────────────────────────────────────
+  // ── WeatherNews API（目黒区: 35.6418, 139.6975） ────
   async function fetchWeather() {
     if (state.weather !== 'auto') {
       state.isRaining = state.weather==='rain'||state.weather==='snow';
@@ -313,13 +347,31 @@
       updateBackground(); return;
     }
     try {
-      const res  = await fetch('https://www.jma.go.jp/bosai/forecast/data/forecast/130000.json');
+      const res  = await fetch(
+        'https://weathernews.jp/onebox/35.6418/139.6975/pa=0'
+      );
       const data = await res.json();
-      const code = data[0]?.timeSeries?.[0]?.areas?.[0]?.weatherCodes?.[0] ?? '100';
-      state.isRaining = /^[34]/.test(code);
-      state.isClear   = /^1/.test(code);
+      // WeatherNews: data.ptype 0=なし 1=雨 2=雪 3=みぞれ
+      const ptype = data?.ptype ?? 0;
+      const wxid  = data?.wxid  ?? 1; // 1=晴れ系
+      state.isRaining = ptype === 1 || ptype === 3;
+      state.isClear   = ptype === 0 && wxid <= 3;
       if (state.isRaining) buildRain(); else rainDrops=[];
-    } catch {}
+      console.log(`%c[heroWeather] WeatherNews 目黒区: ptype=${ptype} wxid=${wxid}`, 'color:#3ecfcf');
+    } catch (e) {
+      console.warn('[heroWeather] WeatherNews取得失敗、気象庁にフォールバック', e);
+      // フォールバック: 気象庁API
+      try {
+        const res  = await fetch('https://www.jma.go.jp/bosai/forecast/data/forecast/130000.json');
+        const data = await res.json();
+        const areas = data[0]?.timeSeries?.[0]?.areas ?? [];
+        const area  = areas.find(a => a.area?.name === '東京地方') ?? areas[0];
+        const code  = area?.weatherCodes?.[0] ?? '100';
+        state.isRaining = /^[34]/.test(code);
+        state.isClear   = /^1/.test(code);
+        if (state.isRaining) buildRain(); else rainDrops=[];
+      } catch {}
+    }
     updateBackground();
   }
 
