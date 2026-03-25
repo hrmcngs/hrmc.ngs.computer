@@ -159,14 +159,12 @@
       ctx.translate(this.x, this.y);
       ctx.rotate(this.rot);
 
-      // グリッチ中はRGBずれ
+      // グリッチRGBずれ
       if (this.glitchTimer > 0) {
         ctx.globalAlpha = 0.25 * bright;
-        ctx.translate(4, 0);
-        ctx.beginPath(); this._path(s);
+        ctx.translate(4, 0); ctx.beginPath(); this._path(s);
         ctx.fillStyle = 'rgba(0,255,200,0.7)'; ctx.fill();
-        ctx.translate(-8, 0);
-        ctx.beginPath(); this._path(s);
+        ctx.translate(-8, 0); ctx.beginPath(); this._path(s);
         ctx.fillStyle = 'rgba(255,0,80,0.7)'; ctx.fill();
         ctx.translate(4, 0);
       }
@@ -174,45 +172,58 @@
       // ── ベース花びら ──
       ctx.globalAlpha = this.alpha * bright;
       ctx.beginPath(); this._path(s);
-      const g = ctx.createRadialGradient(0, -s*0.3, 0, 0, s*0.3, s*1.3);
-      g.addColorStop(0, '#fff8fa');
-      g.addColorStop(0.45, '#ffccd8');
-      g.addColorStop(1, '#f08098');
-      ctx.fillStyle = g;
+      const base = ctx.createRadialGradient(0, -s*0.3, 0, 0, s*0.3, s*1.3);
+      base.addColorStop(0, '#fff8fa');
+      base.addColorStop(0.45, '#ffccd8');
+      base.addColorStop(1, '#f08098');
+      ctx.fillStyle = base;
       ctx.fill();
 
-      // ── デジタルノイズ（花びら内部） ──
-      ctx.beginPath(); this._path(s);
-      ctx.clip(); // 花びら形でクリップ
+      // ── ホログラム干渉縞 ──
+      ctx.beginPath(); this._path(s); ctx.clip();
 
-      // 走査線（横に細いライン）
-      const lineStep = 2 + Math.floor(Math.random() * 2);
-      ctx.globalAlpha = (0.06 + Math.random() * 0.06) * bright;
-      ctx.fillStyle = '#000';
-      for (let ly = -s * 1.3; ly < s * 1.3; ly += lineStep) {
-        if (Math.random() < 0.5) ctx.fillRect(-s, ly, s * 2, 0.8);
+      // 虹色グラデーション帯（角度を毎フレーム少しずつずらす）
+      const t     = Date.now() / 800;
+      const angle = t + this.swing;
+      const hx1   = Math.cos(angle) * s * 1.5;
+      const hy1   = Math.sin(angle) * s * 1.5;
+      const holo  = ctx.createLinearGradient(-hx1, -hy1, hx1, hy1);
+      holo.addColorStop(0.00, 'rgba(255,100,180,0.0)');
+      holo.addColorStop(0.15, 'rgba(0,255,220,0.22)');
+      holo.addColorStop(0.30, 'rgba(120,80,255,0.18)');
+      holo.addColorStop(0.45, 'rgba(255,220,0,0.20)');
+      holo.addColorStop(0.60, 'rgba(0,200,255,0.18)');
+      holo.addColorStop(0.75, 'rgba(255,80,120,0.22)');
+      holo.addColorStop(1.00, 'rgba(80,255,180,0.0)');
+      ctx.globalAlpha = (0.5 + 0.3 * Math.sin(t * 1.3)) * bright;
+      ctx.fillStyle   = holo;
+      ctx.fillRect(-s * 1.5, -s * 1.5, s * 3, s * 3);
+
+      // 細かい水平スキャンライン
+      ctx.globalAlpha = 0.08 * bright;
+      ctx.fillStyle   = '#000';
+      for (let ly = -s * 1.3; ly < s * 1.3; ly += 2) {
+        ctx.fillRect(-s, ly, s * 2, 0.7);
       }
 
-      // チラつくピクセル粒
-      const dotCount = 4 + Math.floor(Math.random() * 6);
-      for (let d = 0; d < dotCount; d++) {
+      // チラつくスペックル
+      const specCount = 3 + Math.floor(Math.random() * 5);
+      for (let d = 0; d < specCount; d++) {
         const px = (Math.random() - 0.5) * s * 1.6;
         const py = (Math.random() - 0.9) * s * 2.2;
-        const pw = 1 + Math.random() * 2;
-        ctx.globalAlpha = (0.3 + Math.random() * 0.5) * bright;
-        ctx.fillStyle = Math.random() < 0.5 ? '#fff' : `hsl(${320+Math.random()*40},80%,85%)`;
+        const pw = 0.8 + Math.random() * 1.5;
+        ctx.globalAlpha = (0.4 + Math.random() * 0.5) * bright;
+        const hue = Math.random() * 360;
+        ctx.fillStyle = `hsl(${hue},100%,85%)`;
         ctx.fillRect(px, py, pw, pw);
       }
 
-      // カラーチャンネルずれライン（まれに）
-      if (Math.random() < 0.08) {
-        const ly = (Math.random() - 0.5) * s * 2;
-        ctx.globalAlpha = 0.15 * bright;
-        ctx.fillStyle = 'rgba(0,255,200,0.6)';
-        ctx.fillRect(-s, ly, s * 2, 1);
-        ctx.fillStyle = 'rgba(255,0,80,0.6)';
-        ctx.fillRect(-s + 2, ly + 1, s * 2, 1);
-      }
+      // エッジ輝線
+      ctx.globalAlpha = (0.15 + 0.1 * Math.sin(t * 2.1)) * bright;
+      ctx.beginPath(); this._path(s);
+      ctx.strokeStyle = `hsl(${(t * 60) % 360},100%,80%)`;
+      ctx.lineWidth   = 0.8;
+      ctx.stroke();
 
       ctx.restore();
     }
@@ -302,21 +313,40 @@
     }
   }
 
-  // ── 雨 ───────────────────────────────────────────
+  // ── 雨（ホログラム） ─────────────────────────────
   class Rain {
     constructor(initial) { this.init(initial); }
     init(initial = false) {
-      this.x = Math.random() * canvas.width; this.y = initial ? Math.random() * canvas.height : -30;
-      this.len = 10 + Math.random() * 15; this.speed = 10 + Math.random() * 7;
-      this.alpha = 0.08 + Math.random() * 0.1;
+      this.x     = Math.random() * canvas.width;
+      this.y     = initial ? Math.random() * canvas.height : -30;
+      this.len   = 10 + Math.random() * 18;
+      this.speed = 9 + Math.random() * 7;
+      this.alpha = 0.12 + Math.random() * 0.15;
+      this.hue   = Math.random() * 360; // ホログラム色相
     }
-    update() { this.x += 0.8; this.y += this.speed; if (this.y > canvas.height + 30) this.init(); }
+    update() {
+      this.x   += 0.8;
+      this.y   += this.speed;
+      this.hue  = (this.hue + 2) % 360; // 色相を毎フレームずらす
+      if (this.y > canvas.height + 30) this.init();
+    }
     draw(bright) {
-      ctx.save(); ctx.globalAlpha = this.alpha * bright;
-      ctx.strokeStyle = '#90beff'; ctx.lineWidth = 0.8;
-      ctx.beginPath(); ctx.moveTo(this.x, this.y);
-      ctx.lineTo(this.x + this.len*0.08, this.y + this.len);
-      ctx.stroke(); ctx.restore();
+      ctx.save();
+      // ホログラム虹色グラデーション
+      const grad = ctx.createLinearGradient(this.x, this.y, this.x + this.len*0.08, this.y + this.len);
+      grad.addColorStop(0,   `hsla(${this.hue},100%,80%,0)`);
+      grad.addColorStop(0.3, `hsla(${this.hue},100%,80%,${this.alpha * bright})`);
+      grad.addColorStop(0.7, `hsla(${(this.hue+60)%360},100%,85%,${this.alpha * bright})`);
+      grad.addColorStop(1,   `hsla(${(this.hue+120)%360},100%,90%,0)`);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth   = 0.9;
+      ctx.shadowColor = `hsl(${this.hue},100%,70%)`;
+      ctx.shadowBlur  = 3;
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y);
+      ctx.lineTo(this.x + this.len * 0.08, this.y + this.len);
+      ctx.stroke();
+      ctx.restore();
     }
   }
 
