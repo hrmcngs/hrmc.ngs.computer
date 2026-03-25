@@ -251,7 +251,7 @@
     function safeUrl(u){const t=u.trim();return/^(javascript|data|vbscript):/i.test(t)?'#':t;}
     function cleanUrl(url){url=url.replace(/\\([&()[\]#*_!])/g,'$1');url=url.replace(/github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)/,'raw.githubusercontent.com/$1/$2/$3');return safeUrl(url);}
     function stripHtml(md){
-      md=md.replace(/\[!\[([^\]]*)\]\(([^)]+)\)\]\(([^)]+)\)/g,(_,a,i,h)=>`<a href="${safeUrl(h)}" target="_blank" rel="noopener noreferrer"><img src="${cleanUrl(i)}" alt="${escHtml(a)}" class="readme-img"></a>`);
+      md=md.replace(/\[!\[([^\]]*)\]\(([^)]+)\)\]\(([^)]+)\)/g,(_,a,i,h)=>`<a href="${safeUrl(h)}" target="_blank" rel="noopener noreferrer"><img src="${cleanUrl(i)}" alt="${escAttr(a)}" class="readme-img"></a>`);
       md=md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,(_,a,s)=>`<img src="${cleanUrl(s)}" alt="${a}" class="readme-img">`);
       md=md.replace(/<a\s+href="([^"]*)"[^>]*>[\s\S]*?<img\s[^>]*src="([^"]*)"[^>]*\/?>[\s\S]*?<\/a>/gi,(_,h,s)=>`<a href="${safeUrl(h)}" target="_blank" rel="noopener noreferrer"><img src="${cleanUrl(s)}" class="readme-img"></a>`);
       md=md.replace(/<img\s[^>]*src="([^"]*)"[^>]*\/?>/gi,(m,s)=>{if(m.includes('readme-img'))return m;const a=m.match(/alt="([^"]*)"/i);const altText=a?a[1]:'';return`<img src="${cleanUrl(s)}" alt="${escAttr(altText)}" class="readme-img">`;});
