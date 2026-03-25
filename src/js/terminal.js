@@ -245,6 +245,8 @@
 
     // ── Markdown ───────────────────────────────────────
     function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+    // Attribute-safe HTML escaper (also escapes double quotes for use inside attributes)
+    function escAttr(s){return escHtml(s).replace(/"/g,'&quot;');}
     // javascript:/data:/vbscript: を除去して XSS を防ぐ
     function safeUrl(u){const t=u.trim();return/^(javascript|data|vbscript):/i.test(t)?'#':t;}
     function cleanUrl(url){url=url.replace(/\\([&()[\]#*_!])/g,'$1');url=url.replace(/github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)/,'raw.githubusercontent.com/$1/$2/$3');return safeUrl(url);}
@@ -252,7 +254,7 @@
       md=md.replace(/\[!\[([^\]]*)\]\(([^)]+)\)\]\(([^)]+)\)/g,(_,a,i,h)=>`<a href="${safeUrl(h)}" target="_blank" rel="noopener noreferrer"><img src="${cleanUrl(i)}" alt="${escHtml(a)}" class="readme-img"></a>`);
       md=md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,(_,a,s)=>`<img src="${cleanUrl(s)}" alt="${a}" class="readme-img">`);
       md=md.replace(/<a\s+href="([^"]*)"[^>]*>[\s\S]*?<img\s[^>]*src="([^"]*)"[^>]*\/?>[\s\S]*?<\/a>/gi,(_,h,s)=>`<a href="${safeUrl(h)}" target="_blank" rel="noopener noreferrer"><img src="${cleanUrl(s)}" class="readme-img"></a>`);
-      md=md.replace(/<img\s[^>]*src="([^"]*)"[^>]*\/?>/gi,(m,s)=>{if(m.includes('readme-img'))return m;const a=m.match(/alt="([^"]*)"/i);return`<img src="${cleanUrl(s)}" alt="${a?a[1]:''}" class="readme-img">`;});
+      md=md.replace(/<img\s[^>]*src="([^"]*)"[^>]*\/?>/gi,(m,s)=>{if(m.includes('readme-img'))return m;const a=m.match(/alt="([^"]*)"/i);const altText=a?a[1]:'';return`<img src="${cleanUrl(s)}" alt="${escAttr(altText)}" class="readme-img">`;});
       md=md.replace(/<a\s+href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi,(m,h,inner)=>{if(inner.includes('<img'))return m;return`[${inner.trim()}](${safeUrl(h)})`;});
       md=md.replace(/<br\s*\/?>/gi,'\n');
       md=md.replace(/<(?!img\s|a\s[^>]*><img|\/a>)[^>]+(>|$)/gi,'');
