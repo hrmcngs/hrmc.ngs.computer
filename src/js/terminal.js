@@ -43,7 +43,7 @@
 
       appendLines([
         '',
-        `<span class="success">▶ 集計開始</span>  <span style="opacity:0.6">${username} / ${periodLabel}</span>`,
+        `<span class="success">▶ 集計開始</span>  <span style="opacity:0.6">${escHtml(username)} / ${escHtml(periodLabel)}</span>`,
         '<span style="opacity:0.3">────────────────────────────────────</span>',
       ], body);
 
@@ -61,7 +61,7 @@
         if (!res.ok) throw new Error(`${res.status}: ${data?.message ?? ''}`);
         prCount = data.total_count ?? 0;
       } catch (err) {
-        setLoading(ld, `<span class="error">PR取得エラー: ${err.message}</span>`);
+        setLoading(ld, `<span class="error">PR取得エラー: ${escHtml(err.message)}</span>`);
         return;
       }
 
@@ -77,7 +77,7 @@
         if (!res.ok) throw new Error(`${res.status}: ${data?.message ?? ''}`);
         commitCount = data.total_count ?? 0;
       } catch (err) {
-        setLoading(ld, `<span class="error">コミット取得エラー: ${err.message}</span>`);
+        setLoading(ld, `<span class="error">コミット取得エラー: ${escHtml(err.message)}</span>`);
         return;
       }
 
@@ -118,8 +118,8 @@
 
       whoami: () => {
         const lines = [];
-        if (profile.name) lines.push(`${profile.name} / ${(profile.handle ?? '').replace(/^@/, '')}`);
-        (profile.bio ?? []).forEach(b => lines.push(b));
+        if (profile.name) lines.push(`${escHtml(profile.name)} / ${escHtml((profile.handle ?? '').replace(/^@/, ''))}`);
+        (profile.bio ?? []).forEach(b => lines.push(escHtml(b)));
         const xHosts = new Set(['x.com','www.x.com','twitter.com','www.twitter.com','mobile.twitter.com']);
         const accs = socialLinks.filter(l => {
           try { return xHosts.has(new URL(l.url, location.origin).hostname); } catch { return false; }
@@ -128,16 +128,16 @@
         return lines;
       },
 
-      ls: () => (works ?? []).map(p => `${p.title}/`),
+      ls: () => (works ?? []).map(p => `${escHtml(p.title)}/`),
 
       './build.sh': () => {
         buildActive = true;
         const lines = ['<span class="success">▶ Building projects...</span>', ''];
         build.forEach((p, i) => {
-          const cs = p.color ? ` style="color:${p.color}"` : '';
-          lines.push(`<span class="term-cmd"${cs}>[${i+1}] ${p.title}</span>`);
-          lines.push(`    ${p.desc}`);
-          if (p.tags?.length) lines.push(`    <span style="opacity:0.5">${p.tags.map(t=>`[${t}]`).join(' ')}</span>`);
+          const cs = p.color && /^[#a-zA-Z0-9(),%. ]+$/.test(p.color) ? ` style="color:${p.color}"` : '';
+          lines.push(`<span class="term-cmd"${cs}>[${i+1}] ${escHtml(p.title)}</span>`);
+          lines.push(`    ${escHtml(p.desc)}`);
+          if (p.tags?.length) lines.push(`    <span style="opacity:0.5">${p.tags.map(t=>`[${escHtml(t)}]`).join(' ')}</span>`);
           (p.links ?? []).forEach(url => lines.push(`    → <a href="${safeUrl(url)}" target="_blank" rel="noopener noreferrer">${url}</a>`));
           lines.push('');
         });
@@ -147,13 +147,13 @@
 
       './about.sh': () => {
         const lines = [];
-        if (profile.name)   lines.push(`<span class="success">${profile.name}</span>`);
-        if (profile.handle) lines.push(`<span style="opacity:0.6">${profile.handle}</span>`);
+        if (profile.name)   lines.push(`<span class="success">${escHtml(profile.name)}</span>`);
+        if (profile.handle) lines.push(`<span style="opacity:0.6">${escHtml(profile.handle)}</span>`);
         if (lines.length)   lines.push('');
-        (profile.bio ?? []).forEach(b => lines.push(b));
+        (profile.bio ?? []).forEach(b => lines.push(escHtml(b)));
         if (profile.chips?.length) {
           lines.push('');
-          lines.push(profile.chips.map(c => `<span style="color:var(--text-muted)">${c}</span>`).join('  '));
+          lines.push(profile.chips.map(c => `<span style="color:var(--text-muted)">${escHtml(c)}</span>`).join('  '));
         }
         lines.push('');
         lines.push(`→ <a href="/about" target="_blank" rel="noopener noreferrer">/about</a>`);
@@ -177,7 +177,7 @@
 
       'cat links.txt': () => {
         const max = Math.max(...socialLinks.map(l => l.label.length), 0);
-        return socialLinks.map(l => `${l.label.padEnd(max)} : <a href="${safeUrl(l.url)}" target="_blank" rel="noopener noreferrer">${l.url}</a>`);
+        return socialLinks.map(l => `${escHtml(l.label).padEnd(max)} : <a href="${safeUrl(l.url)}" target="_blank" rel="noopener noreferrer">${escHtml(l.url)}</a>`);
       },
 
       clear: () => '__clear__',
@@ -189,9 +189,9 @@
         if (!matched.length) return [{ type: 'error', message: `${chip}: 関連プロジェクトが見つかりません。` }];
         const lines = [`<span class="success">${chip} に関連するプロジェクト:</span>`, ''];
         matched.forEach(p => {
-          const cs = p.color ? ` style="color:${p.color}"` : '';
-          lines.push(`<span class="term-cmd"${cs}>${p.title}</span>  ${(p.tags??[]).map(t=>`<span style="opacity:0.5">[${t}]</span>`).join(' ')}`);
-          lines.push(`    ${p.desc}`);
+          const cs = p.color && /^[#a-zA-Z0-9(),%. ]+$/.test(p.color) ? ` style="color:${p.color}"` : '';
+          lines.push(`<span class="term-cmd"${cs}>${escHtml(p.title)}</span>  ${(p.tags??[]).map(t=>`<span style="opacity:0.5">[${escHtml(t)}]</span>`).join(' ')}`);
+          lines.push(`    ${escHtml(p.desc)}`);
           (p.links ?? []).forEach(url => lines.push(`    → <a href="${safeUrl(url)}" target="_blank" rel="noopener noreferrer">${url}</a>`));
           lines.push('');
         });
