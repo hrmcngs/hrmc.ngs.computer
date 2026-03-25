@@ -124,7 +124,7 @@
         const accs = socialLinks.filter(l => {
           try { return xHosts.has(new URL(l.url, location.origin).hostname); } catch { return false; }
         });
-        if (accs.length) lines.push(accs.map(l => `<a href="${l.url}" target="_blank" rel="noopener">@${l.url.split('/').pop()}</a>`).join(' · '));
+        if (accs.length) lines.push(accs.map(l => `<a href="${safeUrl(l.url)}" target="_blank" rel="noopener noreferrer">@${l.url.split('/').pop()}</a>`).join(' · '));
         return lines;
       },
 
@@ -138,7 +138,7 @@
           lines.push(`<span class="term-cmd"${cs}>[${i+1}] ${p.title}</span>`);
           lines.push(`    ${p.desc}`);
           if (p.tags?.length) lines.push(`    <span style="opacity:0.5">${p.tags.map(t=>`[${t}]`).join(' ')}</span>`);
-          (p.links ?? []).forEach(url => lines.push(`    → <a href="${url}" target="_blank" rel="noopener">${url}</a>`));
+          (p.links ?? []).forEach(url => lines.push(`    → <a href="${safeUrl(url)}" target="_blank" rel="noopener noreferrer">${url}</a>`));
           lines.push('');
         });
         lines.push('<span class="success">Done.</span>');
@@ -156,7 +156,7 @@
           lines.push(profile.chips.map(c => `<span style="color:var(--text-muted)">${c}</span>`).join('  '));
         }
         lines.push('');
-        lines.push(`→ <a href="/about" target="_blank" rel="noopener">/about</a>`);
+        lines.push(`→ <a href="/about" target="_blank" rel="noopener noreferrer">/about</a>`);
         return lines;
       },
 
@@ -177,7 +177,7 @@
 
       'cat links.txt': () => {
         const max = Math.max(...socialLinks.map(l => l.label.length), 0);
-        return socialLinks.map(l => `${l.label.padEnd(max)} : <a href="${l.url}" target="_blank" rel="noopener">${l.url}</a>`);
+        return socialLinks.map(l => `${l.label.padEnd(max)} : <a href="${safeUrl(l.url)}" target="_blank" rel="noopener noreferrer">${l.url}</a>`);
       },
 
       clear: () => '__clear__',
@@ -192,7 +192,7 @@
           const cs = p.color ? ` style="color:${p.color}"` : '';
           lines.push(`<span class="term-cmd"${cs}>${p.title}</span>  ${(p.tags??[]).map(t=>`<span style="opacity:0.5">[${t}]</span>`).join(' ')}`);
           lines.push(`    ${p.desc}`);
-          (p.links ?? []).forEach(url => lines.push(`    → <a href="${url}" target="_blank" rel="noopener">${url}</a>`));
+          (p.links ?? []).forEach(url => lines.push(`    → <a href="${safeUrl(url)}" target="_blank" rel="noopener noreferrer">${url}</a>`));
           lines.push('');
         });
         return lines;
@@ -245,13 +245,15 @@
 
     // ── Markdown ───────────────────────────────────────
     function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-    function cleanUrl(url){url=url.replace(/\\([&()[\]#*_!])/g,'$1');url=url.replace(/github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)/,'raw.githubusercontent.com/$1/$2/$3');return url;}
+    // javascript:/data:/vbscript: を除去して XSS を防ぐ
+    function safeUrl(u){const t=u.trim();return/^(javascript|data|vbscript):/i.test(t)?'#':t;}
+    function cleanUrl(url){url=url.replace(/\\([&()[\]#*_!])/g,'$1');url=url.replace(/github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)/,'raw.githubusercontent.com/$1/$2/$3');return safeUrl(url);}
     function stripHtml(md){
-      md=md.replace(/\[!\[([^\]]*)\]\(([^)]+)\)\]\(([^)]+)\)/g,(_,a,i,h)=>`<a href="${h}" target="_blank" rel="noopener"><img src="${cleanUrl(i)}" alt="${a}" class="readme-img"></a>`);
+      md=md.replace(/\[!\[([^\]]*)\]\(([^)]+)\)\]\(([^)]+)\)/g,(_,a,i,h)=>`<a href="${safeUrl(h)}" target="_blank" rel="noopener noreferrer"><img src="${cleanUrl(i)}" alt="${escHtml(a)}" class="readme-img"></a>`);
       md=md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,(_,a,s)=>`<img src="${cleanUrl(s)}" alt="${a}" class="readme-img">`);
-      md=md.replace(/<a\s+href="([^"]*)"[^>]*>[\s\S]*?<img\s[^>]*src="([^"]*)"[^>]*\/?>[\s\S]*?<\/a>/gi,(_,h,s)=>`<a href="${h}" target="_blank" rel="noopener"><img src="${cleanUrl(s)}" class="readme-img"></a>`);
+      md=md.replace(/<a\s+href="([^"]*)"[^>]*>[\s\S]*?<img\s[^>]*src="([^"]*)"[^>]*\/?>[\s\S]*?<\/a>/gi,(_,h,s)=>`<a href="${safeUrl(h)}" target="_blank" rel="noopener noreferrer"><img src="${cleanUrl(s)}" class="readme-img"></a>`);
       md=md.replace(/<img\s[^>]*src="([^"]*)"[^>]*\/?>/gi,(m,s)=>{if(m.includes('readme-img'))return m;const a=m.match(/alt="([^"]*)"/i);return`<img src="${cleanUrl(s)}" alt="${a?a[1]:''}" class="readme-img">`;});
-      md=md.replace(/<a\s+href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi,(m,h,inner)=>{if(inner.includes('<img'))return m;return`[${inner.trim()}](${h})`;});
+      md=md.replace(/<a\s+href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi,(m,h,inner)=>{if(inner.includes('<img'))return m;return`[${inner.trim()}](${safeUrl(h)})`;});
       md=md.replace(/<br\s*\/?>/gi,'\n');
       md=md.replace(/<(?!img\s|a\s[^>]*><img|\/a>)[^>]+(>|$)/gi,'');
       return md;
@@ -264,8 +266,8 @@
       s=s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
       s=s.replace(/\*(.+?)\*/g,'<em>$1</em>');
       s=s.replace(/`([^`]+)`/g,'<code style="background:rgba(255,255,255,0.08);padding:0.1em 0.3em;border-radius:3px">$1</code>');
-      s=s.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
-      s=s.replace(/(^|[\s(])((https?:\/\/)[^\s<)]+)/g,'$1<a href="$2" target="_blank" rel="noopener">$2</a>');
+      s=s.replace(/\[([^\]]+)\]\(([^)]+)\)/g,(_,text,href)=>`<a href="${safeUrl(href)}" target="_blank" rel="noopener noreferrer">${text}</a>`);
+      s=s.replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g,'$1<a href="$2" target="_blank" rel="noopener noreferrer">$2</a>');
       s=s.replace(/\x00P(\d+)\x00/g,(_,i)=>p[i]);
       return s;
     }
