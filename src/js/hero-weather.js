@@ -347,14 +347,9 @@
     updateBackground();
   }
 
-  // ── アニメーション（12fps） ─────────────────────────
-  const FRAME_MS = 1000 / 12;
-  let lastTime   = 0;
-
+  // ── アニメーション ─────────────────────────────────
   function animate(now = 0) {
     requestAnimationFrame(animate);
-    if (now - lastTime < FRAME_MS) return;
-    lastTime = now - ((now - lastTime) % FRAME_MS);
     frame++;
     const { bright } = getTimeInfo();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -362,7 +357,6 @@
     particles.forEach(p => { p.update(); p.draw(bright); });
     if (state.isRaining) rainDrops.forEach(r => { r.update(); r.draw(bright); });
 
-    // ノイズ（24フレームに1回 = 2秒に1回）
     if (frame % 24 === 0) updateNoise();
     if (noisePat) {
       ctx.save();
