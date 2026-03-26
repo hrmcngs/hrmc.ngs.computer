@@ -42,28 +42,76 @@
     return { phase, bright };
   }
 
-  // ── 背景 ────────────────────────────────────────────
+  // ── 背景（ホラゲー風） ──────────────────────────────
   function updateBackground() {
     if (!overlay) return;
     const { phase } = getTimeInfo();
     const isDayClear = phase === 'day' && state.isClear;
     const configs = {
-      midnight: { grad: 'linear-gradient(160deg,#000010 0%,#050518 100%)', opacity: 0.92 },
-      dawn    : { grad: 'linear-gradient(160deg,#1a0828 0%,#3a1228 100%)', opacity: 0.85 },
+      midnight: { grad: 'linear-gradient(180deg,#000000 0%,#020008 60%,#050005 100%)', opacity: 0.96 },
+      dawn    : { grad: 'linear-gradient(180deg,#0a0005 0%,#1a0510 50%,#0d0008 100%)', opacity: 0.92 },
       day     : isDayClear
-                ? { grad: 'linear-gradient(160deg,#0a1830 0%,#0d2448 100%)', opacity: 0.50 }
-                : { grad: 'linear-gradient(160deg,#080d18 0%,#0d1222 100%)', opacity: 0.82 },
-      dusk    : { grad: 'linear-gradient(160deg,#180818 0%,#2a0c14 100%)', opacity: 0.85 },
-      night   : { grad: 'linear-gradient(160deg,#020210 0%,#060818 100%)', opacity: 0.90 },
+                ? { grad: 'linear-gradient(180deg,#060a14 0%,#0a1020 100%)', opacity: 0.62 }
+                : { grad: 'linear-gradient(180deg,#020205 0%,#05050a 100%)', opacity: 0.90 },
+      dusk    : { grad: 'linear-gradient(180deg,#0a0005 0%,#1a0208 60%,#050010 100%)', opacity: 0.92 },
+      night   : { grad: 'linear-gradient(180deg,#000000 0%,#030008 50%,#020005 100%)', opacity: 0.94 },
     };
     const cfg = configs[phase] ?? configs.night;
-    overlay.style.transition = 'background 4s ease, opacity 4s ease';
+    overlay.style.transition = 'background 6s ease, opacity 6s ease';
     overlay.style.background = cfg.grad;
     overlay.style.opacity    = cfg.opacity;
   }
   setInterval(updateBackground, 60000);
 
-  // ── 花びらオフスクリーンキャッシュ ─────────────────
+  // ── ホラゲー風CSS（フィルム粒子+歪みスキャンライン） ─
+  function injectHorrorStyle() {
+    if (document.getElementById('horror-style')) return;
+    const style = document.createElement('style');
+    style.id = 'horror-style';
+    style.textContent = `
+      .hero {
+        filter: contrast(1.08) brightness(0.92) saturate(0.85);
+      }
+      .hero-bg {
+        position: relative;
+      }
+      /* 荒れたスキャンライン：不均一な間隔 */
+      .hero-bg::before {
+        content: '';
+        position: absolute; inset: 0; z-index: 2; pointer-events: none;
+        background:
+          repeating-linear-gradient(
+            0deg,
+            transparent 0px,
+            transparent 2px,
+            rgba(0,0,0,0.10) 2px,
+            rgba(0,0,0,0.10) 3px,
+            transparent 3px,
+            transparent 7px,
+            rgba(0,0,0,0.06) 7px,
+            rgba(0,0,0,0.06) 8px
+          );
+        mix-blend-mode: multiply;
+      }
+      /* ビネット（四隅を暗く） */
+      .hero-bg::after {
+        content: '';
+        position: absolute; inset: 0; z-index: 2; pointer-events: none;
+        background: radial-gradient(
+          ellipse at 50% 50%,
+          transparent 40%,
+          rgba(0,0,0,0.55) 80%,
+          rgba(0,0,0,0.85) 100%
+        );
+      }
+      /* テキストをわずかに滲ませる */
+      .hero-content {
+        filter: drop-shadow(0 0 8px rgba(200,180,255,0.12));
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  injectHorrorStyle();
 
   function buildPetalCache() {
     petalCache = PETAL_SIZES.map(s => {
@@ -138,35 +186,28 @@
   }
   updateNoise();
 
-  // ── スキャンライン（CSSで代替） ─────────────────────
-  // JS描画をやめてCSSで処理
-  function injectScanlineStyle() {
-    if (document.getElementById('scanline-style')) return;
-    const style = document.createElement('style');
-    style.id = 'scanline-style';
-    style.textContent = `
-      #hero-canvas::after {
-        content:''; position:absolute; inset:0; pointer-events:none;
-        background: repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 3px);
-      }
-    `;
-    document.head.appendChild(style);
-  }
-  injectScanlineStyle();
-
-  // ── グリッチ ────────────────────────────────────────
+  // ── グリッチ（ホラゲー風） ────────────────────────────
   let glitchLines  = [];
   let glitchActive = false;
 
   function triggerGlitch() {
     glitchActive = true;
-    glitchLines  = Array.from({ length: 2 + Math.floor(Math.random()*2) }, () => ({
-      y: Math.random() * canvas.height,
-      h: 1 + Math.random() * 3,
-      dx: (Math.random() - 0.5) * 16,
-      life: 3 + Math.floor(Math.random() * 4), f: 0,
+    const count = 3 + Math.floor(Math.random() * 5);
+    glitchLines = Array.from({ length: count }, () => ({
+      y   : Math.random() * canvas.height,
+      h   : 0.5 + Math.random() * 5,
+      dx  : (Math.random() - 0.5) * 40,
+      life: 2 + Math.floor(Math.random() * 5),
+      f   : 0,
+      // 色：白いノイズ・赤・紫・黒帯をランダムに
+      type: Math.floor(Math.random() * 4),
     }));
-    setTimeout(() => { glitchActive = false; glitchLines = []; }, 120 + Math.random()*150);
+    const dur = 80 + Math.random() * 180;
+    setTimeout(() => { glitchActive = false; glitchLines = []; }, dur);
+    // 連続グリッチ（たまに）
+    if (Math.random() < 0.3) {
+      setTimeout(triggerGlitch, dur + 30 + Math.random() * 100);
+    }
   }
 
   function drawGlitch(bright) {
@@ -174,12 +215,33 @@
     ctx.save();
     glitchLines.forEach(g => {
       g.f++;
-      const a = (1 - g.f / g.life) * 0.5 * bright;
-      ctx.globalAlpha = a;
-      ctx.fillStyle = 'rgba(0,255,200,0.25)';
-      ctx.fillRect(g.dx+3, g.y, canvas.width, g.h);
-      ctx.fillStyle = 'rgba(255,0,80,0.25)';
-      ctx.fillRect(g.dx-3, g.y, canvas.width, g.h);
+      const a = Math.max(0, 1 - g.f / g.life);
+      switch (g.type) {
+        case 0: // 白ノイズ帯
+          ctx.globalAlpha = a * 0.35 * bright;
+          ctx.fillStyle = `rgba(255,255,255,0.8)`;
+          ctx.fillRect(0, g.y, canvas.width, g.h);
+          break;
+        case 1: // 赤ずれ
+          ctx.globalAlpha = a * 0.25 * bright;
+          ctx.fillStyle = 'rgba(180,0,0,0.6)';
+          ctx.fillRect(g.dx, g.y, canvas.width, g.h);
+          ctx.fillStyle = 'rgba(0,0,0,0.8)';
+          ctx.fillRect(-g.dx, g.y + g.h, canvas.width, g.h * 0.5);
+          break;
+        case 2: // 黒帯（信号切れ）
+          ctx.globalAlpha = a * 0.9;
+          ctx.fillStyle = '#000';
+          ctx.fillRect(0, g.y, canvas.width, g.h * 2);
+          break;
+        case 3: // 紫・緑ずれ
+          ctx.globalAlpha = a * 0.20 * bright;
+          ctx.fillStyle = 'rgba(120,0,180,0.5)';
+          ctx.fillRect(g.dx + 5, g.y, canvas.width, g.h);
+          ctx.fillStyle = 'rgba(0,180,80,0.4)';
+          ctx.fillRect(g.dx - 5, g.y, canvas.width, g.h);
+          break;
+      }
     });
     ctx.restore();
   }
