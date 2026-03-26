@@ -48,13 +48,13 @@
     const { phase } = getTimeInfo();
     const isDayClear = phase === 'day' && state.isClear;
     const configs = {
-      midnight: { grad: 'linear-gradient(180deg,#000000 0%,#020008 60%,#050005 100%)', opacity: 0.96 },
-      dawn    : { grad: 'linear-gradient(180deg,#0a0005 0%,#1a0510 50%,#0d0008 100%)', opacity: 0.92 },
+      midnight: { grad: 'linear-gradient(180deg,#000000 0%,#020008 60%,#050005 100%)', opacity: 0.80 },
+      dawn    : { grad: 'linear-gradient(180deg,#0a0005 0%,#1a0510 50%,#0d0008 100%)', opacity: 0.75 },
       day     : isDayClear
-                ? { grad: 'linear-gradient(180deg,#060a14 0%,#0a1020 100%)', opacity: 0.62 }
-                : { grad: 'linear-gradient(180deg,#020205 0%,#05050a 100%)', opacity: 0.90 },
-      dusk    : { grad: 'linear-gradient(180deg,#0a0005 0%,#1a0208 60%,#050010 100%)', opacity: 0.92 },
-      night   : { grad: 'linear-gradient(180deg,#000000 0%,#030008 50%,#020005 100%)', opacity: 0.94 },
+                ? { grad: 'linear-gradient(180deg,#060a14 0%,#0a1020 100%)', opacity: 0.50 }
+                : { grad: 'linear-gradient(180deg,#020205 0%,#05050a 100%)', opacity: 0.72 },
+      dusk    : { grad: 'linear-gradient(180deg,#0a0005 0%,#1a0208 60%,#050010 100%)', opacity: 0.75 },
+      night   : { grad: 'linear-gradient(180deg,#000000 0%,#030008 50%,#020005 100%)', opacity: 0.78 },
     };
     const cfg = configs[phase] ?? configs.night;
     overlay.style.transition = 'background 6s ease, opacity 6s ease';
@@ -192,21 +192,26 @@
 
   function triggerGlitch() {
     glitchActive = true;
-    const count = 3 + Math.floor(Math.random() * 5);
-    glitchLines = Array.from({ length: count }, () => ({
-      y   : Math.random() * canvas.height,
-      h   : 0.5 + Math.random() * 5,
-      dx  : (Math.random() - 0.5) * 40,
-      life: 2 + Math.floor(Math.random() * 5),
-      f   : 0,
-      // 色：白いノイズ・赤・紫・黒帯をランダムに
-      type: Math.floor(Math.random() * 4),
-    }));
-    const dur = 80 + Math.random() * 180;
+    const count = 2 + Math.floor(Math.random() * 4);
+    glitchLines = Array.from({ length: count }, () => {
+      // 80%は画面の一部分だけ、20%は全幅
+      const partial = Math.random() < 0.80;
+      const startX  = partial ? Math.random() * canvas.width * 0.6 : 0;
+      const w       = partial ? canvas.width * (0.1 + Math.random() * 0.5) : canvas.width;
+      return {
+        y   : Math.random() * canvas.height,
+        h   : 0.5 + Math.random() * 4,
+        dx  : (Math.random() - 0.5) * 30,
+        life: 2 + Math.floor(Math.random() * 4),
+        f   : 0,
+        type: Math.floor(Math.random() * 4),
+        startX, w,
+      };
+    });
+    const dur = 60 + Math.random() * 140;
     setTimeout(() => { glitchActive = false; glitchLines = []; }, dur);
-    // 連続グリッチ（たまに）
-    if (Math.random() < 0.3) {
-      setTimeout(triggerGlitch, dur + 30 + Math.random() * 100);
+    if (Math.random() < 0.25) {
+      setTimeout(triggerGlitch, dur + 40 + Math.random() * 80);
     }
   }
 
@@ -216,30 +221,32 @@
     glitchLines.forEach(g => {
       g.f++;
       const a = Math.max(0, 1 - g.f / g.life);
+      const x = g.startX + g.dx;
+      const w = g.w;
       switch (g.type) {
-        case 0: // 白ノイズ帯
-          ctx.globalAlpha = a * 0.35 * bright;
-          ctx.fillStyle = `rgba(255,255,255,0.8)`;
-          ctx.fillRect(0, g.y, canvas.width, g.h);
+        case 0:
+          ctx.globalAlpha = a * 0.30 * bright;
+          ctx.fillStyle = 'rgba(255,255,255,0.8)';
+          ctx.fillRect(x, g.y, w, g.h);
           break;
-        case 1: // 赤ずれ
-          ctx.globalAlpha = a * 0.25 * bright;
+        case 1:
+          ctx.globalAlpha = a * 0.22 * bright;
           ctx.fillStyle = 'rgba(180,0,0,0.6)';
-          ctx.fillRect(g.dx, g.y, canvas.width, g.h);
+          ctx.fillRect(x, g.y, w, g.h);
           ctx.fillStyle = 'rgba(0,0,0,0.8)';
-          ctx.fillRect(-g.dx, g.y + g.h, canvas.width, g.h * 0.5);
+          ctx.fillRect(x - g.dx * 0.5, g.y + g.h, w, g.h * 0.5);
           break;
-        case 2: // 黒帯（信号切れ）
-          ctx.globalAlpha = a * 0.9;
+        case 2:
+          ctx.globalAlpha = a * 0.85;
           ctx.fillStyle = '#000';
-          ctx.fillRect(0, g.y, canvas.width, g.h * 2);
+          ctx.fillRect(g.startX, g.y, w, g.h * 2);
           break;
-        case 3: // 紫・緑ずれ
-          ctx.globalAlpha = a * 0.20 * bright;
+        case 3:
+          ctx.globalAlpha = a * 0.18 * bright;
           ctx.fillStyle = 'rgba(120,0,180,0.5)';
-          ctx.fillRect(g.dx + 5, g.y, canvas.width, g.h);
+          ctx.fillRect(x + 4, g.y, w, g.h);
           ctx.fillStyle = 'rgba(0,180,80,0.4)';
-          ctx.fillRect(g.dx - 5, g.y, canvas.width, g.h);
+          ctx.fillRect(x - 4, g.y, w, g.h);
           break;
       }
     });
