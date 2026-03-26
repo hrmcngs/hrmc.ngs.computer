@@ -452,7 +452,12 @@
 
   rebuildAll();
   updateBackground();
-  animate();
+  requestAnimationFrame(() => {
+    // DOMレイアウト確定後にサイズ再取得して粒子を再生成
+    resize();
+    rebuildAll();
+    animate();
+  });
   fetchWeather();
   console.log('%c[heroWeather] ready — heroWeather.help()','color:#3ecfcf');
 })();
