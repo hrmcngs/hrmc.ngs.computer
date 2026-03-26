@@ -281,15 +281,15 @@
       const cached = getNearestCache(this.s);
       const cw = cached.canvas.width;
       const ch = cached.canvas.height;
+      // 花びらは夜でも最低0.45は見えるようにする
+      const petalBright = Math.max(bright, 0.45);
       ctx.save();
       ctx.translate(this.x, this.y);
       ctx.rotate(this.rot);
-      ctx.globalAlpha = this.alpha * bright;
-      // オフスクリーンキャッシュをそのままdrawImage
+      ctx.globalAlpha = this.alpha * petalBright;
       ctx.drawImage(cached.canvas, -cw/2, -ch/2);
-      // VHSライン（持っている花びらだけ描画）
       if (this.vhsLine) {
-        ctx.globalAlpha = 0.25 * bright;
+        ctx.globalAlpha = 0.25 * petalBright;
         ctx.fillStyle   = 'rgba(255,210,225,0.8)';
         ctx.fillRect(-this.s, 0, this.s*2, 1);
       }
