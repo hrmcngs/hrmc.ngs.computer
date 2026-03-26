@@ -133,7 +133,7 @@
       this.y      = initial ? Math.random() * canvas.height : -20;
       this.s      = 6 + Math.random() * 8;
       this.vx     = (Math.random() - 0.5) * 1.0;
-      this.vy     = 0.6 + Math.random() * 1.0;
+      this.vy     = 1.8 + Math.random() * 2.5;
       this.rot    = Math.random() * Math.PI * 2;
       this.drot   = (Math.random() - 0.5) * 0.04;
       this.swing  = Math.random() * Math.PI * 2;
@@ -161,16 +161,16 @@
 
       // グリッチRGBずれ
       if (this.glitchTimer > 0) {
-        ctx.globalAlpha = 0.25 * bright;
-        ctx.translate(4, 0); ctx.beginPath(); this._path(s);
-        ctx.fillStyle = 'rgba(0,255,200,0.7)'; ctx.fill();
-        ctx.translate(-8, 0); ctx.beginPath(); this._path(s);
-        ctx.fillStyle = 'rgba(255,0,80,0.7)'; ctx.fill();
-        ctx.translate(4, 0);
+        ctx.globalAlpha = 0.4 * bright;
+        ctx.translate(5, 0); ctx.beginPath(); this._path(s);
+        ctx.fillStyle = 'rgba(0,255,200,0.9)'; ctx.fill();
+        ctx.translate(-10, 0); ctx.beginPath(); this._path(s);
+        ctx.fillStyle = 'rgba(255,0,80,0.9)'; ctx.fill();
+        ctx.translate(5, 0);
       }
 
-      // ── ベース花びら ──
-      ctx.globalAlpha = this.alpha * bright;
+      // ── ベース花びら（半透明で薄く） ──
+      ctx.globalAlpha = this.alpha * bright * 0.5;
       ctx.beginPath(); this._path(s);
       const base = ctx.createRadialGradient(0, -s*0.3, 0, 0, s*0.3, s*1.3);
       base.addColorStop(0, '#fff8fa');
@@ -179,50 +179,56 @@
       ctx.fillStyle = base;
       ctx.fill();
 
-      // ── ホログラム干渉縞 ──
+      // ── ホログラム（クリップして内部に描画） ──
       ctx.beginPath(); this._path(s); ctx.clip();
 
-      // 虹色グラデーション帯（角度を毎フレーム少しずつずらす）
-      const t     = Date.now() / 800;
-      const angle = t + this.swing;
-      const hx1   = Math.cos(angle) * s * 1.5;
-      const hy1   = Math.sin(angle) * s * 1.5;
-      const holo  = ctx.createLinearGradient(-hx1, -hy1, hx1, hy1);
-      holo.addColorStop(0.00, 'rgba(255,100,180,0.0)');
-      holo.addColorStop(0.15, 'rgba(0,255,220,0.22)');
-      holo.addColorStop(0.30, 'rgba(120,80,255,0.18)');
-      holo.addColorStop(0.45, 'rgba(255,220,0,0.20)');
-      holo.addColorStop(0.60, 'rgba(0,200,255,0.18)');
-      holo.addColorStop(0.75, 'rgba(255,80,120,0.22)');
-      holo.addColorStop(1.00, 'rgba(80,255,180,0.0)');
-      ctx.globalAlpha = (0.5 + 0.3 * Math.sin(t * 1.3)) * bright;
-      ctx.fillStyle   = holo;
-      ctx.fillRect(-s * 1.5, -s * 1.5, s * 3, s * 3);
+      const t     = Date.now() / 400; // 速めに動かす
+      const angle = t * 0.7 + this.swing;
 
-      // 細かい水平スキャンライン
-      ctx.globalAlpha = 0.08 * bright;
-      ctx.fillStyle   = '#000';
-      for (let ly = -s * 1.3; ly < s * 1.3; ly += 2) {
-        ctx.fillRect(-s, ly, s * 2, 0.7);
+      // 太い虹色帯を複数本走らせる
+      for (let i = 0; i < 3; i++) {
+        const offset = (i / 3) * Math.PI * 2;
+        const a1 = angle + offset;
+        const hx1 = Math.cos(a1) * s * 2;
+        const hy1 = Math.sin(a1) * s * 2;
+        const holo = ctx.createLinearGradient(-hx1, -hy1, hx1, hy1);
+        const hue  = ((t * 40 + i * 120) % 360);
+        holo.addColorStop(0.0,  `hsla(${hue},100%,70%,0)`);
+        holo.addColorStop(0.35, `hsla(${hue},100%,75%,0.55)`);
+        holo.addColorStop(0.5,  `hsla(${(hue+60)%360},100%,85%,0.70)`);
+        holo.addColorStop(0.65, `hsla(${(hue+120)%360},100%,75%,0.55)`);
+        holo.addColorStop(1.0,  `hsla(${(hue+180)%360},100%,70%,0)`);
+        ctx.globalAlpha = (0.55 + 0.35 * Math.sin(t + offset)) * bright;
+        ctx.fillStyle   = holo;
+        ctx.fillRect(-s*1.5, -s*1.5, s*3, s*3);
       }
 
-      // チラつくスペックル
-      const specCount = 3 + Math.floor(Math.random() * 5);
+      // 細かい水平スキャンライン（はっきり見えるよう濃く）
+      ctx.globalAlpha = 0.18 * bright;
+      ctx.fillStyle   = '#000';
+      for (let ly = -s * 1.4; ly < s * 1.4; ly += 2) {
+        ctx.fillRect(-s, ly, s * 2, 0.9);
+      }
+
+      // チラつくスペックル（大きめ・明るめ）
+      const specCount = 5 + Math.floor(Math.random() * 6);
       for (let d = 0; d < specCount; d++) {
         const px = (Math.random() - 0.5) * s * 1.6;
         const py = (Math.random() - 0.9) * s * 2.2;
-        const pw = 0.8 + Math.random() * 1.5;
-        ctx.globalAlpha = (0.4 + Math.random() * 0.5) * bright;
-        const hue = Math.random() * 360;
-        ctx.fillStyle = `hsl(${hue},100%,85%)`;
+        const pw = 1.2 + Math.random() * 2;
+        ctx.globalAlpha = (0.6 + Math.random() * 0.4) * bright;
+        const hue = (t * 60 + d * 60) % 360;
+        ctx.fillStyle = `hsl(${hue},100%,90%)`;
         ctx.fillRect(px, py, pw, pw);
       }
 
-      // エッジ輝線
-      ctx.globalAlpha = (0.15 + 0.1 * Math.sin(t * 2.1)) * bright;
+      // エッジ輝線（太く・明るく）
+      ctx.globalAlpha = (0.5 + 0.35 * Math.sin(t * 1.8)) * bright;
       ctx.beginPath(); this._path(s);
-      ctx.strokeStyle = `hsl(${(t * 60) % 360},100%,80%)`;
-      ctx.lineWidth   = 0.8;
+      ctx.strokeStyle = `hsl(${(t * 80) % 360},100%,85%)`;
+      ctx.lineWidth   = 1.4;
+      ctx.shadowColor = `hsl(${(t * 80) % 360},100%,70%)`;
+      ctx.shadowBlur  = 6;
       ctx.stroke();
 
       ctx.restore();
@@ -405,8 +411,15 @@
     updateBackground();
   }
 
-  // ── アニメーション ─────────────────────────────────
-  function animate() {
+  // ── アニメーション（12fps固定でホラゲー風） ──────────
+  const TARGET_FPS  = 12;
+  const FRAME_MS    = 1000 / TARGET_FPS;
+  let lastTime      = 0;
+
+  function animate(now = 0) {
+    requestAnimationFrame(animate);
+    if (now - lastTime < FRAME_MS) return;
+    lastTime = now - ((now - lastTime) % FRAME_MS);
     frame++;
     const { bright } = getTimeInfo();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -414,8 +427,7 @@
     particles.forEach(p => { p.update(); p.draw(bright); });
     if (state.isRaining) rainDrops.forEach(r => { r.update(); r.draw(bright); });
 
-    // ノイズ（6フレームに1回更新）
-    if (frame % 6 === 0) updateNoise();
+    if (frame % 2 === 0) updateNoise();
     if (noisePat) {
       ctx.save();
       ctx.globalAlpha = 0.025 * bright;
@@ -426,9 +438,7 @@
 
     drawScanlines(bright);
     drawGlitch(bright);
-    if (Math.random() < 1/360) triggerGlitch();
-
-    requestAnimationFrame(animate);
+    if (Math.random() < 1/60) triggerGlitch();
   }
 
   // ── コンソールAPI ──────────────────────────────────
