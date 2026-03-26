@@ -4,10 +4,13 @@
   const ctx = canvas.getContext('2d');
   const overlay = canvas.closest('.hero-bg')?.querySelector('.hero-overlay');
 
+  const PETAL_SIZES = [8, 11, 14, 17];
+  let petalCache = null;
+
   function resize() {
     canvas.width  = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
-    petalCache = null; // リサイズ時にキャッシュ破棄
+    petalCache = null;
   }
   resize();
   window.addEventListener('resize', () => { resize(); rebuildAll(); });
@@ -61,9 +64,6 @@
   setInterval(updateBackground, 60000);
 
   // ── 花びらオフスクリーンキャッシュ ─────────────────
-  // サイズ別に最大4種キャッシュしてdrawImageで使い回す
-  let petalCache = null;
-  const PETAL_SIZES = [8, 11, 14, 17]; // 代表サイズ4種
 
   function buildPetalCache() {
     petalCache = PETAL_SIZES.map(s => {
