@@ -192,7 +192,7 @@
       this.y      = initial ? Math.random() * canvas.height : -20;
       this.s      = PETAL_SIZES[Math.floor(Math.random() * PETAL_SIZES.length)];
       this.vx     = (Math.random() - 0.5) * 1.0;
-      this.vy     = 1.8 + Math.random() * 2.5;
+      this.vy     = 3.5 + Math.random() * 4.0;
       this.rot    = Math.random() * Math.PI * 2;
       this.drot   = (Math.random() - 0.5) * 0.04;
       this.swing  = Math.random() * Math.PI * 2;
