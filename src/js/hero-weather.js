@@ -56,8 +56,8 @@
       this.x += this.vx + Math.sin(this.swing) * 0.8;
       this.y += this.vy;
       this.rot += this.drot;
-      // ランダムにグリッチ発動
-      if (Math.random() < 0.004) this.glitchT = 3 + Math.floor(Math.random() * 5);
+      // ランダムにグリッチ発動（頻度高め）
+      if (Math.random() < 0.025) this.glitchT = 4 + Math.floor(Math.random() * 6);
       if (this.glitchT > 0) this.glitchT--;
       if (this.y > canvas.height + 20) this.init();
     }
@@ -69,29 +69,29 @@
 
       // グリッチ：RGBずれ + 水平スライス
       if (this.glitchT > 0) {
-        const dx = (Math.random() - 0.5) * s * 1.2;
-        const dy = (Math.random() - 0.5) * s * 0.4;
+        const dx = (Math.random() - 0.5) * s * 2.5;
+        const dy = (Math.random() - 0.5) * s * 0.8;
 
         // シアンずれ
-        ctx.globalAlpha = 0.5;
+        ctx.globalAlpha = 0.75;
         ctx.translate(dx, dy);
-        ctx.beginPath(); this._path(s * 1.05);
-        ctx.fillStyle = 'rgba(0,255,220,0.55)'; ctx.fill();
+        ctx.beginPath(); this._path(s * 1.1);
+        ctx.fillStyle = 'rgba(0,255,220,0.80)'; ctx.fill();
         ctx.translate(-dx * 2, -dy);
 
         // マゼンタずれ
-        ctx.beginPath(); this._path(s * 1.05);
-        ctx.fillStyle = 'rgba(255,0,100,0.55)'; ctx.fill();
+        ctx.beginPath(); this._path(s * 1.1);
+        ctx.fillStyle = 'rgba(255,0,100,0.80)'; ctx.fill();
         ctx.translate(dx, 0);
 
         // 水平スライスノイズ
-        const slices = 2 + Math.floor(Math.random() * 3);
+        const slices = 3 + Math.floor(Math.random() * 4);
         for (let i = 0; i < slices; i++) {
-          const sy = (Math.random() - 0.5) * s * 2.2;
-          const sdx = (Math.random() - 0.5) * s * 0.8;
-          ctx.globalAlpha = 0.35 * Math.random();
+          const sy  = (Math.random() - 0.5) * s * 2.5;
+          const sdx = (Math.random() - 0.5) * s * 1.5;
+          ctx.globalAlpha = 0.5 + Math.random() * 0.5;
           ctx.fillStyle = Math.random() < 0.5 ? '#fff' : '#f0a0c0';
-          ctx.fillRect(-s + sdx, sy, s * 2, 1 + Math.random() * 1.5);
+          ctx.fillRect(-s + sdx, sy, s * 2, 1.5 + Math.random() * 2);
         }
       }
 
