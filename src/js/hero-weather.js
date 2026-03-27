@@ -174,7 +174,14 @@
       ctx.globalAlpha=a;
       const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,glow);
       g.addColorStop(0,'#ffffcc');g.addColorStop(0.4,'#aaffaa');g.addColorStop(1,'transparent');
-      ctx.beginPath();ctx.arc(this.x,this.y,glow,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();ctx.restore();
+      ctx.beginPath();ctx.arc(this.x,this.y,glow,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+      // ノイズスパーク
+      if(Math.random()<0.1){
+        ctx.globalAlpha=a*this.z*(0.3+Math.random()*0.5);
+        ctx.fillStyle=Math.random()<0.5?'#ffffaa':'rgba(150,255,150,0.9)';
+        ctx.fillRect(this.x+(Math.random()-0.5)*glow*1.5,this.y+(Math.random()-0.5)*glow*1.5,0.8,0.8);
+      }
+      ctx.restore();
     }
   }
 
@@ -209,7 +216,14 @@
         ctx.translate(-dx*2,-dy*2);ctx.beginPath();ctx.ellipse(0,0,this.sz*0.45,this.sz,0,0,Math.PI*2);ctx.fillStyle='rgba(255,0,80,0.7)';ctx.fill();
         ctx.translate(dx,dy);
       }
-      ctx.globalAlpha=this.alpha;ctx.beginPath();ctx.ellipse(0,0,this.sz*0.45,this.sz,0,0,Math.PI*2);ctx.fillStyle=this.color;ctx.fill();ctx.restore();}
+      ctx.globalAlpha=this.alpha;ctx.beginPath();ctx.ellipse(0,0,this.sz*0.45,this.sz,0,0,Math.PI*2);ctx.fillStyle=this.color;ctx.fill();
+      // ノイズ粒
+      for(let i=0;i<2;i++){
+        ctx.globalAlpha=(0.15+Math.random()*0.3)*this.z;
+        ctx.fillStyle=Math.random()<0.5?'#fff':'rgba(255,180,80,0.9)';
+        ctx.fillRect((Math.random()-0.5)*this.sz,(Math.random()-0.5)*this.sz*1.8,0.8,0.8);
+      }
+      ctx.restore();}
   }
 
   // ── 冬：雪 ───────────────────────────────────────
@@ -241,6 +255,14 @@
       ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
       const l=Math.round(80+this.z*15);
       ctx.fillStyle=`hsl(210,60%,${l}%)`;ctx.fill();
+      // ノイズ粒（手前の雪だけ）
+      if(this.r>1.5){
+        for(let i=0;i<2;i++){
+          ctx.globalAlpha=(0.2+Math.random()*0.4)*this.z;
+          ctx.fillStyle=Math.random()<0.5?'#fff':'rgba(100,200,255,0.9)';
+          ctx.fillRect(this.x+(Math.random()-0.5)*this.r*2.5, this.y+(Math.random()-0.5)*this.r*2.5, 0.8, 0.8);
+        }
+      }
       ctx.restore();
     }
   }
@@ -268,7 +290,14 @@
       g.addColorStop(1,`hsla(${(this.hue+80)%360},100%,90%,0)`);
       ctx.strokeStyle=g;ctx.lineWidth=this.lw;
       ctx.beginPath();ctx.moveTo(this.x,this.y);ctx.lineTo(this.x+this.len*0.08,this.y+this.len);
-      ctx.stroke();ctx.restore();
+      ctx.stroke();
+      // ノイズスパーク（手前の雨粒だけ）
+      if(this.z>0.5&&Math.random()<0.08){
+        ctx.globalAlpha=this.alpha*this.z*(0.4+Math.random()*0.5);
+        ctx.fillStyle=`hsl(${this.hue},100%,90%)`;
+        ctx.fillRect(this.x+(Math.random()-0.5)*3, this.y+this.len*Math.random(), 1, 1);
+      }
+      ctx.restore();
     }
   }
 
