@@ -8,9 +8,14 @@
   let petalCache = null;
 
   function resize() {
-    canvas.width  = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+    // hero-bg または hero セクションからサイズを取得（canvasは absolute で0になりやすい）
+    const hero = canvas.closest('.hero') ?? canvas.parentElement;
+    const w = hero ? hero.offsetWidth  : window.innerWidth;
+    const h = hero ? hero.offsetHeight : window.innerHeight;
+    canvas.width  = w || window.innerWidth;
+    canvas.height = h || window.innerHeight;
     petalCache = null;
+    console.log(`%c[heroWeather] canvas ${canvas.width}×${canvas.height}`, 'color:#aaa');
   }
   resize();
   window.addEventListener('resize', () => { resize(); rebuildAll(); });
@@ -450,14 +455,19 @@
     help()          { console.log('%c[heroWeather]\n  setSeason("spring"|"summer"|"autumn"|"winter")\n  setWeather("auto"|"clear"|"rain"|"snow")\n  setBrightness("auto"|0~1)\n  glitch() / reset() / status()','color:#3ecfcf'); },
   };
 
-  rebuildAll();
-  updateBackground();
-  requestAnimationFrame(() => {
-    // DOMレイアウト確定後にサイズ再取得して粒子を再生成
+  function start() {
     resize();
     rebuildAll();
+    updateBackground();
     animate();
-  });
-  fetchWeather();
-  console.log('%c[heroWeather] ready — heroWeather.help()','color:#3ecfcf');
+    fetchWeather();
+    console.log(`%c[heroWeather] ready — particles: ${particles.length}`, 'color:#3ecfcf');
+  }
+
+  // DOMが確定してから起動（loadedなら即実行、まだならload待ち）
+  if (document.readyState === 'complete') {
+    requestAnimationFrame(start);
+  } else {
+    window.addEventListener('load', () => requestAnimationFrame(start));
+  }
 })();
