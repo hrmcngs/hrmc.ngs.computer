@@ -7,8 +7,8 @@
     "sizeMax": 19,         // サイズ（最大px）
     "glitchRate": 0.08,    // グリッチ発動確率（0〜1、高いほど頻繁）
     "glitchDuration": [4, 10], // グリッチ持続フレーム数 [最小, 最大]
-    "glitchShift": 2.5,    // RGBずれ幅の倍率
-    "glitchRange": 0.3,    // グリッチのずれ範囲（0〜1、小さいほど狭い）
+    "glitchShift": 1.5,    // RGBずれ幅の倍率
+    "glitchRange": 0.1,    // グリッチのずれ範囲（0〜1、小さいほど狭い）
     "glitchOpacity": 0.80, // グリッチの不透明度（0〜1）
     "sliceCount": [3, 6]   // 水平スライスノイズの本数 [最小, 最大]
   },
