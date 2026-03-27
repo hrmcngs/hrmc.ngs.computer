@@ -55,7 +55,7 @@
       this.drot   = (Math.random() - 0.5) * 0.04;
       this.swing  = Math.random() * Math.PI * 2;
       this.dswing = 0.016 + Math.random() * 0.016;
-      this.alpha  = 0.2 + this.z * 0.75;            // 奥:薄い 手前:濃い
+      this.alpha  = 0.45 + this.z * 0.5;            // 奥:0.45 手前:0.95
       this.glitchT = 0;
     }
     update() {
@@ -102,7 +102,7 @@
           const sl = spread * (1.0 + Math.random() * 1.0);
           const sx = (Math.random() - 0.5) * spread;
           const sy = (Math.random() - 0.5) * spread * 1.5;
-          ctx.globalAlpha = 0.5 + Math.random() * 0.5;
+          ctx.globalAlpha = (0.5 + Math.random() * 0.5) * this.z;
           ctx.fillStyle = Math.random() < 0.5 ? '#fff' : '#f0a0c0';
           ctx.save();
           ctx.translate(sx, sy);
@@ -113,14 +113,15 @@
         ctx.restore(); // グリッチ終わり
       }
 
-      // 本体（グラデーションの明るさをzで制御）
+      // 本体（z値で明度・彩度・alphaを調整）
       ctx.globalAlpha = this.alpha;
       ctx.beginPath(); this._path(s);
-      const brightness = Math.round(60 + this.z * 140); // 奥:暗め 手前:明るめ
+      const sat   = Math.round(60 + this.z * 30);           // 奥:彩度低め 手前:高め
+      const light = Math.round(30 + this.z * 45);           // 奥:暗め 手前:明るめ
       const g = ctx.createRadialGradient(0,-s*0.2,0, 0,s*0.4,s*1.3);
-      g.addColorStop(0,   `hsl(340,80%,${Math.min(brightness + 20, 95)}%)`);
-      g.addColorStop(0.5, `hsl(340,75%,${brightness}%)`);
-      g.addColorStop(1,   `hsl(340,65%,${Math.max(brightness - 20, 20)}%)`);
+      g.addColorStop(0,   `hsl(340,${sat}%,${Math.min(light+15, 85)}%)`);
+      g.addColorStop(0.5, `hsl(340,${sat}%,${light}%)`);
+      g.addColorStop(1,   `hsl(340,${sat-10}%,${Math.max(light-15, 15)}%)`);
       ctx.fillStyle = g; ctx.fill();
 
       // スペックル
