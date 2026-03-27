@@ -18,6 +18,7 @@
     season    : month>=3&&month<=5?'spring':month>=6&&month<=8?'summer':month>=9&&month<=11?'autumn':'winter',
     weather   : 'auto',
     isRaining : false,
+    isSnowing : false,
     isClear   : false,
     brightness: 'auto',
   };
@@ -162,7 +163,15 @@
     draw(){
       const a=this.max*(0.5+0.5*Math.sin(this.phase));
       const glow=this.r*(3+this.z*3);
-      ctx.save();ctx.globalAlpha=a;
+      ctx.save();
+      // グリッチ（まれに色相がずれる）
+      if(this.z>0.5&&Math.random()<0.006){
+        ctx.globalAlpha=a*this.z*0.7;
+        const g2=ctx.createRadialGradient(this.x+glow*0.4,this.y,0,this.x,this.y,glow);
+        g2.addColorStop(0,'rgba(0,255,200,0.9)');g2.addColorStop(1,'transparent');
+        ctx.beginPath();ctx.arc(this.x,this.y,glow,0,Math.PI*2);ctx.fillStyle=g2;ctx.fill();
+      }
+      ctx.globalAlpha=a;
       const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,glow);
       g.addColorStop(0,'#ffffcc');g.addColorStop(0.4,'#aaffaa');g.addColorStop(1,'transparent');
       ctx.beginPath();ctx.arc(this.x,this.y,glow,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();ctx.restore();
@@ -189,7 +198,18 @@
       this.color=cs[Math.floor(Math.random()*cs.length)];
     }
     update(){this.swing+=this.dswing;this.x+=this.vx+Math.sin(this.swing)*(0.3+this.z*0.6);this.y+=this.vy;this.rot+=this.drot;if(this.y>canvas.height+20)this.init();}
-    draw(){ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rot);ctx.globalAlpha=this.alpha;ctx.beginPath();ctx.ellipse(0,0,this.sz*0.45,this.sz,0,0,Math.PI*2);ctx.fillStyle=this.color;ctx.fill();ctx.restore();}
+    draw(){
+      ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rot);
+      // グリッチ
+      if(Math.random()<0.004){
+        const dx=(Math.random()-0.5)*this.sz*0.6*this.z;
+        const dy=(Math.random()-0.5)*this.sz*0.6*this.z;
+        ctx.globalAlpha=this.alpha*this.z*0.7;
+        ctx.translate(dx,dy);ctx.beginPath();ctx.ellipse(0,0,this.sz*0.45,this.sz,0,0,Math.PI*2);ctx.fillStyle='rgba(0,255,200,0.7)';ctx.fill();
+        ctx.translate(-dx*2,-dy*2);ctx.beginPath();ctx.ellipse(0,0,this.sz*0.45,this.sz,0,0,Math.PI*2);ctx.fillStyle='rgba(255,0,80,0.7)';ctx.fill();
+        ctx.translate(dx,dy);
+      }
+      ctx.globalAlpha=this.alpha;ctx.beginPath();ctx.ellipse(0,0,this.sz*0.45,this.sz,0,0,Math.PI*2);ctx.fillStyle=this.color;ctx.fill();ctx.restore();}
   }
 
   // ── 冬：雪 ───────────────────────────────────────
@@ -209,8 +229,16 @@
     update(){this.swing+=0.015+this.z*0.01;this.x+=this.vx+Math.sin(this.swing)*(0.15+this.z*0.2);this.y+=this.vy;if(this.y>canvas.height+10)this.init();}
     draw(){
       ctx.save();ctx.globalAlpha=this.alpha;
+      // グリッチ（z値が高い手前の雪だけ）
+      if(this.z>0.6&&Math.random()<0.005){
+        ctx.globalAlpha=this.alpha*this.z*0.8;
+        ctx.beginPath();ctx.arc(this.x+this.r*2,this.y,this.r,0,Math.PI*2);
+        ctx.fillStyle='rgba(0,220,255,0.8)';ctx.fill();
+        ctx.beginPath();ctx.arc(this.x-this.r*2,this.y,this.r,0,Math.PI*2);
+        ctx.fillStyle='rgba(255,100,200,0.8)';ctx.fill();
+        ctx.globalAlpha=this.alpha;
+      }
       ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
-      // 手前は白く、奥は青みがかる
       const l=Math.round(80+this.z*15);
       ctx.fillStyle=`hsl(210,60%,${l}%)`;ctx.fill();
       ctx.restore();
@@ -251,7 +279,7 @@
     if      (s==='spring'){const n=count(8000); particles=Array.from({length:n},(_,i)=>new Petal(i<n*0.7));}
     else if (s==='summer'){const n=count(12000);particles=Array.from({length:n},(_,i)=>new Firefly(i<n*0.7));}
     else if (s==='autumn'){const n=count(9000); particles=Array.from({length:n},(_,i)=>new Leaf(i<n*0.7));}
-    else                  {const n=count(6000); particles=Array.from({length:n},(_,i)=>new Snow(i<n*0.7));}
+    else                  { particles=[]; } // 冬は天気=雪の時だけ降る
   }
 
   function buildRain(){
@@ -259,7 +287,13 @@
     rainDrops=Array.from({length:n},(_,i)=>new Rain(i<n*0.6));
   }
 
-  function rebuildAll(){buildParticles();if(state.isRaining)buildRain();else rainDrops=[];}
+  let snowDrops = [];
+  function buildSnow(){
+    const n=Math.min(Math.floor(canvas.width*canvas.height/5000),120);
+    snowDrops=Array.from({length:n},(_,i)=>new Snow(i<n*0.7));
+  }
+
+  function rebuildAll(){buildParticles();if(state.isRaining)buildRain();else rainDrops=[];if(state.isSnowing)buildSnow();else snowDrops=[];}
 
   // ── グリッチ ────────────────────────────────────────
   let glitchLines=[];let glitchActive=false;
@@ -301,8 +335,9 @@
       const res=await fetch('https://weathernews.jp/onebox/35.6418/139.6975/pa=0');
       const data=await res.json();
       const ptype=data?.ptype??0,wxid=data?.wxid??1;
-      state.isRaining=ptype===1||ptype===3;state.isClear=ptype===0&&wxid<=3;
+      state.isRaining=ptype===1;state.isSnowing=ptype===3||ptype===4;state.isClear=ptype===0&&wxid<=3;
       if(state.isRaining)buildRain();else rainDrops=[];
+      if(state.isSnowing)buildSnow();else snowDrops=[];
       console.log(`%c[heroWeather] 目黒区 ptype=${ptype}`,'color:#3ecfcf');
     }catch{
       try{
@@ -311,8 +346,9 @@
         const areas=data[0]?.timeSeries?.[0]?.areas??[];
         const area=areas.find(a=>a.area?.name==='東京地方')??areas[0];
         const code=area?.weatherCodes?.[0]??'100';
-        state.isRaining=/^[34]/.test(code);state.isClear=/^1/.test(code);
+        state.isRaining=/^3/.test(code);state.isSnowing=/^4/.test(code);state.isClear=/^1/.test(code);
         if(state.isRaining)buildRain();else rainDrops=[];
+        if(state.isSnowing)buildSnow();else snowDrops=[];
       }catch{}
     }
   }
@@ -332,6 +368,7 @@
 
     particles.forEach(p=>{p.update();p.draw();});
     if(state.isRaining)rainDrops.forEach(r=>{r.update();r.draw();});
+    if(state.isSnowing)snowDrops.forEach(s=>{s.update();s.draw();});
     drawGlitch();
     if(Math.random()<1/180)triggerGlitch();
 
