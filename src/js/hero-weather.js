@@ -327,9 +327,12 @@
   // ── 天気取得 ──────────────────────────────────────
   async function fetchWeather(){
     if(state.weather!=='auto'){
-      state.isRaining=state.weather==='rain'||state.weather==='snow';
-      state.isClear=state.weather==='clear';
-      if(state.isRaining)buildRain();else rainDrops=[];return;
+      state.isRaining = state.weather==='rain';
+      state.isSnowing = state.weather==='snow';
+      state.isClear   = state.weather==='clear';
+      if(state.isRaining)buildRain();else rainDrops=[];
+      if(state.isSnowing)buildSnow();else snowDrops=[];
+      return;
     }
     try{
       const res=await fetch('https://weathernews.jp/onebox/35.6418/139.6975/pa=0');
