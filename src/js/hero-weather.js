@@ -35,7 +35,7 @@
     return 0.2;
   }
 
-  // ── 桜の花びら ─────────────────────────────────────
+  // ── 桜の花びら（サイバー風） ───────────────────────
   class Petal {
     constructor(initial) { this.init(initial); }
     init(initial = false) {
@@ -49,12 +49,18 @@
       this.swing  = Math.random() * Math.PI * 2;
       this.dswing = 0.016 + Math.random() * 0.016;
       this.alpha  = 0.75 + Math.random() * 0.2;
+      // サイバー色：シアン・マゼンタ・ピンク・紫からランダム
+      const hues  = [185, 300, 330, 270];
+      this.hue    = hues[Math.floor(Math.random() * hues.length)];
+      this.glitchT = 0;
     }
     update() {
       this.swing += this.dswing;
       this.x += this.vx + Math.sin(this.swing) * 0.8;
       this.y += this.vy;
       this.rot += this.drot;
+      if (Math.random() < 0.003) this.glitchT = 4 + Math.floor(Math.random() * 6);
+      if (this.glitchT > 0) this.glitchT--;
       if (this.y > canvas.height + 20) this.init();
     }
     draw() {
@@ -62,53 +68,91 @@
       ctx.save();
       ctx.translate(this.x, this.y);
       ctx.rotate(this.rot);
-      ctx.globalAlpha = this.alpha;
-      ctx.beginPath();
+
+      // グリッチ時RGBずれ
+      if (this.glitchT > 0) {
+        const dx = (Math.random() - 0.5) * 8;
+        ctx.globalAlpha = 0.4;
+        ctx.translate(dx, 0);
+        ctx.beginPath(); this._path(s);
+        ctx.fillStyle = `hsl(${(this.hue+120)%360},100%,70%)`; ctx.fill();
+        ctx.translate(-dx*2, 0);
+        ctx.beginPath(); this._path(s);
+        ctx.fillStyle = `hsl(${(this.hue+240)%360},100%,70%)`; ctx.fill();
+        ctx.translate(dx, 0);
+      }
+
+      // ベース（暗め半透明）
+      ctx.globalAlpha = this.alpha * 0.35;
+      ctx.beginPath(); this._path(s);
+      ctx.fillStyle = `hsl(${this.hue},80%,15%)`;
+      ctx.fill();
+
+      // ワイヤーフレーム輝線
+      ctx.globalAlpha = this.alpha * 0.9;
+      ctx.beginPath(); this._path(s);
+      ctx.strokeStyle = `hsl(${this.hue},100%,70%)`;
+      ctx.lineWidth = 0.8;
+      ctx.shadowColor = `hsl(${this.hue},100%,60%)`;
+      ctx.shadowBlur  = 6;
+      ctx.stroke();
+
+      // 内側に細い輝線（二重）
+      ctx.globalAlpha = this.alpha * 0.4;
+      ctx.beginPath(); this._path(s * 0.7);
+      ctx.strokeStyle = `hsl(${(this.hue+40)%360},100%,85%)`;
+      ctx.lineWidth = 0.5;
+      ctx.shadowBlur = 4;
+      ctx.stroke();
+
+      // スペックル（デジタルノイズ）
+      ctx.shadowBlur = 0;
+      for (let i = 0; i < 4; i++) {
+        const px = (Math.random() - 0.5) * s * 1.4;
+        const py = (Math.random() - 0.8) * s * 2.0;
+        ctx.globalAlpha = 0.4 + Math.random() * 0.5;
+        ctx.fillStyle = Math.random() < 0.5
+          ? `hsl(${this.hue},100%,90%)`
+          : '#fff';
+        ctx.fillRect(px, py, 1.0, 1.0);
+      }
+
+      ctx.restore();
+    }
+    _path(s) {
       ctx.moveTo(0, s * 1.2);
       ctx.bezierCurveTo(-s*0.6,  s*0.7, -s*0.9, -s*0.1, -s*0.65, -s*0.7);
       ctx.bezierCurveTo(-s*0.45,-s*1.1, -s*0.12,-s*0.95,  0,      -s*0.6);
       ctx.bezierCurveTo( s*0.12,-s*0.95,  s*0.45,-s*1.1,  s*0.65, -s*0.7);
       ctx.bezierCurveTo( s*0.9, -s*0.1,   s*0.6,  s*0.7,  0,       s*1.2);
       ctx.closePath();
-      const g = ctx.createRadialGradient(0,-s*0.2,0, 0,s*0.4,s*1.3);
-      g.addColorStop(0,   '#ffe8f0');
-      g.addColorStop(0.5, '#f8a0b8');
-      g.addColorStop(1,   '#e06080');
-      ctx.fillStyle = g;
-      ctx.fill();
-      // ノイズ粒
-      for (let i = 0; i < 4; i++) {
-        ctx.globalAlpha = 0.25 + Math.random() * 0.3;
-        ctx.fillStyle = Math.random() < 0.5 ? '#fff' : '#ffc8d8';
-        ctx.fillRect(
-          (Math.random()-0.5)*s*1.2,
-          (Math.random()-0.8)*s*2.0,
-          1.2, 1.2
-        );
-      }
-      ctx.restore();
     }
   }
 
-  // ── 夏：蛍 ────────────────────────────────────────
+  // ── 夏：サイバー蛍 ────────────────────────────────
   class Firefly {
     constructor(initial) { this.init(initial); }
     init(initial=false) {
       this.x=Math.random()*canvas.width; this.y=initial?Math.random()*canvas.height:canvas.height+10;
-      this.r=2+Math.random()*2; this.vx=(Math.random()-0.5)*0.6; this.vy=-(0.2+Math.random()*0.4);
-      this.phase=Math.random()*Math.PI*2; this.dphase=0.02+Math.random()*0.02; this.max=0.5+Math.random()*0.4;
+      this.r=1.5+Math.random()*2; this.vx=(Math.random()-0.5)*0.6; this.vy=-(0.2+Math.random()*0.4);
+      this.phase=Math.random()*Math.PI*2; this.dphase=0.02+Math.random()*0.02; this.max=0.6+Math.random()*0.3;
+      this.hue=Math.random()<0.5?185:300; // シアンかマゼンタ
     }
     update(){this.phase+=this.dphase;this.x+=this.vx;this.y+=this.vy;if(this.y<-10)this.init();}
     draw(){
       const a=this.max*(0.5+0.5*Math.sin(this.phase));
       ctx.save();ctx.globalAlpha=a;
-      const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r*5);
-      g.addColorStop(0,'#ffffcc');g.addColorStop(0.4,'#aaffaa');g.addColorStop(1,'transparent');
-      ctx.beginPath();ctx.arc(this.x,this.y,this.r*5,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();ctx.restore();
+      const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r*6);
+      g.addColorStop(0,`hsl(${this.hue},100%,90%)`);
+      g.addColorStop(0.3,`hsl(${this.hue},100%,60%)`);
+      g.addColorStop(1,'transparent');
+      ctx.shadowColor=`hsl(${this.hue},100%,70%)`;ctx.shadowBlur=8;
+      ctx.beginPath();ctx.arc(this.x,this.y,this.r*6,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+      ctx.restore();
     }
   }
 
-  // ── 秋：落ち葉 ────────────────────────────────────
+  // ── 秋：サイバー落ち葉 ────────────────────────────
   class Leaf {
     constructor(initial){this.init(initial);}
     init(initial=false){
@@ -116,24 +160,49 @@
       this.sz=5+Math.random()*8;this.vx=(Math.random()-0.5)*1.2;this.vy=0.5+Math.random()*0.9;
       this.rot=Math.random()*Math.PI*2;this.drot=(Math.random()-0.5)*0.04;
       this.swing=Math.random()*Math.PI*2;this.dswing=0.015+Math.random()*0.015;
-      this.alpha=0.6+Math.random()*0.3;
-      const cs=['#c8501a','#e07830','#b83010','#f09040','#a02808'];
-      this.color=cs[Math.floor(Math.random()*cs.length)];
+      this.alpha=0.7+Math.random()*0.25;
+      // オレンジ〜赤をサイバー化（彩度高め）
+      const hues=[20,0,35,15];
+      this.hue=hues[Math.floor(Math.random()*hues.length)];
     }
     update(){this.swing+=this.dswing;this.x+=this.vx+Math.sin(this.swing)*0.7;this.y+=this.vy;this.rot+=this.drot;if(this.y>canvas.height+20)this.init();}
-    draw(){ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rot);ctx.globalAlpha=this.alpha;ctx.beginPath();ctx.ellipse(0,0,this.sz*0.45,this.sz,0,0,Math.PI*2);ctx.fillStyle=this.color;ctx.fill();ctx.restore();}
+    draw(){
+      ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rot);
+      // 暗い塗り
+      ctx.globalAlpha=this.alpha*0.3;
+      ctx.beginPath();ctx.ellipse(0,0,this.sz*0.45,this.sz,0,0,Math.PI*2);
+      ctx.fillStyle=`hsl(${this.hue},100%,10%)`;ctx.fill();
+      // 輝線
+      ctx.globalAlpha=this.alpha*0.9;
+      ctx.beginPath();ctx.ellipse(0,0,this.sz*0.45,this.sz,0,0,Math.PI*2);
+      ctx.strokeStyle=`hsl(${this.hue},100%,65%)`;ctx.lineWidth=0.8;
+      ctx.shadowColor=`hsl(${this.hue},100%,55%)`;ctx.shadowBlur=5;
+      ctx.stroke();
+      ctx.restore();
+    }
   }
 
-  // ── 冬：雪 ───────────────────────────────────────
+  // ── 冬：サイバー雪 ───────────────────────────────
   class Snow {
     constructor(initial){this.init(initial);}
     init(initial=false){
       this.x=Math.random()*canvas.width;this.y=initial?Math.random()*canvas.height:-10;
-      this.r=1.5+Math.random()*2.5;this.vx=(Math.random()-0.5)*0.4;this.vy=0.4+Math.random()*0.8;
-      this.swing=Math.random()*Math.PI*2;this.alpha=0.5+Math.random()*0.4;
+      this.r=1+Math.random()*2;this.vx=(Math.random()-0.5)*0.4;this.vy=0.4+Math.random()*0.8;
+      this.swing=Math.random()*Math.PI*2;this.alpha=0.6+Math.random()*0.35;
+      this.hue=Math.random()<0.5?200:270; // 青系かバイオレット
     }
     update(){this.swing+=0.018;this.x+=this.vx+Math.sin(this.swing)*0.3;this.y+=this.vy;if(this.y>canvas.height+10)this.init();}
-    draw(){ctx.save();ctx.globalAlpha=this.alpha;ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle='#e8f2ff';ctx.fill();ctx.restore();}
+    draw(){
+      ctx.save();ctx.globalAlpha=this.alpha;
+      ctx.shadowColor=`hsl(${this.hue},100%,80%)`;ctx.shadowBlur=6;
+      ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+      ctx.fillStyle=`hsl(${this.hue},80%,85%)`;ctx.fill();
+      // 外リング
+      ctx.globalAlpha=this.alpha*0.4;
+      ctx.beginPath();ctx.arc(this.x,this.y,this.r*2.5,0,Math.PI*2);
+      ctx.strokeStyle=`hsl(${this.hue},100%,70%)`;ctx.lineWidth=0.5;ctx.stroke();
+      ctx.restore();
+    }
   }
 
   // ── 雨（ホログラム） ─────────────────────────────
