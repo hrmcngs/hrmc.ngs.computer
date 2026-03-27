@@ -1,0 +1,21 @@
+{
+  "petal": {
+    "count": 80,           // 花びらの数
+    "speedMin": 3.0,       // 落下速度（最小）
+    "speedMax": 6.5,       // 落下速度（最大）
+    "sizeMin": 9,          // サイズ（最小px）
+    "sizeMax": 19,         // サイズ（最大px）
+    "glitchRate": 0.08,    // グリッチ発動確率（0〜1、高いほど頻繁）
+    "glitchDuration": [4, 10], // グリッチ持続フレーム数 [最小, 最大]
+    "glitchShift": 2.5,    // RGBずれ幅の倍率
+    "glitchOpacity": 0.80, // グリッチの不透明度（0〜1）
+    "sliceCount": [3, 6]   // 水平スライスノイズの本数 [最小, 最大]
+  },
+  "rain": {
+    "density": 6           // 雨粒の密度（小さいほど多い）
+  },
+  "glitch": {
+    "rate": 180            // 画面グリッチの間隔（フレーム数、小さいほど頻繁）
+  },
+  "brightness": "auto"    // 明るさ（"auto" または 0.0〜1.0）
+}
