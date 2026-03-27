@@ -113,13 +113,14 @@
         ctx.restore(); // グリッチ終わり
       }
 
-      // 本体
+      // 本体（グラデーションの明るさをzで制御）
       ctx.globalAlpha = this.alpha;
       ctx.beginPath(); this._path(s);
+      const brightness = Math.round(60 + this.z * 140); // 奥:暗め 手前:明るめ
       const g = ctx.createRadialGradient(0,-s*0.2,0, 0,s*0.4,s*1.3);
-      g.addColorStop(0,   '#ffe8f0');
-      g.addColorStop(0.5, '#f8a0b8');
-      g.addColorStop(1,   '#d05070');
+      g.addColorStop(0,   `hsl(340,80%,${Math.min(brightness + 20, 95)}%)`);
+      g.addColorStop(0.5, `hsl(340,75%,${brightness}%)`);
+      g.addColorStop(1,   `hsl(340,65%,${Math.max(brightness - 20, 20)}%)`);
       ctx.fillStyle = g; ctx.fill();
 
       // スペックル
