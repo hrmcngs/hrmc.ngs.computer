@@ -109,6 +109,10 @@
           rgba(0,0,0,0.85) 100%
         );
       }
+      /* canvasを疑似要素より前面に */
+      #hero-canvas {
+        z-index: 3 !important;
+      }
       /* テキストをわずかに滲ませる */
       .hero-content {
         filter: drop-shadow(0 0 8px rgba(200,180,255,0.12));
