@@ -2,9 +2,26 @@
   const canvas = document.getElementById('hero-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-
-  // canvasのインラインスタイルのz-indexを確実に上書き
   canvas.style.zIndex = '10';
+
+  // ── デフォルト設定（hero-weather.jsonで上書き可） ───
+  let cfg = {
+    petal: {
+      count       : 80,
+      speedMin    : 3.0,
+      speedMax    : 6.5,
+      sizeMin     : 9,
+      sizeMax     : 19,
+      glitchRate  : 0.08,      // 0〜1: 高いほど頻繁
+      glitchDuration: [4, 10], // [最小, 最大] フレーム数
+      glitchShift : 2.5,       // RGBずれ幅倍率
+      glitchOpacity: 0.80,     // グリッチ不透明度
+      sliceCount  : [3, 6],    // 水平スライス本数 [min, max]
+    },
+    rain    : { density: 6 },
+    glitch  : { rate: 180 },   // 画面グリッチ: n フレームに1回
+    brightness: 'auto',
+  };
 
   function resize() {
     const hero = document.querySelector('.hero');
@@ -41,9 +58,9 @@
     init(initial = false) {
       this.x      = Math.random() * canvas.width;
       this.y      = initial ? Math.random() * canvas.height : -20;
-      this.s      = 9 + Math.random() * 10;
+      this.s      = cfg.petal.sizeMin + Math.random() * (cfg.petal.sizeMax - cfg.petal.sizeMin);
       this.vx     = (Math.random() - 0.5) * 1.0;
-      this.vy     = 3.0 + Math.random() * 3.5;
+      this.vy     = cfg.petal.speedMin + Math.random() * (cfg.petal.speedMax - cfg.petal.speedMin);
       this.rot    = Math.random() * Math.PI * 2;
       this.drot   = (Math.random() - 0.5) * 0.04;
       this.swing  = Math.random() * Math.PI * 2;
@@ -57,7 +74,7 @@
       this.y += this.vy;
       this.rot += this.drot;
       // ランダムにグリッチ発動（頻度高め）
-      if (Math.random() < 0.025) this.glitchT = 4 + Math.floor(Math.random() * 6);
+      if (Math.random() < cfg.petal.glitchRate) { const [d0,d1]=cfg.petal.glitchDuration; this.glitchT = d0 + Math.floor(Math.random()*(d1-d0)); }
       if (this.glitchT > 0) this.glitchT--;
       if (this.y > canvas.height + 20) this.init();
     }
@@ -69,11 +86,11 @@
 
       // グリッチ：RGBずれ + 水平スライス
       if (this.glitchT > 0) {
-        const dx = (Math.random() - 0.5) * s * 2.5;
+        const dx = (Math.random() - 0.5) * s * cfg.petal.glitchShift;
         const dy = (Math.random() - 0.5) * s * 0.8;
 
         // シアンずれ
-        ctx.globalAlpha = 0.75;
+        ctx.globalAlpha = cfg.petal.glitchOpacity;
         ctx.translate(dx, dy);
         ctx.beginPath(); this._path(s * 1.1);
         ctx.fillStyle = 'rgba(0,255,220,0.80)'; ctx.fill();
@@ -85,7 +102,7 @@
         ctx.translate(dx, 0);
 
         // 水平スライスノイズ
-        const slices = 3 + Math.floor(Math.random() * 4);
+        const [sMin,sMax]=cfg.petal.sliceCount; const slices=sMin+Math.floor(Math.random()*(sMax-sMin));
         for (let i = 0; i < slices; i++) {
           const sy  = (Math.random() - 0.5) * s * 2.5;
           const sdx = (Math.random() - 0.5) * s * 1.5;
@@ -296,12 +313,31 @@
   };
 
   // ── 起動 ──────────────────────────────────────────
-  function start(){
+  async function start(){
+    // hero-weather.json を読み込んでデフォルト設定を上書き
+    try {
+      const res  = await fetch('/hero-weather.json');
+      if (res.ok) {
+        const json = await res.json();
+        // ディープマージ
+        for (const key of Object.keys(json)) {
+          if (typeof json[key] === 'object' && !Array.isArray(json[key]) && cfg[key]) {
+            Object.assign(cfg[key], json[key]);
+          } else {
+            cfg[key] = json[key];
+          }
+        }
+        console.log('%c[heroWeather] hero-weather.json 読み込み完了', 'color:#3ecfcf');
+      }
+    } catch { /* JSONがなければデフォルト値を使う */ }
+
+    if (cfg.brightness !== 'auto') state.brightness = cfg.brightness;
+
     resize();
     rebuildAll();
     animate();
     fetchWeather();
-    console.log(`%c[heroWeather] started — ${particles.length} particles`,'color:#3ecfcf');
+    console.log(`%c[heroWeather] started — ${particles.length} particles`, 'color:#3ecfcf');
   }
 
   window.addEventListener('resize',()=>{resize();rebuildAll();});
