@@ -1,6 +1,6 @@
 {
   "petal": {
-    "count": 80,    /* test */
+    "count": 80,
     "speedMin": 3.0,
     "speedMax": 6.5,
     "sizeMin": 9,
