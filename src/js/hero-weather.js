@@ -49,12 +49,16 @@
       this.swing  = Math.random() * Math.PI * 2;
       this.dswing = 0.016 + Math.random() * 0.016;
       this.alpha  = 0.75 + Math.random() * 0.2;
+      this.glitchT = 0;
     }
     update() {
       this.swing += this.dswing;
       this.x += this.vx + Math.sin(this.swing) * 0.8;
       this.y += this.vy;
       this.rot += this.drot;
+      // ランダムにグリッチ発動
+      if (Math.random() < 0.004) this.glitchT = 3 + Math.floor(Math.random() * 5);
+      if (this.glitchT > 0) this.glitchT--;
       if (this.y > canvas.height + 20) this.init();
     }
     draw() {
@@ -63,34 +67,59 @@
       ctx.translate(this.x, this.y);
       ctx.rotate(this.rot);
 
-      // 花びら本体（滑らかなピンク）
+      // グリッチ：RGBずれ + 水平スライス
+      if (this.glitchT > 0) {
+        const dx = (Math.random() - 0.5) * s * 1.2;
+        const dy = (Math.random() - 0.5) * s * 0.4;
+
+        // シアンずれ
+        ctx.globalAlpha = 0.5;
+        ctx.translate(dx, dy);
+        ctx.beginPath(); this._path(s * 1.05);
+        ctx.fillStyle = 'rgba(0,255,220,0.55)'; ctx.fill();
+        ctx.translate(-dx * 2, -dy);
+
+        // マゼンタずれ
+        ctx.beginPath(); this._path(s * 1.05);
+        ctx.fillStyle = 'rgba(255,0,100,0.55)'; ctx.fill();
+        ctx.translate(dx, 0);
+
+        // 水平スライスノイズ
+        const slices = 2 + Math.floor(Math.random() * 3);
+        for (let i = 0; i < slices; i++) {
+          const sy = (Math.random() - 0.5) * s * 2.2;
+          const sdx = (Math.random() - 0.5) * s * 0.8;
+          ctx.globalAlpha = 0.35 * Math.random();
+          ctx.fillStyle = Math.random() < 0.5 ? '#fff' : '#f0a0c0';
+          ctx.fillRect(-s + sdx, sy, s * 2, 1 + Math.random() * 1.5);
+        }
+      }
+
+      // 本体
       ctx.globalAlpha = this.alpha;
-      ctx.beginPath();
+      ctx.beginPath(); this._path(s);
+      const g = ctx.createRadialGradient(0,-s*0.2,0, 0,s*0.4,s*1.3);
+      g.addColorStop(0,   '#ffe8f0');
+      g.addColorStop(0.5, '#f8a0b8');
+      g.addColorStop(1,   '#d05070');
+      ctx.fillStyle = g; ctx.fill();
+
+      // スペックル
+      for (let i = 0; i < 6; i++) {
+        ctx.globalAlpha = (0.08 + Math.random() * 0.12) * this.alpha;
+        ctx.fillStyle = Math.random() < 0.6 ? '#fff' : '#ffb0c8';
+        ctx.fillRect((Math.random()-0.5)*s*1.3, (Math.random()-0.5)*s*2.2, 1, 1);
+      }
+
+      ctx.restore();
+    }
+    _path(s) {
       ctx.moveTo(0, s * 1.2);
       ctx.bezierCurveTo(-s*0.6,  s*0.7, -s*0.9, -s*0.1, -s*0.65, -s*0.7);
       ctx.bezierCurveTo(-s*0.45,-s*1.1, -s*0.12,-s*0.95,  0,      -s*0.6);
       ctx.bezierCurveTo( s*0.12,-s*0.95,  s*0.45,-s*1.1,  s*0.65, -s*0.7);
       ctx.bezierCurveTo( s*0.9, -s*0.1,   s*0.6,  s*0.7,  0,       s*1.2);
       ctx.closePath();
-      const g = ctx.createRadialGradient(0,-s*0.2,0, 0,s*0.4,s*1.3);
-      g.addColorStop(0,   '#ffe8f0');
-      g.addColorStop(0.5, '#f8a0b8');
-      g.addColorStop(1,   '#d05070');
-      ctx.fillStyle = g;
-      ctx.fill();
-
-      // ノイズ：白い微細なスペックルをごく薄く散らす
-      for (let i = 0; i < 6; i++) {
-        ctx.globalAlpha = (0.08 + Math.random() * 0.12) * this.alpha;
-        ctx.fillStyle = Math.random() < 0.6 ? '#fff' : '#ffb0c8';
-        ctx.fillRect(
-          (Math.random() - 0.5) * s * 1.3,
-          (Math.random() - 0.5) * s * 2.2,
-          1, 1
-        );
-      }
-
-      ctx.restore();
     }
   }
 
