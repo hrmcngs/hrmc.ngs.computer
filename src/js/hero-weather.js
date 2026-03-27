@@ -423,15 +423,24 @@
       return;
     }
     try{
-      const res=await fetch('https://weathernews.jp/onebox/35.6418/139.6975/pa=0');
+      // Open-Meteo API（無料・登録不要・CORS対応）目黒区: 35.6418, 139.6975
+      const res=await fetch(
+        'https://api.open-meteo.com/v1/forecast?latitude=35.6418&longitude=139.6975&current=weathercode,precipitation&timezone=Asia%2FTokyo'
+      );
       const data=await res.json();
-      const ptype=data?.ptype??0,wxid=data?.wxid??1;
-      state.isRaining=ptype===1;state.isSnowing=ptype===3||ptype===4;state.isClear=ptype===0&&wxid<=3;state.isCloudy=ptype===0&&wxid>3&&wxid<=6;
+      const code=data?.current?.weathercode??0;
+      const precip=data?.current?.precipitation??0;
+      // WMO天気コード: 0-1=晴れ, 2-3=曇り, 51-67=雨, 71-77=雪, 80-82=にわか雨, 85-86=にわか雪
+      state.isRaining = (code>=51&&code<=67)||(code>=80&&code<=82);
+      state.isSnowing = (code>=71&&code<=77)||(code>=85&&code<=86);
+      state.isCloudy  = (code>=2&&code<=3)||code===45||code===48;
+      state.isClear   = code<=1;
       if(state.isRaining)buildRain();else rainDrops=[];
       if(state.isSnowing)buildSnow();else snowDrops=[];
       if(state.isCloudy)buildCloud();else cloudDrops=[];
-      console.log(`%c[heroWeather] 目黒区 ptype=${ptype}`,'color:#3ecfcf');
-    }catch{
+      console.log(`%c[heroWeather] Open-Meteo: code=${code} precip=${precip}mm`,'color:#3ecfcf');
+    }catch(e){
+      console.warn('[heroWeather] Open-Meteo失敗、気象庁にフォールバック',e);
       try{
         const res=await fetch('https://www.jma.go.jp/bosai/forecast/data/forecast/130000.json');
         const data=await res.json();
