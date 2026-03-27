@@ -396,13 +396,11 @@
       const res  = await fetch('/hero-weather.jsonc');
       if (res.ok) {
         const text = await res.text();
-        // // コメントと /* */ コメントを除去してからJSONパース
         const stripped = text
-          .replace(/\/\/[^\n]*/g, '')      // //コメント除去
-          .replace(/\/\*[\s\S]*?\*\//g, '') // /* */コメント除去
-          .replace(/,(\s*[}\]])/g, '$1');   // 末尾カンマ除去
+          .replace(/\/\/[^\n]*/g, '')
+          .replace(/\/\*[\s\S]*?\*\//g, '')
+          .replace(/,(\s*[}\]])/g, '$1');
         const json = JSON.parse(stripped);
-        // ディープマージ（cfg[key]が未定義でも対応）
         for (const key of Object.keys(json)) {
           if (typeof json[key] === 'object' && !Array.isArray(json[key])) {
             cfg[key] = Object.assign(cfg[key] ?? {}, json[key]);
@@ -410,17 +408,18 @@
             cfg[key] = json[key];
           }
         }
-        // 必須キーのフォールバック（JSONCに不足があっても動く）
-        cfg.petal = Object.assign({
-          count:80, speedMin:[2,4], speedMax:[5,9], sizeMin:9, sizeMax:19,
-          glitchRate:0.08, glitchDuration:[2,5], glitchShift:[0.5,2.5],
-          glitchRange:0.1, glitchOpacity:0.8, sliceCount:[3,6]
-        }, cfg.petal ?? {});
-        cfg.rain   = Object.assign({ density:6 },   cfg.rain   ?? {});
-        cfg.glitch = Object.assign({ rate:180 },     cfg.glitch ?? {});
         console.log('%c[heroWeather] hero-weather.jsonc 読み込み完了', 'color:#3ecfcf');
       }
-    } catch { /* JSONがなければデフォルト値を使う */ }
+    } catch(e) { console.warn('[heroWeather] JSONC読み込み失敗、デフォルト値を使用', e); }
+
+    // 必須キーのフォールバック（常に実行してcfg.petalが必ず存在するように）
+    cfg.petal = Object.assign({
+      count:80, speedMin:[2,4], speedMax:[5,9], sizeMin:9, sizeMax:19,
+      glitchRate:0.08, glitchDuration:[2,5], glitchShift:[0.5,2.5],
+      glitchRange:0.1, glitchOpacity:0.8, sliceCount:[3,6]
+    }, cfg.petal ?? {});
+    cfg.rain   = Object.assign({ density:6 },   cfg.rain   ?? {});
+    cfg.glitch = Object.assign({ rate:180 },     cfg.glitch ?? {});
 
     if (cfg.brightness !== 'auto') state.brightness = cfg.brightness;
 
