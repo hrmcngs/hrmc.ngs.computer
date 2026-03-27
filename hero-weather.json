@@ -1,0 +1,17 @@
+{
+  "petal": {
+    "count": 80,          // 花びらの数
+    "speedMin": 3.0,      // 落下速度（最小）
+    "speedMax": 6.5,      // 落下速度（最大）
+    "sizeMin": 9,         // サイズ（最小）
+    "sizeMax": 19,        // サイズ（最大）
+    "glitchRate": 0.08,   // グリッチ頻度（0〜1、高いほど頻繁）
+    "glitchDuration": [4, 10],  // グリッチ持続フレーム数
+    "glitchShift": 2.5,   // RGBずれ幅
+    "glitchOpacity": 0.80, // グリッチの不透明度
+    "sliceCount": [3, 6]  // 水平スライス本数
+  },
+  "glitch": {
+    "rate": 180           // 画面グリッチ（nフレームに1回、小さいほど頻繁）
+  }
+}
