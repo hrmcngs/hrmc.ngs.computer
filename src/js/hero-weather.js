@@ -380,7 +380,7 @@
 
   // ── コンソールAPI ──────────────────────────────────
   window.heroWeather={
-    setSeason(s){if(!['spring','summer','autumn','winter'].includes(s)){console.warn('spring/summer/autumn/winter');return;}state.season=s;resize();rebuildAll();console.log(`%c[heroWeather] season→${s}`,'color:#3ecfcf');},
+    setSeason(s){if(!['spring','summer','autumn','winter'].includes(s)){console.warn('spring/summer/autumn/winter');return;}state.season=s;if(cfg.petal){resize();rebuildAll();}console.log(`%c[heroWeather] season→${s}`,'color:#3ecfcf');},
     setWeather(w){if(!['auto','clear','rain','snow'].includes(w)){console.warn('auto/clear/rain/snow');return;}state.weather=w;fetchWeather();console.log(`%c[heroWeather] weather→${w}`,'color:#3ecfcf');},
     setBrightness(b){state.brightness=b;console.log(`%c[heroWeather] brightness→${b}`,'color:#3ecfcf');},
     glitch(){triggerGlitch();},
@@ -430,7 +430,7 @@
     console.log(`%c[heroWeather] started — ${particles.length} particles`, 'color:#3ecfcf');
   }
 
-  window.addEventListener('resize',()=>{resize();rebuildAll();});
+  window.addEventListener('resize',()=>{resize();if(cfg.petal)rebuildAll();});
 
   if(document.readyState==='complete'){
     start();
