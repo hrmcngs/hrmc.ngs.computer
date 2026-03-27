@@ -91,9 +91,8 @@ body {
 
 .hero-content {
   position: relative;
-  z-index: 2;
-  padding: 0 2.5rem;
-  animation: fade-up 1s ease both;
+  z-index: 11;
+  filter: brightness(1.4);
 }
 
 @keyframes fade-up {
