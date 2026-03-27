@@ -20,6 +20,7 @@
     isRaining : false,
     isSnowing : false,
     isClear   : false,
+    isCloudy  : false,
     brightness: 'auto',
   };
 
@@ -176,7 +177,8 @@
       g.addColorStop(0,'#ffffcc');g.addColorStop(0.4,'#aaffaa');g.addColorStop(1,'transparent');
       ctx.beginPath();ctx.arc(this.x,this.y,glow,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
       // ノイズスパーク
-      if(Math.random()<0.1){
+      const fRate=cfg.firefly?.noiseRate??0.12;
+      if(Math.random()<fRate){
         ctx.globalAlpha=a*this.z*(0.3+Math.random()*0.5);
         ctx.fillStyle=Math.random()<0.5?'#ffffaa':'rgba(150,255,150,0.9)';
         ctx.fillRect(this.x+(Math.random()-0.5)*glow*1.5,this.y+(Math.random()-0.5)*glow*1.5,0.8,0.8);
@@ -218,8 +220,9 @@
       }
       ctx.globalAlpha=this.alpha;ctx.beginPath();ctx.ellipse(0,0,this.sz*0.45,this.sz,0,0,Math.PI*2);ctx.fillStyle=this.color;ctx.fill();
       // ノイズ粒
-      for(let i=0;i<2;i++){
-        ctx.globalAlpha=(0.15+Math.random()*0.3)*this.z;
+      const lCount=cfg.leaf?.noiseCount??3;
+      for(let i=0;i<lCount;i++){
+        ctx.globalAlpha=(0.15+Math.random()*0.4)*this.z;
         ctx.fillStyle=Math.random()<0.5?'#fff':'rgba(255,180,80,0.9)';
         ctx.fillRect((Math.random()-0.5)*this.sz,(Math.random()-0.5)*this.sz*1.8,0.8,0.8);
       }
@@ -255,12 +258,13 @@
       ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
       const l=Math.round(80+this.z*15);
       ctx.fillStyle=`hsl(210,60%,${l}%)`;ctx.fill();
-      // ノイズ粒（手前の雪だけ）
-      if(this.r>1.5){
-        for(let i=0;i<2;i++){
-          ctx.globalAlpha=(0.2+Math.random()*0.4)*this.z;
+      // ノイズ粒
+      if(this.r>1.0){
+        const sCount=cfg.snow?.noiseCount??3;
+        for(let i=0;i<sCount;i++){
+          ctx.globalAlpha=(0.2+Math.random()*0.5)*this.z;
           ctx.fillStyle=Math.random()<0.5?'#fff':'rgba(100,200,255,0.9)';
-          ctx.fillRect(this.x+(Math.random()-0.5)*this.r*2.5, this.y+(Math.random()-0.5)*this.r*2.5, 0.8, 0.8);
+          ctx.fillRect(this.x+(Math.random()-0.5)*this.r*3, this.y+(Math.random()-0.5)*this.r*3, 0.8, 0.8);
         }
       }
       ctx.restore();
@@ -291,16 +295,65 @@
       ctx.strokeStyle=g;ctx.lineWidth=this.lw;
       ctx.beginPath();ctx.moveTo(this.x,this.y);ctx.lineTo(this.x+this.len*0.08,this.y+this.len);
       ctx.stroke();
-      // ノイズスパーク（手前の雨粒だけ）
-      if(this.z>0.5&&Math.random()<0.08){
-        ctx.globalAlpha=this.alpha*this.z*(0.4+Math.random()*0.5);
-        ctx.fillStyle=`hsl(${this.hue},100%,90%)`;
-        ctx.fillRect(this.x+(Math.random()-0.5)*3, this.y+this.len*Math.random(), 1, 1);
+      // ノイズスパーク
+      const rRate=cfg.rain?.noiseRate??0.15;
+      const rCount=cfg.rain?.noiseCount??3;
+      if(this.z>0.3&&Math.random()<rRate){
+        for(let i=0;i<rCount;i++){
+          ctx.globalAlpha=this.alpha*this.z*(0.5+Math.random()*0.5);
+          ctx.fillStyle=`hsl(${this.hue},100%,90%)`;
+          ctx.fillRect(this.x+(Math.random()-0.5)*5, this.y+this.len*Math.random(), 0.8+Math.random()*0.8, 0.8);
+        }
       }
       ctx.restore();
     }
   }
 
+
+  // ── 曇り：浮遊するダスト粒子 ────────────────────────
+  class Cloud {
+    constructor(initial){this.init(initial);}
+    init(initial=false){
+      this.z    = Math.random();
+      this.x    = Math.random()*canvas.width;
+      this.y    = initial?Math.random()*canvas.height:(Math.random()<0.5?-10:canvas.height+10);
+      this.r    = 1.5 + this.z * 4;
+      this.vx   = (Math.random()-0.5)*(0.1+this.z*0.4);
+      this.vy   = (Math.random()-0.5)*(0.05+this.z*0.15);
+      this.alpha= 0.04 + this.z * 0.1;
+      this.swing= Math.random()*Math.PI*2;
+    }
+    update(){
+      this.swing+=0.008;
+      this.x+=this.vx+Math.sin(this.swing)*0.3;
+      this.y+=this.vy;
+      if(this.x<-10)this.x=canvas.width+10;
+      if(this.x>canvas.width+10)this.x=-10;
+      if(this.y<-10)this.y=canvas.height+10;
+      if(this.y>canvas.height+10)this.y=-10;
+      // ノイズ
+      if(Math.random()<(cfg.cloud?.noiseRate??0.05)){
+        this._noiseFlash=2;
+      }
+      if(this._noiseFlash>0)this._noiseFlash--;
+    }
+    draw(){
+      ctx.save();
+      ctx.globalAlpha=this.alpha;
+      const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r*3);
+      g.addColorStop(0,`rgba(180,190,210,${0.3+this.z*0.4})`);
+      g.addColorStop(1,'rgba(100,110,130,0)');
+      ctx.beginPath();ctx.arc(this.x,this.y,this.r*3,0,Math.PI*2);
+      ctx.fillStyle=g;ctx.fill();
+      // ノイズ粒
+      if(this._noiseFlash>0){
+        ctx.globalAlpha=this.alpha*2;
+        ctx.fillStyle='rgba(200,210,230,0.9)';
+        ctx.fillRect(this.x+(Math.random()-0.5)*this.r*2,this.y+(Math.random()-0.5)*this.r*2,0.8,0.8);
+      }
+      ctx.restore();
+    }
+  }
   function count(d){return Math.min(Math.floor(canvas.width*canvas.height/d),80);}
 
   function buildParticles(){
@@ -317,12 +370,17 @@
   }
 
   let snowDrops = [];
+  let cloudDrops = [];
+  function buildCloud(){
+    const n=Math.min(Math.floor(canvas.width*canvas.height/8000),60);
+    cloudDrops=Array.from({length:n},(_,i)=>new Cloud(true));
+  }
   function buildSnow(){
     const n=Math.min(Math.floor(canvas.width*canvas.height/5000),120);
     snowDrops=Array.from({length:n},(_,i)=>new Snow(i<n*0.7));
   }
 
-  function rebuildAll(){buildParticles();if(state.isRaining)buildRain();else rainDrops=[];if(state.isSnowing)buildSnow();else snowDrops=[];}
+  function rebuildAll(){buildParticles();if(state.isRaining)buildRain();else rainDrops=[];if(state.isSnowing)buildSnow();else snowDrops=[];if(state.isCloudy)buildCloud();else cloudDrops=[];}
 
   // ── グリッチ ────────────────────────────────────────
   let glitchLines=[];let glitchActive=false;
@@ -359,6 +417,7 @@
       state.isRaining = state.weather==='rain';
       state.isSnowing = state.weather==='snow';
       state.isClear   = state.weather==='clear';
+      state.isCloudy  = state.weather==='cloudy';
       if(state.isRaining)buildRain();else rainDrops=[];
       if(state.isSnowing)buildSnow();else snowDrops=[];
       return;
@@ -367,9 +426,10 @@
       const res=await fetch('https://weathernews.jp/onebox/35.6418/139.6975/pa=0');
       const data=await res.json();
       const ptype=data?.ptype??0,wxid=data?.wxid??1;
-      state.isRaining=ptype===1;state.isSnowing=ptype===3||ptype===4;state.isClear=ptype===0&&wxid<=3;
+      state.isRaining=ptype===1;state.isSnowing=ptype===3||ptype===4;state.isClear=ptype===0&&wxid<=3;state.isCloudy=ptype===0&&wxid>3&&wxid<=6;
       if(state.isRaining)buildRain();else rainDrops=[];
       if(state.isSnowing)buildSnow();else snowDrops=[];
+      if(state.isCloudy)buildCloud();else cloudDrops=[];
       console.log(`%c[heroWeather] 目黒区 ptype=${ptype}`,'color:#3ecfcf');
     }catch{
       try{
@@ -401,6 +461,7 @@
     particles.forEach(p=>{p.update();p.draw();});
     if(state.isRaining)rainDrops.forEach(r=>{r.update();r.draw();});
     if(state.isSnowing)snowDrops.forEach(s=>{s.update();s.draw();});
+    if(state.isCloudy)cloudDrops.forEach(c=>{c.update();c.draw();});
     drawGlitch();
     if(Math.random()<1/180)triggerGlitch();
 
@@ -410,7 +471,7 @@
   // ── コンソールAPI ──────────────────────────────────
   window.heroWeather={
     setSeason(s){if(!['spring','summer','autumn','winter'].includes(s)){console.warn('spring/summer/autumn/winter');return;}state.season=s;if(cfg.petal){resize();rebuildAll();}console.log(`%c[heroWeather] season→${s}`,'color:#3ecfcf');},
-    setWeather(w){if(!['auto','clear','rain','snow'].includes(w)){console.warn('auto/clear/rain/snow');return;}state.weather=w;fetchWeather();console.log(`%c[heroWeather] weather→${w}`,'color:#3ecfcf');},
+    setWeather(w){if(!['auto','clear','rain','snow','cloudy'].includes(w)){console.warn('auto/clear/rain/snow');return;}state.weather=w;fetchWeather();console.log(`%c[heroWeather] weather→${w}`,'color:#3ecfcf');},
     setBrightness(b){state.brightness=b;console.log(`%c[heroWeather] brightness→${b}`,'color:#3ecfcf');},
     glitch(){triggerGlitch();},
     reset(){const m=new Date().getMonth()+1;state.season=m>=3&&m<=5?'spring':m>=6&&m<=8?'summer':m>=9&&m<=11?'autumn':'winter';state.weather='auto';state.brightness='auto';resize();rebuildAll();fetchWeather();console.log('%c[heroWeather] reset','color:#3ecfcf');},
