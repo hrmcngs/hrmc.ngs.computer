@@ -73,7 +73,10 @@
         // glitchRange で振れ幅を制御（0〜1、小さいほど狭い）
         const range = cfg.petal.glitchRange ?? 0.3;
         const angle = Math.random() * Math.PI * 2;
-        const dist  = s * cfg.petal.glitchShift * range;
+        const shift = Array.isArray(cfg.petal.glitchShift)
+          ? cfg.petal.glitchShift[0] + Math.random() * (cfg.petal.glitchShift[1] - cfg.petal.glitchShift[0])
+          : cfg.petal.glitchShift;
+        const dist  = s * shift * range;
         const dx    = Math.cos(angle) * dist * (0.5 + Math.random() * 0.5);
         const dy    = Math.sin(angle) * dist * (0.5 + Math.random() * 0.5);
 
