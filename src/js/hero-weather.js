@@ -70,29 +70,35 @@
 
       // グリッチ：RGBずれ + 水平スライス
       if (this.glitchT > 0) {
-        const dx = (Math.random() - 0.5) * s * cfg.petal.glitchShift;
-        const dy = (Math.random() - 0.5) * s * 0.8;
+        // 全方向ランダムなずれ（横・縦・斜め）
+        const angle = Math.random() * Math.PI * 2;
+        const dist  = s * cfg.petal.glitchShift;
+        const dx    = Math.cos(angle) * dist * (0.3 + Math.random() * 0.7);
+        const dy    = Math.sin(angle) * dist * (0.3 + Math.random() * 0.7);
 
-        // シアンずれ
         ctx.globalAlpha = cfg.petal.glitchOpacity;
         ctx.translate(dx, dy);
         ctx.beginPath(); this._path(s * 1.1);
         ctx.fillStyle = 'rgba(0,255,220,0.80)'; ctx.fill();
-        ctx.translate(-dx * 2, -dy);
-
-        // マゼンタずれ
+        ctx.translate(-dx * 2, -dy * 2);
         ctx.beginPath(); this._path(s * 1.1);
         ctx.fillStyle = 'rgba(255,0,100,0.80)'; ctx.fill();
-        ctx.translate(dx, 0);
+        ctx.translate(dx, dy);
 
-        // 水平スライスノイズ
+        // スライスも方向ランダム（横・縦・斜め）
         const [sMin,sMax]=cfg.petal.sliceCount; const slices=sMin+Math.floor(Math.random()*(sMax-sMin));
         for (let i = 0; i < slices; i++) {
-          const sy  = (Math.random() - 0.5) * s * 2.5;
-          const sdx = (Math.random() - 0.5) * s * 1.5;
+          const sa = Math.random() * Math.PI * 2;
+          const sl = s * (1.5 + Math.random() * 1.5);
+          const sx = (Math.random() - 0.5) * s * 1.5;
+          const sy = (Math.random() - 0.5) * s * 2.5;
           ctx.globalAlpha = 0.5 + Math.random() * 0.5;
           ctx.fillStyle = Math.random() < 0.5 ? '#fff' : '#f0a0c0';
-          ctx.fillRect(-s + sdx, sy, s * 2, 1.5 + Math.random() * 2);
+          ctx.save();
+          ctx.translate(sx, sy);
+          ctx.rotate(sa);
+          ctx.fillRect(-sl / 2, 0, sl, 1.2 + Math.random() * 1.8);
+          ctx.restore();
         }
       }
 
