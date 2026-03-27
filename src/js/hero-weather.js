@@ -4,24 +4,8 @@
   const ctx = canvas.getContext('2d');
   canvas.style.zIndex = '10';
 
-  // ── デフォルト設定（hero-weather.jsonで上書き可） ───
-  let cfg = {
-    petal: {
-      count       : 80,
-      speedMin    : 3.0,
-      speedMax    : 6.5,
-      sizeMin     : 9,
-      sizeMax     : 19,
-      glitchRate  : 0.08,      // 0〜1: 高いほど頻繁
-      glitchDuration: [4, 10], // [最小, 最大] フレーム数
-      glitchShift : 2.5,       // RGBずれ幅倍率
-      glitchOpacity: 0.80,     // グリッチ不透明度
-      sliceCount  : [3, 6],    // 水平スライス本数 [min, max]
-    },
-    rain    : { density: 6 },
-    glitch  : { rate: 180 },   // 画面グリッチ: n フレームに1回
-    brightness: 'auto',
-  };
+  // ── 設定（hero-weather.json から読み込み） ──────────
+  let cfg = {};
 
   function resize() {
     const hero = document.querySelector('.hero');
