@@ -35,97 +35,76 @@
     return 0.2;
   }
 
-  // ── 桜の花びら（サイバー風） ───────────────────────
+  // ── 桜の花びら（デジタルノイズ版） ─────────────────
   class Petal {
     constructor(initial) { this.init(initial); }
     init(initial = false) {
       this.x      = Math.random() * canvas.width;
       this.y      = initial ? Math.random() * canvas.height : -20;
-      this.s      = 8 + Math.random() * 10;
+      this.s      = 9 + Math.random() * 10;
       this.vx     = (Math.random() - 0.5) * 1.0;
       this.vy     = 3.0 + Math.random() * 3.5;
       this.rot    = Math.random() * Math.PI * 2;
       this.drot   = (Math.random() - 0.5) * 0.04;
       this.swing  = Math.random() * Math.PI * 2;
       this.dswing = 0.016 + Math.random() * 0.016;
-      this.alpha  = 0.75 + Math.random() * 0.2;
-      // サイバー色：シアン・マゼンタ・ピンク・紫からランダム
-      const hues  = [185, 300, 330, 270];
-      this.hue    = hues[Math.floor(Math.random() * hues.length)];
-      this.glitchT = 0;
+      this.alpha  = 0.80 + Math.random() * 0.18;
+      // ピクセルグリッドを事前生成（花びら形の中にランダム輝度で散らす）
+      this._buildPixels();
+    }
+    _buildPixels() {
+      const s   = this.s;
+      const px  = 2; // ピクセルサイズ
+      this.dots = [];
+      for (let y = -s * 1.4; y < s * 1.4; y += px) {
+        for (let x = -s * 1.1; x < s * 1.1; x += px) {
+          if (this._inPetal(x + px/2, y + px/2)) {
+            // ピクセルごとにランダム輝度・色
+            const v = Math.random();
+            const bright = 0.3 + Math.random() * 0.7;
+            // ピンク〜白〜暗ピンクのノイズ
+            const r = Math.round(180 + bright * 75);
+            const g = Math.round(80  + bright * 80);
+            const b = Math.round(100 + bright * 80);
+            this.dots.push({ x, y, w: px - 0.3, a: v < 0.08 ? 0 : 0.4 + bright * 0.55 });
+            this.dots[this.dots.length - 1].r = r;
+            this.dots[this.dots.length - 1].g = g;
+            this.dots[this.dots.length - 1].b = b;
+          }
+        }
+      }
+    }
+    // 花びら形の内外判定
+    _inPetal(px, py) {
+      const s = this.s;
+      // 楕円近似で上下非対称
+      const nx = px / (s * 0.85);
+      const ny = (py - s * 0.1) / (s * 1.25);
+      if (nx*nx + ny*ny > 1) return false;
+      // 上部の切れ込み
+      if (py < -s * 0.45 && Math.abs(px) < s * 0.2) return false;
+      return true;
     }
     update() {
       this.swing += this.dswing;
       this.x += this.vx + Math.sin(this.swing) * 0.8;
       this.y += this.vy;
       this.rot += this.drot;
-      if (Math.random() < 0.003) this.glitchT = 4 + Math.floor(Math.random() * 6);
-      if (this.glitchT > 0) this.glitchT--;
       if (this.y > canvas.height + 20) this.init();
     }
     draw() {
-      const s = this.s;
       ctx.save();
       ctx.translate(this.x, this.y);
       ctx.rotate(this.rot);
-
-      // グリッチ時RGBずれ
-      if (this.glitchT > 0) {
-        const dx = (Math.random() - 0.5) * 8;
-        ctx.globalAlpha = 0.4;
-        ctx.translate(dx, 0);
-        ctx.beginPath(); this._path(s);
-        ctx.fillStyle = `hsl(${(this.hue+120)%360},100%,70%)`; ctx.fill();
-        ctx.translate(-dx*2, 0);
-        ctx.beginPath(); this._path(s);
-        ctx.fillStyle = `hsl(${(this.hue+240)%360},100%,70%)`; ctx.fill();
-        ctx.translate(dx, 0);
+      // ドットを描画（毎フレーム輝度をランダムに揺らす）
+      for (const d of this.dots) {
+        // ちらつき：一部のピクセルがランダムに明滅
+        const flicker = Math.random() < 0.15 ? Math.random() * 0.8 : 1;
+        ctx.globalAlpha = d.a * this.alpha * flicker;
+        ctx.fillStyle = `rgb(${d.r},${d.g},${d.b})`;
+        ctx.fillRect(d.x, d.y, d.w, d.w);
       }
-
-      // ベース（暗め半透明）
-      ctx.globalAlpha = this.alpha * 0.35;
-      ctx.beginPath(); this._path(s);
-      ctx.fillStyle = `hsl(${this.hue},80%,15%)`;
-      ctx.fill();
-
-      // ワイヤーフレーム輝線
-      ctx.globalAlpha = this.alpha * 0.9;
-      ctx.beginPath(); this._path(s);
-      ctx.strokeStyle = `hsl(${this.hue},100%,70%)`;
-      ctx.lineWidth = 0.8;
-      ctx.shadowColor = `hsl(${this.hue},100%,60%)`;
-      ctx.shadowBlur  = 6;
-      ctx.stroke();
-
-      // 内側に細い輝線（二重）
-      ctx.globalAlpha = this.alpha * 0.4;
-      ctx.beginPath(); this._path(s * 0.7);
-      ctx.strokeStyle = `hsl(${(this.hue+40)%360},100%,85%)`;
-      ctx.lineWidth = 0.5;
-      ctx.shadowBlur = 4;
-      ctx.stroke();
-
-      // スペックル（デジタルノイズ）
-      ctx.shadowBlur = 0;
-      for (let i = 0; i < 4; i++) {
-        const px = (Math.random() - 0.5) * s * 1.4;
-        const py = (Math.random() - 0.8) * s * 2.0;
-        ctx.globalAlpha = 0.4 + Math.random() * 0.5;
-        ctx.fillStyle = Math.random() < 0.5
-          ? `hsl(${this.hue},100%,90%)`
-          : '#fff';
-        ctx.fillRect(px, py, 1.0, 1.0);
-      }
-
       ctx.restore();
-    }
-    _path(s) {
-      ctx.moveTo(0, s * 1.2);
-      ctx.bezierCurveTo(-s*0.6,  s*0.7, -s*0.9, -s*0.1, -s*0.65, -s*0.7);
-      ctx.bezierCurveTo(-s*0.45,-s*1.1, -s*0.12,-s*0.95,  0,      -s*0.6);
-      ctx.bezierCurveTo( s*0.12,-s*0.95,  s*0.45,-s*1.1,  s*0.65, -s*0.7);
-      ctx.bezierCurveTo( s*0.9, -s*0.1,   s*0.6,  s*0.7,  0,       s*1.2);
-      ctx.closePath();
     }
   }
 
