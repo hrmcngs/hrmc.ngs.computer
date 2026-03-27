@@ -35,7 +35,7 @@
     return 0.2;
   }
 
-  // ── 桜の花びら（デジタルノイズ版） ─────────────────
+  // ── 桜の花びら ─────────────────────────────────────
   class Petal {
     constructor(initial) { this.init(initial); }
     init(initial = false) {
@@ -48,42 +48,7 @@
       this.drot   = (Math.random() - 0.5) * 0.04;
       this.swing  = Math.random() * Math.PI * 2;
       this.dswing = 0.016 + Math.random() * 0.016;
-      this.alpha  = 0.80 + Math.random() * 0.18;
-      // ピクセルグリッドを事前生成（花びら形の中にランダム輝度で散らす）
-      this._buildPixels();
-    }
-    _buildPixels() {
-      const s   = this.s;
-      const px  = 2; // ピクセルサイズ
-      this.dots = [];
-      for (let y = -s * 1.4; y < s * 1.4; y += px) {
-        for (let x = -s * 1.1; x < s * 1.1; x += px) {
-          if (this._inPetal(x + px/2, y + px/2)) {
-            // ピクセルごとにランダム輝度・色
-            const v = Math.random();
-            const bright = 0.3 + Math.random() * 0.7;
-            // ピンク〜白〜暗ピンクのノイズ
-            const r = Math.round(180 + bright * 75);
-            const g = Math.round(80  + bright * 80);
-            const b = Math.round(100 + bright * 80);
-            this.dots.push({ x, y, w: px - 0.3, a: v < 0.08 ? 0 : 0.4 + bright * 0.55 });
-            this.dots[this.dots.length - 1].r = r;
-            this.dots[this.dots.length - 1].g = g;
-            this.dots[this.dots.length - 1].b = b;
-          }
-        }
-      }
-    }
-    // 花びら形の内外判定
-    _inPetal(px, py) {
-      const s = this.s;
-      // 楕円近似で上下非対称
-      const nx = px / (s * 0.85);
-      const ny = (py - s * 0.1) / (s * 1.25);
-      if (nx*nx + ny*ny > 1) return false;
-      // 上部の切れ込み
-      if (py < -s * 0.45 && Math.abs(px) < s * 0.2) return false;
-      return true;
+      this.alpha  = 0.75 + Math.random() * 0.2;
     }
     update() {
       this.swing += this.dswing;
@@ -93,45 +58,61 @@
       if (this.y > canvas.height + 20) this.init();
     }
     draw() {
+      const s = this.s;
       ctx.save();
       ctx.translate(this.x, this.y);
       ctx.rotate(this.rot);
-      // ドットを描画（毎フレーム輝度をランダムに揺らす）
-      for (const d of this.dots) {
-        // ちらつき：一部のピクセルがランダムに明滅
-        const flicker = Math.random() < 0.15 ? Math.random() * 0.8 : 1;
-        ctx.globalAlpha = d.a * this.alpha * flicker;
-        ctx.fillStyle = `rgb(${d.r},${d.g},${d.b})`;
-        ctx.fillRect(d.x, d.y, d.w, d.w);
+
+      // 花びら本体（滑らかなピンク）
+      ctx.globalAlpha = this.alpha;
+      ctx.beginPath();
+      ctx.moveTo(0, s * 1.2);
+      ctx.bezierCurveTo(-s*0.6,  s*0.7, -s*0.9, -s*0.1, -s*0.65, -s*0.7);
+      ctx.bezierCurveTo(-s*0.45,-s*1.1, -s*0.12,-s*0.95,  0,      -s*0.6);
+      ctx.bezierCurveTo( s*0.12,-s*0.95,  s*0.45,-s*1.1,  s*0.65, -s*0.7);
+      ctx.bezierCurveTo( s*0.9, -s*0.1,   s*0.6,  s*0.7,  0,       s*1.2);
+      ctx.closePath();
+      const g = ctx.createRadialGradient(0,-s*0.2,0, 0,s*0.4,s*1.3);
+      g.addColorStop(0,   '#ffe8f0');
+      g.addColorStop(0.5, '#f8a0b8');
+      g.addColorStop(1,   '#d05070');
+      ctx.fillStyle = g;
+      ctx.fill();
+
+      // ノイズ：白い微細なスペックルをごく薄く散らす
+      for (let i = 0; i < 6; i++) {
+        ctx.globalAlpha = (0.08 + Math.random() * 0.12) * this.alpha;
+        ctx.fillStyle = Math.random() < 0.6 ? '#fff' : '#ffb0c8';
+        ctx.fillRect(
+          (Math.random() - 0.5) * s * 1.3,
+          (Math.random() - 0.5) * s * 2.2,
+          1, 1
+        );
       }
+
       ctx.restore();
     }
   }
 
-  // ── 夏：サイバー蛍 ────────────────────────────────
+  // ── 夏：蛍 ────────────────────────────────────────
   class Firefly {
     constructor(initial) { this.init(initial); }
     init(initial=false) {
       this.x=Math.random()*canvas.width; this.y=initial?Math.random()*canvas.height:canvas.height+10;
-      this.r=1.5+Math.random()*2; this.vx=(Math.random()-0.5)*0.6; this.vy=-(0.2+Math.random()*0.4);
-      this.phase=Math.random()*Math.PI*2; this.dphase=0.02+Math.random()*0.02; this.max=0.6+Math.random()*0.3;
-      this.hue=Math.random()<0.5?185:300; // シアンかマゼンタ
+      this.r=2+Math.random()*2; this.vx=(Math.random()-0.5)*0.6; this.vy=-(0.2+Math.random()*0.4);
+      this.phase=Math.random()*Math.PI*2; this.dphase=0.02+Math.random()*0.02; this.max=0.5+Math.random()*0.4;
     }
     update(){this.phase+=this.dphase;this.x+=this.vx;this.y+=this.vy;if(this.y<-10)this.init();}
     draw(){
       const a=this.max*(0.5+0.5*Math.sin(this.phase));
       ctx.save();ctx.globalAlpha=a;
-      const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r*6);
-      g.addColorStop(0,`hsl(${this.hue},100%,90%)`);
-      g.addColorStop(0.3,`hsl(${this.hue},100%,60%)`);
-      g.addColorStop(1,'transparent');
-      ctx.shadowColor=`hsl(${this.hue},100%,70%)`;ctx.shadowBlur=8;
-      ctx.beginPath();ctx.arc(this.x,this.y,this.r*6,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
-      ctx.restore();
+      const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r*5);
+      g.addColorStop(0,'#ffffcc');g.addColorStop(0.4,'#aaffaa');g.addColorStop(1,'transparent');
+      ctx.beginPath();ctx.arc(this.x,this.y,this.r*5,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();ctx.restore();
     }
   }
 
-  // ── 秋：サイバー落ち葉 ────────────────────────────
+  // ── 秋：落ち葉 ────────────────────────────────────
   class Leaf {
     constructor(initial){this.init(initial);}
     init(initial=false){
@@ -139,49 +120,24 @@
       this.sz=5+Math.random()*8;this.vx=(Math.random()-0.5)*1.2;this.vy=0.5+Math.random()*0.9;
       this.rot=Math.random()*Math.PI*2;this.drot=(Math.random()-0.5)*0.04;
       this.swing=Math.random()*Math.PI*2;this.dswing=0.015+Math.random()*0.015;
-      this.alpha=0.7+Math.random()*0.25;
-      // オレンジ〜赤をサイバー化（彩度高め）
-      const hues=[20,0,35,15];
-      this.hue=hues[Math.floor(Math.random()*hues.length)];
+      this.alpha=0.6+Math.random()*0.3;
+      const cs=['#c8501a','#e07830','#b83010','#f09040','#a02808'];
+      this.color=cs[Math.floor(Math.random()*cs.length)];
     }
     update(){this.swing+=this.dswing;this.x+=this.vx+Math.sin(this.swing)*0.7;this.y+=this.vy;this.rot+=this.drot;if(this.y>canvas.height+20)this.init();}
-    draw(){
-      ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rot);
-      // 暗い塗り
-      ctx.globalAlpha=this.alpha*0.3;
-      ctx.beginPath();ctx.ellipse(0,0,this.sz*0.45,this.sz,0,0,Math.PI*2);
-      ctx.fillStyle=`hsl(${this.hue},100%,10%)`;ctx.fill();
-      // 輝線
-      ctx.globalAlpha=this.alpha*0.9;
-      ctx.beginPath();ctx.ellipse(0,0,this.sz*0.45,this.sz,0,0,Math.PI*2);
-      ctx.strokeStyle=`hsl(${this.hue},100%,65%)`;ctx.lineWidth=0.8;
-      ctx.shadowColor=`hsl(${this.hue},100%,55%)`;ctx.shadowBlur=5;
-      ctx.stroke();
-      ctx.restore();
-    }
+    draw(){ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rot);ctx.globalAlpha=this.alpha;ctx.beginPath();ctx.ellipse(0,0,this.sz*0.45,this.sz,0,0,Math.PI*2);ctx.fillStyle=this.color;ctx.fill();ctx.restore();}
   }
 
-  // ── 冬：サイバー雪 ───────────────────────────────
+  // ── 冬：雪 ───────────────────────────────────────
   class Snow {
     constructor(initial){this.init(initial);}
     init(initial=false){
       this.x=Math.random()*canvas.width;this.y=initial?Math.random()*canvas.height:-10;
-      this.r=1+Math.random()*2;this.vx=(Math.random()-0.5)*0.4;this.vy=0.4+Math.random()*0.8;
-      this.swing=Math.random()*Math.PI*2;this.alpha=0.6+Math.random()*0.35;
-      this.hue=Math.random()<0.5?200:270; // 青系かバイオレット
+      this.r=1.5+Math.random()*2.5;this.vx=(Math.random()-0.5)*0.4;this.vy=0.4+Math.random()*0.8;
+      this.swing=Math.random()*Math.PI*2;this.alpha=0.5+Math.random()*0.4;
     }
     update(){this.swing+=0.018;this.x+=this.vx+Math.sin(this.swing)*0.3;this.y+=this.vy;if(this.y>canvas.height+10)this.init();}
-    draw(){
-      ctx.save();ctx.globalAlpha=this.alpha;
-      ctx.shadowColor=`hsl(${this.hue},100%,80%)`;ctx.shadowBlur=6;
-      ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
-      ctx.fillStyle=`hsl(${this.hue},80%,85%)`;ctx.fill();
-      // 外リング
-      ctx.globalAlpha=this.alpha*0.4;
-      ctx.beginPath();ctx.arc(this.x,this.y,this.r*2.5,0,Math.PI*2);
-      ctx.strokeStyle=`hsl(${this.hue},100%,70%)`;ctx.lineWidth=0.5;ctx.stroke();
-      ctx.restore();
-    }
+    draw(){ctx.save();ctx.globalAlpha=this.alpha;ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle='#e8f2ff';ctx.fill();ctx.restore();}
   }
 
   // ── 雨（ホログラム） ─────────────────────────────
