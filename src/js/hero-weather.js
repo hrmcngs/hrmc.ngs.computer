@@ -86,7 +86,7 @@
         const dx    = Math.cos(angle) * dist * (0.5 + Math.random() * 0.5);
         const dy    = Math.sin(angle) * dist * (0.5 + Math.random() * 0.5);
 
-        ctx.globalAlpha = cfg.petal.glitchOpacity;
+        ctx.globalAlpha = cfg.petal.glitchOpacity * this.z;
         ctx.translate(dx, dy);
         ctx.beginPath(); this._path(s * 1.1);
         ctx.fillStyle = 'rgba(0,255,220,0.80)'; ctx.fill();
