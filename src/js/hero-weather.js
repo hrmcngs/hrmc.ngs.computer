@@ -72,7 +72,7 @@
       if (this.glitchT > 0) {
         // 全方向ランダムなずれ（横・縦・斜め）
         const angle = Math.random() * Math.PI * 2;
-        const dist  = s * cfg.petal.glitchShift;
+        const dist  = s * cfg.petal.glitchShift * cfg.petal.glitchRange;
         const dx    = Math.cos(angle) * dist * (0.3 + Math.random() * 0.7);
         const dy    = Math.sin(angle) * dist * (0.3 + Math.random() * 0.7);
 
