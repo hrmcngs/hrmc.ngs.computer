@@ -76,7 +76,7 @@
 
       // グリッチ：RGBずれ + 水平スライス
       if (this.glitchT > 0) {
-        // glitchRange で振れ幅を制御（0〜1、小さいほど狭い）
+        ctx.save(); // グリッチの状態変化を閉じ込める
         const range = cfg.petal.glitchRange ?? 0.3;
         const angle = Math.random() * Math.PI * 2;
         const shift = Array.isArray(cfg.petal.glitchShift)
@@ -95,7 +95,6 @@
         ctx.fillStyle = 'rgba(255,0,100,0.80)'; ctx.fill();
         ctx.translate(dx, dy);
 
-        // スライス：振れ幅も glitchRange で制御
         const spread = s * range;
         const [sMin,sMax]=cfg.petal.sliceCount; const slices=sMin+Math.floor(Math.random()*(sMax-sMin));
         for (let i = 0; i < slices; i++) {
@@ -111,6 +110,7 @@
           ctx.fillRect(-sl / 2, 0, sl, 1.2 + Math.random() * 1.8);
           ctx.restore();
         }
+        ctx.restore(); // グリッチ終わり
       }
 
       // 本体
