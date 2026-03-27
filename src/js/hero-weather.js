@@ -40,16 +40,22 @@
   class Petal {
     constructor(initial) { this.init(initial); }
     init(initial = false) {
+      // z: 0=奥(小・遅・薄) 〜 1=手前(大・速・濃)
+      this.z      = Math.random();
       this.x      = Math.random() * canvas.width;
       this.y      = initial ? Math.random() * canvas.height : -20;
-      this.s      = cfg.petal.sizeMin + Math.random() * (cfg.petal.sizeMax - cfg.petal.sizeMin);
-      this.vx     = (Math.random() - 0.5) * 1.0;
-      this.vy     = cfg.petal.speedMin + Math.random() * (cfg.petal.speedMax - cfg.petal.speedMin);
+      const baseS = cfg.petal.sizeMin + Math.random() * (cfg.petal.sizeMax - cfg.petal.sizeMin);
+      this.s      = baseS * (0.4 + this.z * 0.8);   // 奥:小さい 手前:大きい
+      this.vx     = (Math.random() - 0.5) * (0.3 + this.z * 1.2);
+      const sMin = Array.isArray(cfg.petal.speedMin) ? cfg.petal.speedMin[0]+Math.random()*(cfg.petal.speedMin[1]-cfg.petal.speedMin[0]) : cfg.petal.speedMin;
+      const sMax = Array.isArray(cfg.petal.speedMax) ? cfg.petal.speedMax[0]+Math.random()*(cfg.petal.speedMax[1]-cfg.petal.speedMax[0]) : cfg.petal.speedMax;
+      const base  = sMin + Math.random() * (sMax - sMin);
+      this.vy     = base * (0.3 + this.z * 0.9);    // 奥:遅い 手前:速い
       this.rot    = Math.random() * Math.PI * 2;
       this.drot   = (Math.random() - 0.5) * 0.04;
       this.swing  = Math.random() * Math.PI * 2;
       this.dswing = 0.016 + Math.random() * 0.016;
-      this.alpha  = 0.75 + Math.random() * 0.2;
+      this.alpha  = 0.2 + this.z * 0.75;            // 奥:薄い 手前:濃い
       this.glitchT = 0;
     }
     update() {
@@ -139,17 +145,25 @@
   class Firefly {
     constructor(initial) { this.init(initial); }
     init(initial=false) {
-      this.x=Math.random()*canvas.width; this.y=initial?Math.random()*canvas.height:canvas.height+10;
-      this.r=2+Math.random()*2; this.vx=(Math.random()-0.5)*0.6; this.vy=-(0.2+Math.random()*0.4);
-      this.phase=Math.random()*Math.PI*2; this.dphase=0.02+Math.random()*0.02; this.max=0.5+Math.random()*0.4;
+      // z: 0=奥(小・遅・薄) 〜 1=手前(大・速・濃)
+      this.z     = Math.random();
+      this.x     = Math.random()*canvas.width;
+      this.y     = initial?Math.random()*canvas.height:canvas.height+10;
+      this.r     = (0.8 + this.z * 2.5);
+      this.vx    = (Math.random()-0.5)*(0.2 + this.z*0.7);
+      this.vy    = -(0.1 + this.z*0.5);
+      this.phase = Math.random()*Math.PI*2;
+      this.dphase= 0.015 + this.z*0.02;
+      this.max   = 0.2 + this.z * 0.7;
     }
     update(){this.phase+=this.dphase;this.x+=this.vx;this.y+=this.vy;if(this.y<-10)this.init();}
     draw(){
       const a=this.max*(0.5+0.5*Math.sin(this.phase));
+      const glow=this.r*(3+this.z*3);
       ctx.save();ctx.globalAlpha=a;
-      const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r*5);
+      const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,glow);
       g.addColorStop(0,'#ffffcc');g.addColorStop(0.4,'#aaffaa');g.addColorStop(1,'transparent');
-      ctx.beginPath();ctx.arc(this.x,this.y,this.r*5,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();ctx.restore();
+      ctx.beginPath();ctx.arc(this.x,this.y,glow,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();ctx.restore();
     }
   }
 
@@ -157,15 +171,22 @@
   class Leaf {
     constructor(initial){this.init(initial);}
     init(initial=false){
-      this.x=Math.random()*canvas.width;this.y=initial?Math.random()*canvas.height:-20;
-      this.sz=5+Math.random()*8;this.vx=(Math.random()-0.5)*1.2;this.vy=0.5+Math.random()*0.9;
-      this.rot=Math.random()*Math.PI*2;this.drot=(Math.random()-0.5)*0.04;
-      this.swing=Math.random()*Math.PI*2;this.dswing=0.015+Math.random()*0.015;
-      this.alpha=0.6+Math.random()*0.3;
+      // z: 0=奥(小・遅・薄) 〜 1=手前(大・速・濃)
+      this.z    = Math.random();
+      this.x    = Math.random()*canvas.width;
+      this.y    = initial?Math.random()*canvas.height:-20;
+      this.sz   = (3 + Math.random()*6) * (0.4 + this.z * 0.8);
+      this.vx   = (Math.random()-0.5)*(0.4 + this.z*1.2);
+      this.vy   = (0.3 + Math.random()*0.5) * (0.3 + this.z*0.9);
+      this.rot  = Math.random()*Math.PI*2;
+      this.drot = (Math.random()-0.5)*(0.02 + this.z*0.04);
+      this.swing= Math.random()*Math.PI*2;
+      this.dswing=0.015+Math.random()*0.015;
+      this.alpha= 0.2 + this.z * 0.7;
       const cs=['#c8501a','#e07830','#b83010','#f09040','#a02808'];
       this.color=cs[Math.floor(Math.random()*cs.length)];
     }
-    update(){this.swing+=this.dswing;this.x+=this.vx+Math.sin(this.swing)*0.7;this.y+=this.vy;this.rot+=this.drot;if(this.y>canvas.height+20)this.init();}
+    update(){this.swing+=this.dswing;this.x+=this.vx+Math.sin(this.swing)*(0.3+this.z*0.6);this.y+=this.vy;this.rot+=this.drot;if(this.y>canvas.height+20)this.init();}
     draw(){ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rot);ctx.globalAlpha=this.alpha;ctx.beginPath();ctx.ellipse(0,0,this.sz*0.45,this.sz,0,0,Math.PI*2);ctx.fillStyle=this.color;ctx.fill();ctx.restore();}
   }
 
@@ -173,30 +194,49 @@
   class Snow {
     constructor(initial){this.init(initial);}
     init(initial=false){
-      this.x=Math.random()*canvas.width;this.y=initial?Math.random()*canvas.height:-10;
-      this.r=1.5+Math.random()*2.5;this.vx=(Math.random()-0.5)*0.4;this.vy=0.4+Math.random()*0.8;
-      this.swing=Math.random()*Math.PI*2;this.alpha=0.5+Math.random()*0.4;
+      // z: 0=奥(小・遅・薄) 〜 1=手前(大・速・濃)
+      this.z    = Math.random();
+      this.x    = Math.random()*canvas.width;
+      this.y    = initial?Math.random()*canvas.height:-10;
+      this.r    = 0.8 + this.z * 3.5;           // 奥:0.8px 〜 手前:4.3px
+      this.vx   = (Math.random()-0.5)*0.3*this.z;
+      this.vy   = 0.3 + this.z * 1.2;           // 奥:遅い 〜 手前:速い
+      this.swing= Math.random()*Math.PI*2;
+      this.alpha= 0.2 + this.z * 0.65;          // 奥:薄い 〜 手前:濃い
     }
-    update(){this.swing+=0.018;this.x+=this.vx+Math.sin(this.swing)*0.3;this.y+=this.vy;if(this.y>canvas.height+10)this.init();}
-    draw(){ctx.save();ctx.globalAlpha=this.alpha;ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle='#e8f2ff';ctx.fill();ctx.restore();}
+    update(){this.swing+=0.015+this.z*0.01;this.x+=this.vx+Math.sin(this.swing)*(0.15+this.z*0.2);this.y+=this.vy;if(this.y>canvas.height+10)this.init();}
+    draw(){
+      ctx.save();ctx.globalAlpha=this.alpha;
+      ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+      // 手前は白く、奥は青みがかる
+      const l=Math.round(80+this.z*15);
+      ctx.fillStyle=`hsl(210,60%,${l}%)`;ctx.fill();
+      ctx.restore();
+    }
   }
 
   // ── 雨（ホログラム） ─────────────────────────────
   class Rain {
     constructor(initial){this.init(initial);}
     init(initial=false){
-      this.x=Math.random()*canvas.width;this.y=initial?Math.random()*canvas.height:-30;
-      this.len=10+Math.random()*18;this.speed=9+Math.random()*7;
-      this.alpha=0.15+Math.random()*0.15;this.hue=Math.random()*360;
+      // z: 0=奥(短・遅・細・薄) 〜 1=手前(長・速・太・濃)
+      this.z    = Math.random();
+      this.x    = Math.random()*canvas.width;
+      this.y    = initial?Math.random()*canvas.height:-30;
+      this.len  = 5 + this.z * 22;              // 奥:5px 〜 手前:27px
+      this.speed= 4 + this.z * 14;              // 奥:遅 〜 手前:速
+      this.lw   = 0.4 + this.z * 1.2;           // 奥:細 〜 手前:太
+      this.alpha= 0.06 + this.z * 0.22;         // 奥:薄 〜 手前:濃
+      this.hue  = Math.random()*360;
     }
-    update(){this.x+=0.8;this.y+=this.speed;this.hue=(this.hue+3)%360;if(this.y>canvas.height+30)this.init();}
+    update(){this.x+=0.5*this.z;this.y+=this.speed;this.hue=(this.hue+2)%360;if(this.y>canvas.height+30)this.init();}
     draw(){
       ctx.save();
       const g=ctx.createLinearGradient(this.x,this.y,this.x+this.len*0.08,this.y+this.len);
       g.addColorStop(0,`hsla(${this.hue},100%,80%,0)`);
       g.addColorStop(0.4,`hsla(${this.hue},100%,80%,${this.alpha})`);
       g.addColorStop(1,`hsla(${(this.hue+80)%360},100%,90%,0)`);
-      ctx.strokeStyle=g;ctx.lineWidth=0.9;
+      ctx.strokeStyle=g;ctx.lineWidth=this.lw;
       ctx.beginPath();ctx.moveTo(this.x,this.y);ctx.lineTo(this.x+this.len*0.08,this.y+this.len);
       ctx.stroke();ctx.restore();
     }
