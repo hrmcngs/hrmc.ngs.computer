@@ -298,11 +298,17 @@
 
   // ── 起動 ──────────────────────────────────────────
   async function start(){
-    // hero-weather.json を読み込んでデフォルト設定を上書き
+    // hero-weather.jsonc を読み込んでデフォルト設定を上書き
     try {
-      const res  = await fetch('/hero-weather.json');
+      const res  = await fetch('/hero-weather.jsonc');
       if (res.ok) {
-        const json = await res.json();
+        const text = await res.text();
+        // // コメントと /* */ コメントを除去してからJSONパース
+        const stripped = text
+          .replace(/\/\/[^\n]*/g, '')      // //コメント除去
+          .replace(/\/\*[\s\S]*?\*\//g, '') // /* */コメント除去
+          .replace(/,(\s*[}\]])/g, '$1');   // 末尾カンマ除去
+        const json = JSON.parse(stripped);
         // ディープマージ
         for (const key of Object.keys(json)) {
           if (typeof json[key] === 'object' && !Array.isArray(json[key]) && cfg[key]) {
@@ -311,7 +317,7 @@
             cfg[key] = json[key];
           }
         }
-        console.log('%c[heroWeather] hero-weather.json 読み込み完了', 'color:#3ecfcf');
+        console.log('%c[heroWeather] hero-weather.jsonc 読み込み完了', 'color:#3ecfcf');
       }
     } catch { /* JSONがなければデフォルト値を使う */ }
 
