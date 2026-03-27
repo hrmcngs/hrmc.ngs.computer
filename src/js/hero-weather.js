@@ -262,22 +262,20 @@
     ctx.restore();
   }
 
-  // ── 桜の花びら ─────────────────────────────────────
+  // ── 桜の花びら（直接描画） ─────────────────────────
   class Petal {
     constructor(initial) { this.init(initial); }
     init(initial = false) {
       this.x      = Math.random() * canvas.width;
       this.y      = initial ? Math.random() * canvas.height : -20;
-      this.s      = PETAL_SIZES[Math.floor(Math.random() * PETAL_SIZES.length)];
+      this.s      = 8 + Math.random() * 10;
       this.vx     = (Math.random() - 0.5) * 1.0;
       this.vy     = 3.5 + Math.random() * 4.0;
       this.rot    = Math.random() * Math.PI * 2;
       this.drot   = (Math.random() - 0.5) * 0.04;
       this.swing  = Math.random() * Math.PI * 2;
       this.dswing = 0.016 + Math.random() * 0.016;
-      this.alpha  = 0.55 + Math.random() * 0.35;
-      // VHSラインは確率で持つ（毎フレーム判定不要）
-      this.vhsLine = Math.random() < 0.12;
+      this.alpha  = 0.70 + Math.random() * 0.25;
     }
     update() {
       this.swing += this.dswing;
@@ -287,21 +285,38 @@
       if (this.y > canvas.height + 20) this.init();
     }
     draw(bright) {
-      const cached = getNearestCache(this.s);
-      const cw = cached.canvas.width;
-      const ch = cached.canvas.height;
-      // 花びらは夜でも最低0.45は見えるようにする
-      const petalBright = Math.max(bright, 0.45);
+      const s = this.s;
+      const petalBright = Math.max(bright, 0.5);
       ctx.save();
       ctx.translate(this.x, this.y);
       ctx.rotate(this.rot);
       ctx.globalAlpha = this.alpha * petalBright;
-      ctx.drawImage(cached.canvas, -cw/2, -ch/2);
-      if (this.vhsLine) {
-        ctx.globalAlpha = 0.25 * petalBright;
-        ctx.fillStyle   = 'rgba(255,210,225,0.8)';
-        ctx.fillRect(-this.s, 0, this.s*2, 1);
+
+      // 花びら本体
+      ctx.beginPath();
+      ctx.moveTo(0, s * 1.2);
+      ctx.bezierCurveTo(-s*0.6,  s*0.7,  -s*0.9, -s*0.1, -s*0.65, -s*0.7);
+      ctx.bezierCurveTo(-s*0.45,-s*1.1, -s*0.12, -s*0.95,  0,      -s*0.6);
+      ctx.bezierCurveTo( s*0.12,-s*0.95,  s*0.45, -s*1.1,  s*0.65, -s*0.7);
+      ctx.bezierCurveTo( s*0.9, -s*0.1,   s*0.6,   s*0.7,  0,       s*1.2);
+      ctx.closePath();
+
+      const g = ctx.createRadialGradient(0, -s*0.2, 0, 0, s*0.4, s*1.3);
+      g.addColorStop(0,   '#ffe0ea');
+      g.addColorStop(0.5, '#f8a0b8');
+      g.addColorStop(1,   '#e06080');
+      ctx.fillStyle = g;
+      ctx.fill();
+
+      // ノイズ粒（花びら形クリップなし・薄く重ねる）
+      for (let i = 0; i < 5; i++) {
+        const px = (Math.random() - 0.5) * s * 1.4;
+        const py = (Math.random() - 0.8) * s * 2.0;
+        ctx.globalAlpha = (0.2 + Math.random() * 0.3) * petalBright;
+        ctx.fillStyle = Math.random() < 0.5 ? '#fff' : '#ffc0d0';
+        ctx.fillRect(px, py, 1.2, 1.2);
       }
+
       ctx.restore();
     }
   }
