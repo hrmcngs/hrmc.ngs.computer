@@ -69,7 +69,7 @@
       let prCount = 0;
       try {
         const res  = await fetch(
-          `https://api.github.com/search/issues?q=type:pr+author:${username}${createdQ}${includeOrg?'+is:public,private':''}`,
+          `https://api.github.com/search/issues?q=type:pr+author:${username}${createdQ}`,
           { headers }
         );
         const data = await res.json();
