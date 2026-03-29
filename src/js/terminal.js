@@ -28,7 +28,7 @@
     // PR:     /search/issues?q=type:pr+author:USERNAME
     // Commit: /search/commits?q=author:USERNAME
     // どちらも total_count を返すので repos ループ不要
-    async function runUserCount(username, year, month) {
+    async function runUserCount(username, year, month, token = '') {
       let prDateQ     = '';
       let commitDateQ = '';
       let periodLabel = '全期間';
@@ -44,7 +44,7 @@
       } else {
         // 全期間 → アカウント作成日を取得して範囲指定
         try {
-          const res  = await fetch(`https://api.github.com/users/${username}`);
+          const res  = await fetch(`https://api.github.com/users/${username}`, { headers: token ? { Authorization: `token ${token}` } : {} });
           const data = await res.json();
           if (res.ok && data.created_at) {
             const created = data.created_at.slice(0, 10); // YYYY-MM-DD
@@ -70,7 +70,8 @@
       let prCount = 0;
       try {
         const res  = await fetch(
-          `https://api.github.com/search/issues?q=type:pr+author:${username}${prDateQ}`
+          `https://api.github.com/search/issues?q=type:pr+author:${username}${prDateQ}`,
+          { headers: token ? { Authorization: `token ${token}` } : {} }
         );
         const data = await res.json();
         if (!res.ok) throw new Error(`${res.status}: ${data?.message ?? ''}`);
@@ -86,7 +87,7 @@
       try {
         const res  = await fetch(
           `https://api.github.com/search/commits?q=author:${username}${commitDateQ}&per_page=1`,
-          { headers: { Accept: 'application/vnd.github.cloak-preview' } }
+          { headers: Object.assign({ Accept: 'application/vnd.github.cloak-preview' }, token ? { Authorization: `token ${token}` } : {}) }
         );
         const data = await res.json();
         if (!res.ok) throw new Error(`${res.status}: ${data?.message ?? ''}`);
@@ -99,7 +100,7 @@
       ld.remove();
       appendLines([
         `  Pull Request数: <span class="success" style="font-weight:700">${prCount}</span>`,
-        `  コミット数:     <span class="success" style="font-weight:700">${commitCount}</span>`,
+        `  コミット数:     <span class="success" style="font-weight:700">${commitCount}</span>  <span style="opacity:0.4">${token ? '(org・private含む)' : '(publicのみ)'}</span>`,
         '',
       ], body);
     }
@@ -180,13 +181,16 @@
         return [
           '<span class="success">▶ GitHub Contribution Counter</span>',
           '',
-          '  書式: <span class="term-cmd">ユーザーID [年 月]</span>',
+          '  書式: <span class="term-cmd">ユーザーID [年 月] [token]</span>',
           '  例:   <span style="opacity:0.7">hrmcngs</span>',
           '  例:   <span style="opacity:0.7">hrmcngs 2024 05</span>',
+          '  例:   <span style="opacity:0.7">hrmcngs ghp_xxxx</span>  <span style="opacity:0.4">← org・private含む</span>',
+          '',
+          '  tokenなし → publicのみ / tokenあり → org・private含む',
           '',
           '<span style="opacity:0.45">キャンセル: ./stop</span>',
           '',
-          'ユーザーID を入力してください:',
+          'ユーザーID [年 月] [token] を入力してください:',
         ];
       },
 
@@ -247,15 +251,25 @@
       const parts = raw.trim().split(/\s+/).filter(Boolean);
       if (!parts.length) { print(['ユーザーID を入力してください:'], raw); return; }
       const username = parts[0];
-      const year     = parts[1] ?? '';
-      const month    = parts[2] ? parts[2].padStart(2, '0') : '';
+      // token判定: ghp_ や github_pat_ で始まる or 40文字の16進数
+      let year='', month='', token='';
+      const isToken = t => /^(ghp_|github_pat_|gho_)/i.test(t) || /^[0-9a-f]{40}$/i.test(t);
+      if(parts.length>=2){
+        if(isToken(parts[1])){ token=parts[1]; }
+        else {
+          year=parts[1]??'';
+          if(parts[2]&&!isToken(parts[2])){ month=parts[2].padStart(2,'0'); }
+          else if(parts[2]&&isToken(parts[2])){ token=parts[2]; }
+          if(parts[3]&&isToken(parts[3])){ token=parts[3]; }
+        }
+      }
       if (year && !month) {
-        print(['<span class="error">月も指定してください (例: 2024 05)</span>', 'ユーザーID [年 月] を入力してください:'], raw);
+        print(['<span class="error">月も指定してください (例: 2024 05)</span>', 'ユーザーID [年 月] [token] を入力してください:'], raw);
         return;
       }
       userCountState = null;
       print([], raw);
-      runUserCount(username, year, month);
+      runUserCount(username, year, month, token);
     }
 
     // ── Markdown ───────────────────────────────────────
