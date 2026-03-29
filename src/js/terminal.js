@@ -31,6 +31,8 @@
     async function runUserCount(username, year, month) {
       let prDateQ     = '';
       let commitDateQ = '';
+      let periodLabel = '全期間';
+
       if (year && month) {
         const start  = `${year}-${month}-01`;
         const em     = month === '12' ? '01' : String(Number(month) + 1).padStart(2, '0');
@@ -38,8 +40,21 @@
         const end    = `${ey}-${em}-01`;
         prDateQ      = `+created:${start}..${end}`;
         commitDateQ  = `+committer-date:${start}..${end}`;
+        periodLabel  = `${year}年${Number(month)}月`;
+      } else {
+        // 全期間 → アカウント作成日を取得して範囲指定
+        try {
+          const res  = await fetch(`https://api.github.com/users/${username}`);
+          const data = await res.json();
+          if (res.ok && data.created_at) {
+            const created = data.created_at.slice(0, 10); // YYYY-MM-DD
+            const today   = new Date().toISOString().slice(0, 10);
+            prDateQ     = `+created:${created}..${today}`;
+            commitDateQ = `+committer-date:${created}..${today}`;
+            periodLabel = `全期間（${created} 〜）`;
+          }
+        } catch { /* 失敗時は日付なし */ }
       }
-      const periodLabel = year && month ? `${year}年${Number(month)}月` : '全期間';
 
       appendLines([
         '',
@@ -245,16 +260,14 @@
 
     // ── Markdown ───────────────────────────────────────
     function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-    // Attribute-safe HTML escaper (also escapes double quotes for use inside attributes)
-    function escAttr(s){return escHtml(s).replace(/"/g,'&quot;');}
     // javascript:/data:/vbscript: を除去して XSS を防ぐ
     function safeUrl(u){const t=u.trim();return/^(javascript|data|vbscript):/i.test(t)?'#':t;}
     function cleanUrl(url){url=url.replace(/\\([&()[\]#*_!])/g,'$1');url=url.replace(/github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)/,'raw.githubusercontent.com/$1/$2/$3');return safeUrl(url);}
     function stripHtml(md){
-      md=md.replace(/\[!\[([^\]]*)\]\(([^)]+)\)\]\(([^)]+)\)/g,(_,a,i,h)=>`<a href="${safeUrl(h)}" target="_blank" rel="noopener noreferrer"><img src="${cleanUrl(i)}" alt="${escAttr(a)}" class="readme-img"></a>`);
+      md=md.replace(/\[!\[([^\]]*)\]\(([^)]+)\)\]\(([^)]+)\)/g,(_,a,i,h)=>`<a href="${safeUrl(h)}" target="_blank" rel="noopener noreferrer"><img src="${cleanUrl(i)}" alt="${escHtml(a)}" class="readme-img"></a>`);
       md=md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,(_,a,s)=>`<img src="${cleanUrl(s)}" alt="${a}" class="readme-img">`);
       md=md.replace(/<a\s+href="([^"]*)"[^>]*>[\s\S]*?<img\s[^>]*src="([^"]*)"[^>]*\/?>[\s\S]*?<\/a>/gi,(_,h,s)=>`<a href="${safeUrl(h)}" target="_blank" rel="noopener noreferrer"><img src="${cleanUrl(s)}" class="readme-img"></a>`);
-      md=md.replace(/<img\s[^>]*src="([^"]*)"[^>]*\/?>/gi,(m,s)=>{if(m.includes('readme-img'))return m;const a=m.match(/alt="([^"]*)"/i);const altText=a?a[1]:'';return`<img src="${cleanUrl(s)}" alt="${escAttr(altText)}" class="readme-img">`;});
+      md=md.replace(/<img\s[^>]*src="([^"]*)"[^>]*\/?>/gi,(m,s)=>{if(m.includes('readme-img'))return m;const a=m.match(/alt="([^"]*)"/i);return`<img src="${cleanUrl(s)}" alt="${a?a[1]:''}" class="readme-img">`;});
       md=md.replace(/<a\s+href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi,(m,h,inner)=>{if(inner.includes('<img'))return m;return`[${inner.trim()}](${safeUrl(h)})`;});
       md=md.replace(/<br\s*\/?>/gi,'\n');
       md=md.replace(/<(?!img\s|a\s[^>]*><img|\/a>)[^>]+(>|$)/gi,'');
@@ -291,7 +304,7 @@
     }
 
     let savedBodyContent=null;
-    function closeViewer(){if(!activeViewer)return;body.innerHTML=savedBodyContent;savedBodyContent=null;activeViewer=null;body.scrollTop=body.scrollHeight;input.focus();}
+    function closeViewer(){if(!activeViewer)return;body.innerHTML=savedBodyContent;savedBodyContent=null;activeViewer=null;body.scrollTop=body.scrollHeight;input.focus({ preventScroll: true });}
     function parseGithubUrl(links){for(const url of(links??[])){const m=url.match(/github\.com\/([^/]+)\/([^/]+)/);if(m)return{owner:m[1],repo:m[2]};}return null;}
     function hasGithubLink(p){return!!parseGithubUrl(p.links);}
     async function fetchReadme(project){
@@ -352,11 +365,11 @@
 
     body.addEventListener('click', e => {
       const c = e.target.closest('.term-cmd');
-      if (c) { const m=c.textContent.match(/^\[(\d+)\]/); input.value=m?m[1]:c.textContent; input.focus(); return; }
-      input.focus();
+      if (c) { const m=c.textContent.match(/^\[(\d+)\]/); input.value=m?m[1]:c.textContent; input.focus({ preventScroll: true }); return; }
+      input.focus({ preventScroll: true });
     });
 
-    wrap.addEventListener('click', () => input.focus());
+    wrap.addEventListener('click', () => input.focus({ preventScroll: true }));
     print(COMMANDS.help(), 'help');
   }
 
