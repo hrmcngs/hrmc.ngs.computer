@@ -29,32 +29,26 @@
     // Commit: /search/commits?q=author:USERNAME
     // どちらも total_count を返すので repos ループ不要
     async function runUserCount(username, year, month, token = '') {
-      let prDateQ     = '';
-      let commitDateQ = '';
+      let since = '', until = '', createdQ = '';
       let periodLabel = '全期間';
 
       if (year && month) {
-        const start  = `${year}-${month}-01`;
-        const em     = month === '12' ? '01' : String(Number(month) + 1).padStart(2, '0');
-        const ey     = month === '12' ? String(Number(year) + 1) : year;
-        const end    = `${ey}-${em}-01`;
-        prDateQ      = `+created:${start}..${end}`;
-        commitDateQ  = `+committer-date:${start}..${end}`;
-        periodLabel  = `${year}年${Number(month)}月`;
+        since    = `${year}-${month}-01T00:00:00Z`;
+        const em = month === '12' ? '01' : String(Number(month) + 1).padStart(2, '0');
+        const ey = month === '12' ? String(Number(year) + 1) : year;
+        until    = `${ey}-${em}-01T00:00:00Z`;
+        createdQ = `+created:${since}..${until}`;
+        periodLabel = `${year}年${Number(month)}月`;
       } else {
-        // 全期間 → アカウント作成日を取得して範囲指定
+        // アカウント作成日を取得して全期間の範囲を表示
         try {
           const res  = await fetch(`https://api.github.com/users/${username}`, { headers: token ? { Authorization: `token ${token}` } : {} });
           const data = await res.json();
-          if (res.ok && data.created_at) {
-            const created = data.created_at.slice(0, 10); // YYYY-MM-DD
-            const today   = new Date().toISOString().slice(0, 10);
-            prDateQ     = `+created:${created}..${today}`;
-            commitDateQ = `+committer-date:${created}..${today}`;
-            periodLabel = `全期間（${created} 〜）`;
-          }
-        } catch { /* 失敗時は日付なし */ }
+          if (res.ok && data.created_at) periodLabel = `全期間（${data.created_at.slice(0, 10)} 〜）`;
+        } catch {}
       }
+
+      const headers = token ? { Authorization: `token ${token}` } : {};
 
       appendLines([
         '',
@@ -65,13 +59,13 @@
       const ld = makeLoadingLine('取得中...');
       body.appendChild(ld); body.scrollTop = body.scrollHeight;
 
-      // PR 数
+      // PR 数（user_count.js と同じ）
       setLoading(ld, 'Pull Requests を取得中...');
       let prCount = 0;
       try {
         const res  = await fetch(
-          `https://api.github.com/search/issues?q=type:pr+author:${username}${prDateQ}`,
-          { headers: token ? { Authorization: `token ${token}` } : {} }
+          `https://api.github.com/search/issues?q=type:pr+author:${username}${createdQ}`,
+          { headers }
         );
         const data = await res.json();
         if (!res.ok) throw new Error(`${res.status}: ${data?.message ?? ''}`);
@@ -81,17 +75,35 @@
         return;
       }
 
-      // コミット数（Search Commits API、per_page=1 で total_count だけ取得）
-      setLoading(ld, 'コミット数を取得中...');
+      // コミット数（user_count.js と同じ：全リポジトリをループ）
       let commitCount = 0;
       try {
-        const res  = await fetch(
-          `https://api.github.com/search/commits?q=author:${username}${commitDateQ}&per_page=1`,
-          { headers: Object.assign({ Accept: 'application/vnd.github.cloak-preview' }, token ? { Authorization: `token ${token}` } : {}) }
-        );
-        const data = await res.json();
-        if (!res.ok) throw new Error(`${res.status}: ${data?.message ?? ''}`);
-        commitCount = data.total_count ?? 0;
+        let page = 1, hasNext = true;
+        while (hasNext) {
+          setLoading(ld, `コミット集計中... (page ${page} / ${commitCount} commits)`);
+          const repoRes = await fetch(
+            `https://api.github.com/users/${username}/repos?per_page=100&page=${page}`,
+            { headers }
+          );
+          const repos = await repoRes.json();
+          if (!Array.isArray(repos) || !repos.length) break;
+          for (const repo of repos) {
+            let cPage = 1, cHasNext = true;
+            while (cHasNext) {
+              let url = `https://api.github.com/repos/${repo.owner.login}/${repo.name}/commits?author=${username}&per_page=100&page=${cPage}`;
+              if (since) url += `&since=${since}`;
+              if (until) url += `&until=${until}`;
+              const commitRes = await fetch(url, { headers });
+              const commits   = await commitRes.json();
+              if (!Array.isArray(commits) || !commits.length) break;
+              commitCount += commits.length;
+              cHasNext     = commits.length === 100;
+              cPage++;
+            }
+          }
+          hasNext = repos.length === 100;
+          page++;
+        }
       } catch (err) {
         setLoading(ld, `<span class="error">コミット取得エラー: ${escHtml(err.message)}</span>`);
         return;
