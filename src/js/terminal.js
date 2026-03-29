@@ -28,7 +28,7 @@
     // PR:     /search/issues?q=type:pr+author:USERNAME
     // Commit: /search/commits?q=author:USERNAME
     // どちらも total_count を返すので repos ループ不要
-    async function runUserCount(username, year, month, token = '') {
+    async function runUserCount(username, year, month, opt = '') {
       let since = '', until = '', createdQ = '';
       let periodLabel = '全期間';
 
@@ -42,13 +42,18 @@
       } else {
         // アカウント作成日を取得して全期間の範囲を表示
         try {
-          const res  = await fetch(`https://api.github.com/users/${username}`, { headers: token ? { Authorization: `token ${token}` } : {} });
+          const res  = await fetch(`https://api.github.com/users/${username}`, { headers });
           const data = await res.json();
           if (res.ok && data.created_at) periodLabel = `全期間（${data.created_at.slice(0, 10)} 〜）`;
         } catch {}
       }
 
-      const headers = token ? { Authorization: `token ${token}` } : {};
+      // opt: '' = publicのみ / 'org' = org含む / 'private' = private含む / 'org.private' = 全て
+      const includeOrg     = opt === 'org'     || opt === 'org.private';
+      const includePrivate = opt === 'private' || opt === 'org.private';
+      const headers = {};
+      // リポジトリ取得タイプ
+      const repoType = includePrivate ? 'all' : (includeOrg ? 'public' : 'public');
 
       appendLines([
         '',
@@ -64,7 +69,7 @@
       let prCount = 0;
       try {
         const res  = await fetch(
-          `https://api.github.com/search/issues?q=type:pr+author:${username}${createdQ}`,
+          `https://api.github.com/search/issues?q=type:pr+author:${username}${createdQ}${includeOrg?'+is:public,private':''}`,
           { headers }
         );
         const data = await res.json();
@@ -82,7 +87,7 @@
         while (hasNext) {
           setLoading(ld, `コミット集計中... (page ${page} / ${commitCount} commits)`);
           const repoRes = await fetch(
-            `https://api.github.com/users/${username}/repos?per_page=100&page=${page}`,
+            `https://api.github.com/users/${username}/repos?per_page=100&page=${page}&type=${repoType}`,
             { headers }
           );
           const repos = await repoRes.json();
@@ -104,6 +109,37 @@
           hasNext = repos.length === 100;
           page++;
         }
+        // org含む場合：参加組織のリポジトリも取得
+        if (includeOrg) {
+          const orgRes  = await fetch(`https://api.github.com/users/${username}/orgs?per_page=100`, { headers });
+          const orgs    = await orgRes.json();
+          if (Array.isArray(orgs)) {
+            for (const org of orgs) {
+              let oPage = 1, oNext = true;
+              while (oNext) {
+                const or = await fetch(`https://api.github.com/orgs/${org.login}/repos?per_page=100&page=${oPage}&type=${repoType}`, { headers });
+                const orepos = await or.json();
+                if (!Array.isArray(orepos) || !orepos.length) break;
+                for (const repo of orepos) {
+                  let cPage = 1, cHasNext = true;
+                  while (cHasNext) {
+                    let url = `https://api.github.com/repos/${repo.owner.login}/${repo.name}/commits?author=${username}&per_page=100&page=${cPage}`;
+                    if (since) url += `&since=${since}`;
+                    if (until) url += `&until=${until}`;
+                    const cr = await fetch(url, { headers });
+                    const cs = await cr.json();
+                    if (!Array.isArray(cs) || !cs.length) break;
+                    commitCount += cs.length;
+                    cHasNext = cs.length === 100;
+                    cPage++;
+                  }
+                }
+                oNext = orepos.length === 100;
+                oPage++;
+              }
+            }
+          }
+        }
       } catch (err) {
         setLoading(ld, `<span class="error">コミット取得エラー: ${escHtml(err.message)}</span>`);
         return;
@@ -112,7 +148,7 @@
       ld.remove();
       appendLines([
         `  Pull Request数: <span class="success" style="font-weight:700">${prCount}</span>`,
-        `  コミット数:     <span class="success" style="font-weight:700">${commitCount}</span>  <span style="opacity:0.4">${token ? '(org・private含む)' : '(publicのみ)'}</span>`,
+        `  コミット数:     <span class="success" style="font-weight:700">${commitCount}</span>  <span style="opacity:0.4">${opt === 'org.private' ? '(org・private含む)' : opt === 'org' ? '(org含む)' : opt === 'private' ? '(private含む)' : '(publicのみ)'}</span>`,
         '',
       ], body);
     }
@@ -193,16 +229,20 @@
         return [
           '<span class="success">▶ GitHub Contribution Counter</span>',
           '',
-          '  書式: <span class="term-cmd">ユーザーID [年 月] [token]</span>',
-          '  例:   <span style="opacity:0.7">hrmcngs</span>',
-          '  例:   <span style="opacity:0.7">hrmcngs 2024 05</span>',
-          '  例:   <span style="opacity:0.7">hrmcngs ghp_xxxx</span>  <span style="opacity:0.4">← org・private含む</span>',
+          '  書式: <span class="term-cmd">ユーザーID [オプション] [年 月]</span>',
           '',
-          '  tokenなし → publicのみ / tokenあり → org・private含む',
+          '  <span style="opacity:0.6">オプションなし</span>  → publicのみ',
+          '  <span class="term-cmd">org</span>         → org（組織）含む',
+          '  <span class="term-cmd">private</span>     → private含む',
+          '  <span class="term-cmd">org.private</span> → org・private全て含む',
+          '',
+          '  例: <span style="opacity:0.7">hrmcngs</span>',
+          '  例: <span style="opacity:0.7">hrmcngs org</span>',
+          '  例: <span style="opacity:0.7">hrmcngs org.private 2024 05</span>',
           '',
           '<span style="opacity:0.45">キャンセル: ./stop</span>',
           '',
-          'ユーザーID [年 月] [token] を入力してください:',
+          'ユーザーID [オプション] [年 月] を入力してください:',
         ];
       },
 
@@ -263,25 +303,20 @@
       const parts = raw.trim().split(/\s+/).filter(Boolean);
       if (!parts.length) { print(['ユーザーID を入力してください:'], raw); return; }
       const username = parts[0];
-      // token判定: ghp_ や github_pat_ で始まる or 40文字の16進数
-      let year='', month='', token='';
-      const isToken = t => /^(ghp_|github_pat_|gho_)/i.test(t) || /^[0-9a-f]{40}$/i.test(t);
-      if(parts.length>=2){
-        if(isToken(parts[1])){ token=parts[1]; }
-        else {
-          year=parts[1]??'';
-          if(parts[2]&&!isToken(parts[2])){ month=parts[2].padStart(2,'0'); }
-          else if(parts[2]&&isToken(parts[2])){ token=parts[2]; }
-          if(parts[3]&&isToken(parts[3])){ token=parts[3]; }
-        }
-      }
+      const OPTS = ['org', 'private', 'org.private'];
+      let opt='', year='', month='';
+      let rest = parts.slice(1);
+      // オプション判定
+      if(rest.length && OPTS.includes(rest[0])){ opt=rest[0]; rest=rest.slice(1); }
+      if(rest.length) year=rest[0];
+      if(rest.length>1) month=rest[1].padStart(2,'0');
       if (year && !month) {
-        print(['<span class="error">月も指定してください (例: 2024 05)</span>', 'ユーザーID [年 月] [token] を入力してください:'], raw);
+        print(['<span class="error">月も指定してください (例: 2024 05)</span>', 'ユーザーID [オプション] [年 月] を入力してください:'], raw);
         return;
       }
       userCountState = null;
       print([], raw);
-      runUserCount(username, year, month, token);
+      runUserCount(username, year, month, opt);
     }
 
     // ── Markdown ───────────────────────────────────────
