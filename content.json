@@ -194,13 +194,14 @@
       {
         "key": "kindergarten",
         "label": "幼稚園",
-        "entered": "2014-04"
+        "entered": "2014-04",
+        "color": "#00bfff"
       },
       {
         "key": "elementarySchool",
         "label": "小学校",
         "entered": "2017-04",
-        "color": "#f5c400"
+        "color": "#ffff00"
       },
       {
         "key": "juniorHighSchool",
@@ -211,15 +212,15 @@
           "angle": 90,
           "stops": [
             {
-              "color": "#f472b6",
+              "color": "#ee93ff",
               "pos": 0
             },
             {
-              "color": "#f472b6",
+              "color": "#ee93ff",
               "pos": 66
             },
             {
-              "color": "#a855f7",
+              "color": "#411e56",
               "pos": 100
             }
           ]
@@ -229,11 +230,7 @@
         "key": "sakuramatiHighSchool",
         "label": "桜町高校",
         "entered": "2026-04",
-        "color": {
-          "type": "gradient",
-          "angle": 135,
-          "colors": ["#f472b6", "#fb7aad", "#f472b6"]
-        }
+        "color": "#e200ea"
       }
     ],
     "codeFile": "hrmcngs.js",
