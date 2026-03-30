@@ -112,6 +112,19 @@ function resolveColorDef(color) {
   return { base: color.base ?? '#888', accent: color.base ?? '#888', type: 'solid' };
 }
 
+// education の日付テキスト色スタイルを返す
+function eduDateStyle(color) {
+  if (!color) return '';
+  if (typeof color === 'string') return `color:${color}`;
+  if (color.type === 'gradient') {
+    const gradStops = makeGradientCss(color);
+    const angle = color.angle ?? 90;
+    return `background:linear-gradient(${angle}deg,${gradStops});-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text`;
+  }
+  if (color.type === 'noise') return `color:${color.base ?? '#888'}`;
+  return '';
+}
+
 let _colorIdCounter = 0;
 // カード要素にカラー定義を適用する
 function applyColor(el, color, varName = '--link-color') {
@@ -126,13 +139,15 @@ function applyColor(el, color, varName = '--link-color') {
   el.classList.add(uid);
 
   if (def.type === 'noise') {
-    // ノイズはdata URLが長いのでinline styleで直接当てる
-    el.style.setProperty('--accent-bg', `url(${def.accent})`);
-    const sheet = getColorStyleSheet();
-    try {
-      sheet.insertRule(`.${uid}::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--accent-bg); border-radius:14px 0 0 14px; }`, sheet.cssRules.length);
-      sheet.insertRule(`.${uid}:hover::after { content:''; position:absolute; inset:0; border-radius:inherit; background:var(--accent-bg); opacity:0.07; pointer-events:none; }`, sheet.cssRules.length);
-    } catch(e) { console.warn('applyColor noise rule failed', e); }
+    // ノイズ: 左端バー（単色）+ カード全体にノイズ背景を薄く重ねる
+    const noiseUrl = def.accent;
+    // 左端バーは単色で表示
+    el.style.borderLeft = `3px solid ${def.base}`;
+    el.style.borderRadius = '14px';
+    // カード全体にノイズを薄く重ねる（pseudo要素はCSSルール不要）
+    const noiseEl = document.createElement('div');
+    noiseEl.style.cssText = `position:absolute;inset:0;border-radius:inherit;background:url(${noiseUrl});opacity:0.12;pointer-events:none;mix-blend-mode:screen;`;
+    el.appendChild(noiseEl);
     return;
   }
 
@@ -228,20 +243,13 @@ fetch('/content.json')
           infoHtml += `<p class="info-birthday">生年月日 <strong>${formatted}</strong>（${age}歳）</p>`;
         }
         if (profile.education?.length) {
-          const items = profile.education.map(e =>
-            `<div class="edu-item" data-edu-key="${e.key}"><span class="edu-date">${e.entered}</span><span class="edu-label">${escHtml(e.label)} 入学</span></div>`
-          ).join('');
+          const items = profile.education.map(e => {
+            const dateStyle = eduDateStyle(e.color);
+            return `<div class="edu-item"><span class="edu-date" style="${dateStyle}">${e.entered}</span><span class="edu-label">${escHtml(e.label)} 入学</span></div>`;
+          }).join('');
           infoHtml += `<div class="edu-timeline">${items}</div>`;
         }
         infoEl.innerHTML = infoHtml;
-        // education カラー適用
-        if (profile.education?.length) {
-          infoEl.querySelectorAll('.edu-item').forEach(el => {
-            const key = el.dataset.eduKey;
-            const e   = profile.education.find(x => x.key === key);
-            if (e?.color) applyColor(el, e.color, '--edu-color');
-          });
-        }
       }
 
       setText('code-file-name', profile.codeFile);
