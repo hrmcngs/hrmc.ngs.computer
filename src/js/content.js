@@ -16,6 +16,108 @@ function setText(id, text) {
   if (el) el.textContent = text;
 }
 
+
+// ── color フィールドをCSSに変換 ──────────────────────
+// 単色:     "#7c6af7"
+// グラデーション（stops指定）:
+//   { "type":"gradient", "angle":135, "stops":[{"color":"#7c6af7","pos":0},{"color":"#3ecfcf","pos":100}] }
+// グラデーション（均等割り）:
+//   { "type":"gradient", "angle":90, "colors":["#7c6af7","#3ecfcf","#f87171"] }
+// ノイズ:
+//   { "type":"noise", "base":"#7c6af7", "colors":["#3ecfcf","#f87171"], "intensity":0.3 }
+
+let _colorStyleSheet = null;
+function getColorStyleSheet() {
+  if (_colorStyleSheet) return _colorStyleSheet;
+  const style = document.createElement('style');
+  document.head.appendChild(style);
+  _colorStyleSheet = style.sheet;
+  return _colorStyleSheet;
+}
+
+function makeGradientCss(color) {
+  const angle = color.angle ?? 135;
+  if (color.stops && color.stops.length) {
+    return color.stops.map(s => `${s.color} ${s.pos ?? ''}%`.trim()).join(', ');
+  }
+  if (color.colors && color.colors.length) {
+    const step = 100 / Math.max(color.colors.length - 1, 1);
+    return color.colors.map((c, i) => `${c} ${Math.round(i * step)}%`).join(', ');
+  }
+  return `${color.base ?? '#888'} 0%, ${color.base ?? '#888'} 100%`;
+}
+
+function makeNoiseDataUrl(colorDef, w = 120, h = 120) {
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx    = canvas.getContext('2d');
+  ctx.fillStyle = colorDef.base ?? '#888';
+  ctx.fillRect(0, 0, w, h);
+  const colors    = colorDef.colors?.length ? colorDef.colors : [colorDef.base ?? '#fff'];
+  const intensity = colorDef.intensity ?? 0.3;
+  for (let i = 0; i < w * h * intensity * 2; i++) {
+    const x = Math.floor(Math.random() * w);
+    const y = Math.floor(Math.random() * h);
+    ctx.globalAlpha = 0.1 + Math.random() * 0.5;
+    ctx.fillStyle   = colors[Math.floor(Math.random() * colors.length)];
+    ctx.fillRect(x, y, 1 + Math.floor(Math.random() * 2), 1 + Math.floor(Math.random() * 2));
+  }
+  ctx.globalAlpha = 1;
+  return canvas.toDataURL();
+}
+
+// color定義から{ baseColor, accentCss }を返す
+// baseColor: --link-color / --work-color に設定するベース色（ホバーボーダー・シャドウ用）
+// accentCss: カード左端のアクセントバーに使うCSS値（linear-gradient or url(...) or 単色）
+function resolveColorDef(color) {
+  if (!color) return null;
+  if (typeof color === 'string') return { base: color, accent: color, type: 'solid' };
+
+  if (color.type === 'gradient') {
+    const gradStops = makeGradientCss(color);
+    const angle     = color.angle ?? 135;
+    const base      = color.stops?.[0]?.color ?? color.colors?.[0] ?? color.base ?? '#888';
+    return {
+      base,
+      accent : `linear-gradient(${angle}deg, ${gradStops})`,
+      type   : 'gradient',
+    };
+  }
+
+  if (color.type === 'noise') {
+    return {
+      base   : color.base ?? '#888',
+      accent : makeNoiseDataUrl(color),
+      type   : 'noise',
+      isUrl  : true,
+    };
+  }
+
+  return { base: color.base ?? '#888', accent: color.base ?? '#888', type: 'solid' };
+}
+
+let _colorIdCounter = 0;
+// カード要素にカラー定義を適用する
+function applyColor(el, color, varName = '--link-color') {
+  const def = resolveColorDef(color);
+  if (!def) return;
+
+  // ベース色をCSS変数に設定（ホバー時のボーダー・グロー用）
+  el.style.setProperty(varName, def.base);
+
+  if (def.type === 'solid') return; // 単色はここで終わり
+
+  // グラデーション・ノイズ: 左端のアクセントバーをpseudo要素で描画
+  const uid  = `cc${++_colorIdCounter}`;
+  el.classList.add(uid);
+  const accentVal = def.isUrl ? `url(${def.accent})` : def.accent;
+  const sheet     = getColorStyleSheet();
+  // カード左端に2pxのアクセントバー
+  sheet.insertRule(`.${uid}::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:${accentVal}; border-radius:14px 0 0 14px; }`, sheet.cssRules.length);
+  // ホバー時はカード全体の背景にも薄く乗せる
+  sheet.insertRule(`.${uid}:hover::after { content:''; position:absolute; inset:0; border-radius:inherit; background:${accentVal}; opacity:0.07; pointer-events:none; }`, sheet.cssRules.length);
+}
+
 fetch('/content.json')
   .then(r => r.json())
   .then(data => {
@@ -33,16 +135,21 @@ fetch('/content.json')
       setText('links-group-name', links.groupName);
       const linksEl = document.getElementById('links-row');
       if (linksEl) {
-        linksEl.innerHTML = links.items.map(l => `
-          <a class="link-card" href="${l.url}" target="_blank" rel="noopener noreferrer" data-platform="${l.platform}"${l.color ? ` style="--link-color:${l.color}"` : ''}>
+        linksEl.innerHTML = links.items.map((l, i) => `
+          <a class="link-card" href="${safeUrl(l.url)}" target="_blank" rel="noopener noreferrer" data-platform="${escHtml(l.platform)}" data-color-idx="${i}">
             <span class="link-icon">${PLATFORM_ICONS[l.platform] ?? ''}</span>
             <span class="link-info">
-              <span class="link-platform">${l.label}</span>
-              <span class="link-handle">${l.handle}</span>
+              <span class="link-platform">${escHtml(l.label)}</span>
+              <span class="link-handle">${escHtml(l.handle)}</span>
             </span>
             <span class="link-arrow">↗</span>
           </a>
         `).join('');
+        // カラーを適用（グラデーション・ノイズ対応）
+        linksEl.querySelectorAll('.link-card').forEach((el, i) => {
+          const l = links.items[i];
+          if (l?.color) applyColor(el, l.color, '--link-color');
+        });
       }
     }
 
@@ -116,18 +223,23 @@ fetch('/content.json')
     if (worksEl && works) {
       worksEl.innerHTML = works.map(w => {
         const icon = w.icon.startsWith('http')
-          ? `<img src="${w.icon}" alt="${w.title}">`
+          ? `<img src="${safeUrl(w.icon)}" alt="${escHtml(w.title)}">`
           : w.icon;
-        const tags = (w.tags ?? []).map(t => `<span class="work-tag">${t}</span>`).join('');
+        const tags = (w.tags ?? []).map(t => `<span class="work-tag">${escHtml(t)}</span>`).join('');
         return `
-          <a class="work-card" href="${w.url}" target="_blank" rel="noopener noreferrer"${w.color ? ` style="--work-color:${w.color}"` : ''}>
+          <a class="work-card" href="${safeUrl(w.url)}" target="_blank" rel="noopener noreferrer">
             <div class="work-icon">${icon}</div>
-            <h3>${w.title}</h3>
-            <p>${w.desc}</p>
+            <h3>${escHtml(w.title)}</h3>
+            <p>${escHtml(w.desc)}</p>
             ${tags ? `<div class="work-tags">${tags}</div>` : ''}
           </a>
         `;
       }).join('');
+      // カラーを適用（グラデーション・ノイズ対応）
+      worksEl.querySelectorAll('.work-card').forEach((el, i) => {
+        const w = works[i];
+        if (w?.color) applyColor(el, w.color, '--work-color');
+      });
     }
 
   })
