@@ -118,20 +118,31 @@ function applyColor(el, color, varName = '--link-color') {
   const def = resolveColorDef(color);
   if (!def) return;
 
-  // ベース色をCSS変数に設定（ホバー時のボーダー・グロー用）
   el.style.setProperty(varName, def.base);
 
-  if (def.type === 'solid') return; // 単色はここで終わり
+  if (def.type === 'solid') return;
 
-  // グラデーション・ノイズ: 左端のアクセントバーをpseudo要素で描画
-  const uid  = `cc${++_colorIdCounter}`;
+  const uid = `cc${++_colorIdCounter}`;
   el.classList.add(uid);
-  const accentVal = def.isUrl ? `url(${def.accent})` : def.accent;
-  const sheet     = getColorStyleSheet();
-  // カード左端に2pxのアクセントバー
-  sheet.insertRule(`.${uid}::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:${accentVal}; border-radius:14px 0 0 14px; }`, sheet.cssRules.length);
-  // ホバー時はカード全体の背景にも薄く乗せる
-  sheet.insertRule(`.${uid}:hover::after { content:''; position:absolute; inset:0; border-radius:inherit; background:${accentVal}; opacity:0.07; pointer-events:none; }`, sheet.cssRules.length);
+
+  if (def.type === 'noise') {
+    // ノイズはdata URLが長いのでinline styleで直接当てる
+    el.style.setProperty('--accent-bg', `url(${def.accent})`);
+    const sheet = getColorStyleSheet();
+    try {
+      sheet.insertRule(`.${uid}::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--accent-bg); border-radius:14px 0 0 14px; }`, sheet.cssRules.length);
+      sheet.insertRule(`.${uid}:hover::after { content:''; position:absolute; inset:0; border-radius:inherit; background:var(--accent-bg); opacity:0.07; pointer-events:none; }`, sheet.cssRules.length);
+    } catch(e) { console.warn('applyColor noise rule failed', e); }
+    return;
+  }
+
+  // グラデーション
+  const accentVal = def.accent;
+  const sheet = getColorStyleSheet();
+  try {
+    sheet.insertRule(`.${uid}::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:${accentVal}; border-radius:14px 0 0 14px; }`, sheet.cssRules.length);
+    sheet.insertRule(`.${uid}:hover::after { content:''; position:absolute; inset:0; border-radius:inherit; background:${accentVal}; opacity:0.07; pointer-events:none; }`, sheet.cssRules.length);
+  } catch(e) { console.warn('applyColor gradient rule failed', e); }
 }
 
 fetch('/content.json')
