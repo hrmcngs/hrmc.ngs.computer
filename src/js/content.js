@@ -313,7 +313,7 @@ fetch('/content.json')
           : w.icon;
         const tags = (w.tags ?? []).map(t => `<span class="work-tag">${escHtml(t)}</span>`).join('');
         return `
-          <a class="work-card" href="${safeUrl(w.url)}" target="_blank" rel="noopener noreferrer" style="width:280px;flex-shrink:0;align-self:start;">
+          <a class="work-card" href="${safeUrl(w.url)}" target="_blank" rel="noopener noreferrer">
             <div class="work-icon">${icon}</div>
             <h3>${escHtml(w.title)}</h3>
             <p>${escHtml(w.desc)}</p>
