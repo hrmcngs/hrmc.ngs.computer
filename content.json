@@ -206,10 +206,18 @@
     {
       "icon": "https://raw.githubusercontent.com/hrmcngs/hrmc.ngs.computer/399199355028e2dad4a7cbe6f7ee1514c705a532/image/icon.svg",
       "title": "hrmc.ngs.computer",
-      "desc": "Drowse-Lab / Minecraft mod",
+      "desc": "Website",
       "url": "https://github.com/hrmcngs/hrmc.ngs.computer",
       "color": "#f87171",
       "tags": ["Web","JavaScript", "HTML", "CSS","JSON","Markdown"]
+    },
+    {
+      "icon": "https://raw.githubusercontent.com/hrmcngs/MC-Mod-Utility/279298835277703f561002d951db0f76d0499491/icon.png",
+      "title": "MC-Mod-Utility",
+      "desc": "Vscode plugin / Minecraft mod",
+      "url": "https://github.com/hrmcngs/MC-Mod-Utility",
+      "color": "#f87171",
+      "tags": ["JavaScript", "Vscode plugin"]
     }
   ]
 }
