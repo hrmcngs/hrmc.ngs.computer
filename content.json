@@ -1,6 +1,6 @@
 {
   "hero": {
-    "tag": "// ngs.computer",
+    "tag": "// hrmc.ngs.computer",
     "title": "hrmcngs",
     "sub": "Web・minecraft mod・"
   },
@@ -184,7 +184,7 @@
     "chips": ["Minecraft Mod", "Web", "JavaScript", "3D Graphics", "Canvas", "Java"]
   },
   "profile": {
-    "label": "// ngs.computer",
+    "label": "// hrmnc.ngs.computer",
     "name": "Hiromichi Nagase",
     "handle": "hrmcngs  ·  0526ngs",
     "bio": ["Minecraft 1.20.1のmodとwebを作っています。", "絡んでくる時はラフな感じでいいですよ。", "憂鬱な時は変なポストをしていますが許してください。"],
