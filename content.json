@@ -237,7 +237,7 @@
       }
     ],
     "codeFile": "hrmcngs.js",
-    "codeBlock": "// @hrmcngs\n\nconst hrmcngs = {\n name: \"Hiromichi Nagase\",\n handle: \"@hrmcngs\",\n formerly: \"@0526ngs\",\n making: [\"Minecraft1.20.1mod\", \"Web\"],\n note: \"絡んでくる時はラフな感じでいいですよ\",\n};\n\n// alt account\n\nconst ngs0526 = {\n handle: \"@0526ngs\",\n url: \"https://x.com/0526ngs\",\n};\n\n// community\n\nconst drowseLab = {\n handle: \"@Drowse_Lab\",\n role: \"同好会\",\n};"
+    "codeBlock": "const log = {\n  birth:                 20100526,\n  kindergarten:          201404,\n  elementarySchool:      201704,\n  juniorHighSchool:      202304,\n  sakuramatiHighSchool:  202604,\n};"
   },
   "works": [
     {
