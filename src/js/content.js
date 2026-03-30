@@ -202,11 +202,19 @@ fetch('/content.json')
         }
         if (profile.education?.length) {
           const items = profile.education.map(e =>
-            `<div class="edu-item"><span class="edu-date">${e.entered}</span><span class="edu-label">${e.label} 入学</span></div>`
+            `<div class="edu-item" data-edu-key="${e.key}"><span class="edu-date">${e.entered}</span><span class="edu-label">${escHtml(e.label)} 入学</span></div>`
           ).join('');
           infoHtml += `<div class="edu-timeline">${items}</div>`;
         }
         infoEl.innerHTML = infoHtml;
+        // education カラー適用
+        if (profile.education?.length) {
+          infoEl.querySelectorAll('.edu-item').forEach(el => {
+            const key = el.dataset.eduKey;
+            const e   = profile.education.find(x => x.key === key);
+            if (e?.color) applyColor(el, e.color, '--edu-color');
+          });
+        }
       }
 
       setText('code-file-name', profile.codeFile);
