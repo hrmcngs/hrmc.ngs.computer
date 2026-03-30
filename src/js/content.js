@@ -252,11 +252,45 @@ fetch('/content.json')
         infoEl.innerHTML = infoHtml;
       }
 
-      setText('code-file-name', profile.codeFile);
+      setText('code-file-name', profile.codeFile ?? 'hrmcngs.js');
 
       const codeEl = document.getElementById('code-block');
       if (codeEl) {
-        codeEl.textContent = profile.codeBlock;
+        // educationからcodeBlockを動的生成
+        const now = new Date();
+        // 各学校の在学期間（年）
+        const durations = {
+          kindergarten         : 3,
+          elementarySchool     : 6,
+          juniorHighSchool     : 3,
+        };
+        let block = 'const log = {\n';
+        if (profile.birthday) {
+          const bd = profile.birthday.replace('-','').replace('-','').slice(0,8);
+          block += `  birth:  ${bd},\n`;
+        }
+        if (profile.education?.length) {
+          // 最大キー長でパディング
+          const maxLen = Math.max(...profile.education.map(e => e.key.length));
+          profile.education.forEach(e => {
+            const ym = e.entered.replace('-','');
+            const enteredDate = new Date(
+              parseInt(e.entered.slice(0,4)),
+              parseInt(e.entered.slice(5,7)) - 1
+            );
+            const dur = durations[e.key];
+            const graduatedDate = dur
+              ? new Date(enteredDate.getFullYear() + dur, enteredDate.getMonth())
+              : null;
+            const isGraduated = graduatedDate ? now >= graduatedDate : false;
+            const label = isGraduated ? 'entered' : 'enter';
+            const pad = ' '.repeat(maxLen - e.key.length + 2);
+            block += `  ${e.key}:${pad}${ym}, // ${label}\n`;
+          });
+        }
+        block += '};';
+
+        codeEl.textContent = block;
         if (typeof hljs !== 'undefined') hljs.highlightElement(codeEl);
       }
     }
@@ -266,7 +300,7 @@ fetch('/content.json')
     if (worksEl && works) {
       worksEl.innerHTML = works.map(w => {
         const icon = w.icon.startsWith('http')
-          ? `<img src="${safeUrl(w.icon)}" alt="${escHtml(w.title)}">`
+          ? `<img src="${safeUrl(w.icon)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:contain;">`
           : w.icon;
         const tags = (w.tags ?? []).map(t => `<span class="work-tag">${escHtml(t)}</span>`).join('');
         return `
