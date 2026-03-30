@@ -1,8 +1,8 @@
 {
   "hero": {
     "tag": "// hrmc.ngs.computer",
-    "title": "hiromichi ngs",
-    "sub": "Web・minecraft mod・"
+    "title": "hrmcngs",
+    "sub": "Web・minecraft mod"
   },
   "footer": {
     "logo": "hrmc.ngs.computer",
@@ -12,23 +12,26 @@
     "title": "hrmc@ngs: ~",
     "prompt": "hrmc@ngs:~$",
     "colors": {
-      "bg":         "#0d0d10",
-      "bar":        "#1e1e28",
-      "text":       "#aaaabc",
-      "typed":      "#e8e8f0",
-      "success":    "#3ecfcf",
-      "error":      "#f87171",
-      "link":       "#7c6af7",
-      "dotRed":     "#ff5f57",
-      "dotYellow":  "#febc2e",
-      "dotGreen":   "#28c840"
+      "bg": "#0d0d10",
+      "bar": "#1e1e28",
+      "text": "#aaaabc",
+      "typed": "#e8e8f0",
+      "success": "#3ecfcf",
+      "error": "#f87171",
+      "link": "#7c6af7",
+      "dotRed": "#ff5f57",
+      "dotYellow": "#febc2e",
+      "dotGreen": "#28c840"
     },
     "build": [
       {
         "title": "RPGish-HPDisplay",
         "desc": "RPG風HP表示、ダメージ表示データパック",
         "color": "#3ecfcf",
-        "tags": ["Minecraft", "DataPack"],
+        "tags": [
+          "Minecraft",
+          "DataPack"
+        ],
         "links": [
           "https://github.com/hrmcngs/RPGish-HPDisplay",
           "https://planetminecraft.com/data-pack/rpgish-hpdisplay/",
@@ -39,7 +42,10 @@
         "title": "Drowse-Lab",
         "desc": "なんとなく作っているweb",
         "color": "#7c6af7",
-        "tags": ["Web", "JavaScript"],
+        "tags": [
+          "Web",
+          "JavaScript"
+        ],
         "links": [
           "https://github.com/Drowse-Lab/Drowse-Lab"
         ]
@@ -48,7 +54,12 @@
         "title": "The-four-primitives-and-Weapons",
         "desc": "Minecraft mod / Drowse-Lab",
         "color": "#f87171",
-        "tags": ["Minecraft", "Mod", "Java", "mcfunction"],
+        "tags": [
+          "Minecraft",
+          "Mod",
+          "Java",
+          "mcfunction"
+        ],
         "links": [
           "https://github.com/Drowse-Lab/The-four-primitives-and-Weapons",
           "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons"
@@ -56,16 +67,46 @@
       }
     ],
     "socialLinks": [
-      { "label": "Twitter (main)", "url": "https://x.com/hrmcngs" },
-      { "label": "Twitter (sub)",  "url": "https://x.com/0526ngs" },
-      { "label": "GitHub",         "url": "https://github.com/hrmcngs" },
-      { "label": "Instagram (main)", "url": "https://instagram.com/hrmcngs" },
-      { "label": "Instagram (sub)",  "url": "https://instagram.com/0526ngs" },
-      { "label": "Pixiv",          "url": "https://pixiv.net/users/83520943" },
-      { "label": "Bluesky",        "url": "https://bsky.app/profile/hrmcngs.bsky.social" },
-      { "label": "Drowse Lab(Twitter)",     "url": "https://x.com/Drowse_Lab" },
-      { "label": "Drowse Lab (Instagram)",  "url": "https://instagram.com/drowse_lab/" },
-      { "label": "Buy Me a Coffee",         "url": "https://buymeacoffee.com/hrmcngs" }
+      {
+        "label": "Twitter (main)",
+        "url": "https://x.com/hrmcngs"
+      },
+      {
+        "label": "Twitter (sub)",
+        "url": "https://x.com/0526ngs"
+      },
+      {
+        "label": "GitHub",
+        "url": "https://github.com/hrmcngs"
+      },
+      {
+        "label": "Instagram (main)",
+        "url": "https://instagram.com/hrmcngs"
+      },
+      {
+        "label": "Instagram (sub)",
+        "url": "https://instagram.com/0526ngs"
+      },
+      {
+        "label": "Pixiv",
+        "url": "https://pixiv.net/users/83520943"
+      },
+      {
+        "label": "Bluesky",
+        "url": "https://bsky.app/profile/hrmcngs.bsky.social"
+      },
+      {
+        "label": "Drowse Lab(Twitter)",
+        "url": "https://x.com/Drowse_Lab"
+      },
+      {
+        "label": "Drowse Lab (Instagram)",
+        "url": "https://instagram.com/drowse_lab/"
+      },
+      {
+        "label": "Buy Me a Coffee",
+        "url": "https://buymeacoffee.com/hrmcngs"
+      }
     ]
   },
   "links": {
@@ -151,29 +192,77 @@
     ]
   },
   "about": {
-    "name": "Hiromichi Nagase",
+    "name": "hrmcngs",
     "bio": [
       "Minecraft1.20.1のmodとwebを作っています。",
       "刀が好きです。"
     ],
-    "chips": ["Minecraft Mod", "Web", "JavaScript", "3D Graphics", "Canvas", "Java"]
+    "chips": [
+      "Minecraft Mod","Web","JavaScript","3D Graphics","Canvas","Java"
+    ]
   },
   "profile": {
-    "label": "// hrmc.ngs.computer",
+    "label": "// ngs.computer",
     "name": "Hiromichi Nagase",
-    "handle": "hrmcngs \u00a0·\u00a0 0526ngs",
+    "handle": "hrmcngs  ·  0526ngs",
     "bio": [
       "Minecraft 1.20.1のmodとwebを作っています。",
       "絡んでくる時はラフな感じでいいですよ。",
       "憂鬱な時は変なポストをしていますが許してください。"
     ],
-    "chips": ["mcfunction", "Web", "JavaScript", "CSS", "3D Graphics", "Java"],
+    "chips": [
+      "mcfunction","Web","JavaScript","CSS","3D Graphics","Java"
+    ],
     "birthday": "2010-05-26",
     "education": [
-      { "key": "kindergarten",         "label": "幼稚園",   "entered": "2014-04" },
-      { "key": "elementarySchool",     "label": "小学校",   "entered": "2017-04" },
-      { "key": "juniorHighSchool",     "label": "中学校",   "entered": "2023-04" },
-      { "key": "sakuramatiHighSchool", "label": "桜町高校", "entered": "2026-04" }
+      {
+        "key": "kindergarten",
+        "label": "幼稚園",
+        "entered": "2014-04"
+      },
+      {
+        "key": "elementarySchool",
+        "label": "小学校",
+        "entered": "2017-04",
+        "color": "#f5c400"
+      },
+      {
+        "key": "juniorHighSchool",
+        "label": "中学校",
+        "entered": "2023-04",
+        "color": {
+          "type": "gradient",
+          "angle": 90,
+          "stops": [
+            {
+              "color": "#f472b6",
+              "pos": 0
+            },
+            {
+              "color": "#f472b6",
+              "pos": 66
+            },
+            {
+              "color": "#a855f7",
+              "pos": 100
+            }
+          ]
+        }
+      },
+      {
+        "key": "sakuramatiHighSchool",
+        "label": "桜町高校",
+        "entered": "2026-04",
+        "color": {
+          "type": "gradient",
+          "angle": 135,
+          "colors": [
+            "#f472b6",
+            "#fb7aad",
+            "#f472b6"
+          ]
+        }
+      }
     ],
     "codeFile": "hrmcngs.js",
     "codeBlock": "// @hrmcngs\n\nconst hrmcngs = {\n  name: \"Hiromichi Nagase\",\n  handle: \"@hrmcngs\",\n  formerly: \"@0526ngs\",\n  making: [\"Minecraft1.20.1mod\", \"Web\"],\n  note: \"絡んでくる時はラフな感じでいいですよ\",\n};\n\n// alt account\n\nconst ngs0526 = {\n  handle: \"@0526ngs\",\n  url: \"https://x.com/0526ngs\",\n};\n\n// community\n\nconst drowseLab = {\n  handle: \"@Drowse_Lab\",\n  role: \"同好会\",\n};"
@@ -185,7 +274,9 @@
       "desc": "RPG風HP表示、ダメージ表示データパック",
       "url": "https://github.com/hrmcngs/RPGish-HPDisplay",
       "color": "#3ecfcf",
-      "tags": ["DataPack", "mcfunction"]
+      "tags": [
+        "DataPack","mcfunction"
+      ]
     },
     {
       "icon": "https://raw.githubusercontent.com/Drowse-Lab/Drowse-Lab/main/assets/image/DrowseLabIcon.jpg",
@@ -193,7 +284,9 @@
       "desc": "なんとなく作っているweb",
       "url": "https://github.com/Drowse-Lab/Drowse-Lab",
       "color": "#7c6af7",
-      "tags": ["Web", "JavaScript","HTML","CSS","JSON","Markdown","YAML"]
+      "tags": [
+        "Web","JavaScript","HTML","CSS","JSON","Markdown","YAML"
+      ]
     },
     {
       "icon": "https://raw.githubusercontent.com/Drowse-Lab/The-four-primitives-and-Weapons/1.20.1/src/main/resources/logo.png",
@@ -201,23 +294,28 @@
       "desc": "Drowse-Lab / Minecraft mod",
       "url": "https://github.com/Drowse-Lab/The-four-primitives-and-Weapons",
       "color": "#f87171",
-      "tags": ["Minecraft", "Mod","Java", "mcfunction"]
+      "tags": [
+        "Minecraft","Mod","Java","mcfunction"
+      ]
     },
     {
       "icon": "https://raw.githubusercontent.com/hrmcngs/hrmc.ngs.computer/399199355028e2dad4a7cbe6f7ee1514c705a532/image/icon.svg",
       "title": "hrmc.ngs.computer",
-      "desc": "Website",
+      "desc": "Drowse-Lab / Minecraft mod",
       "url": "https://github.com/hrmcngs/hrmc.ngs.computer",
-      "color": "#f87171",
-      "tags": ["Web","JavaScript", "HTML", "CSS","JSON","Markdown"]
-    },
-    {
-      "icon": "https://raw.githubusercontent.com/hrmcngs/MC-Mod-Utility/279298835277703f561002d951db0f76d0499491/icon.png",
-      "title": "MC-Mod-Utility",
-      "desc": "Vscode plugin / Minecraft mod",
-      "url": "https://github.com/hrmcngs/MC-Mod-Utility",
-      "color": "#696969",
-      "tags": ["JavaScript", "Vscode plugin"]
+      "color": {
+        "type": "noise",
+        "base": "#555566",
+        "colors": [
+          "#00ff88",
+          "#00cc66",
+          "#00ff44"
+        ],
+        "intensity": 0.35
+      },
+      "tags": [
+        "Web","JavaScript","HTML","CSS","JSON","Markdown"
+      ]
     }
   ]
 }
