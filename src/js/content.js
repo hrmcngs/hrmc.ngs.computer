@@ -16,6 +16,22 @@ function setText(id, text) {
   if (el) el.textContent = text;
 }
 
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function safeUrl(s) {
+  if (typeof s !== 'string') return '';
+  const t = s.trim().toLowerCase();
+  if (/^(javascript|data|vbscript):/.test(t)) return '';
+  return s;
+}
+
 
 // ── color フィールドをCSSに変換 ──────────────────────
 // 単色:     "#7c6af7"
