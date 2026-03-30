@@ -220,7 +220,7 @@
           lines.push(profile.chips.map(c => `<span style="color:var(--text-muted)">${escHtml(c)}</span>`).join('  '));
         }
         lines.push('');
-        lines.push(`→ <a href="/about" target="_blank" rel="noopener noreferrer">/about</a>`);
+        lines.push(`→ <a href="#about" rel="noopener noreferrer">/about</a>`);
         return lines;
       },
 
@@ -400,7 +400,12 @@
         if (activeViewer)   { closeViewer(); return; }
         if (userCountState) { userCountState = null; print(['<span style="opacity:0.45">キャンセルしました。</span>'], cmd); return; }
       }
-      if (userCountState?.step === 'input') { handleUserCountInput(cmd); return; }
+      if (userCountState?.step === 'input') {
+        // 既知のコマンドは通常通り実行（userCountStateをキャンセルせず）
+        if (COMMANDS[cmd]) { print(COMMANDS[cmd](), cmd); return; }
+        handleUserCountInput(cmd);
+        return;
+      }
       if (activeViewer) { print([{ type: 'error', message: `command not found: ${cmd}  (./stop で戻る)` }], cmd); return; }
       if (buildActive && /^\d+$/.test(cmd)) {
         const n = parseInt(cmd, 10);
