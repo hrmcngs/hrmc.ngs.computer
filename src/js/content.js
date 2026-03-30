@@ -264,7 +264,16 @@ fetch('/content.json')
           elementarySchool     : 6,
           juniorHighSchool     : 3,
         };
-        let block = 'const log = {\n';
+        let block = '// @hrmcngs\n\nconst hrmcngs = {\n';
+        if (profile.name)   block += `  name:   "${profile.name}",\n`;
+        if (profile.handle) block += `  handle: "${profile.handle.split('·')[0].trim()}",\n`;
+        if (profile.birthday) {
+          const age = Math.floor((new Date() - new Date(profile.birthday)) / (365.25 * 24 * 3600 * 1000));
+          block += `  age:    ${age}, // int\n`;
+        }
+        block += `  making: ["Minecraft1.20.1mod", "Web"],\n`;
+        block += `  note:   "絡んでくる時はラフな感じでいいですよ",\n`;
+        block += '};\n\n// log\n\nconst log = {\n';
         if (profile.birthday) {
           const bd = profile.birthday.replace('-','').replace('-','').slice(0,8);
           block += `  birth:  ${bd},\n`;
@@ -304,7 +313,7 @@ fetch('/content.json')
           : w.icon;
         const tags = (w.tags ?? []).map(t => `<span class="work-tag">${escHtml(t)}</span>`).join('');
         return `
-          <a class="work-card" href="${safeUrl(w.url)}" target="_blank" rel="noopener noreferrer">
+          <a class="work-card" href="${safeUrl(w.url)}" target="_blank" rel="noopener noreferrer" style="width:280px;flex-shrink:0;align-self:start;">
             <div class="work-icon">${icon}</div>
             <h3>${escHtml(w.title)}</h3>
             <p>${escHtml(w.desc)}</p>
