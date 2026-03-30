@@ -245,7 +245,8 @@ fetch('/content.json')
         if (profile.education?.length) {
           const items = profile.education.map(e => {
             const dateStyle = eduDateStyle(e.color);
-            return `<div class="edu-item"><span class="edu-date" style="${dateStyle}">${e.entered}</span><span class="edu-label">${escHtml(e.label)} 入学</span></div>`;
+            const nyuLabel = e.key === 'kindergarten' ? '入園' : '入学';
+            return `<div class="edu-item"><span class="edu-date" style="${dateStyle}">${e.entered}</span><span class="edu-label">${escHtml(e.label)} ${nyuLabel}</span></div>`;
           }).join('');
           infoHtml += `<div class="edu-timeline">${items}</div>`;
         }
@@ -269,7 +270,7 @@ fetch('/content.json')
         if (profile.handle) block += `  handle: "${profile.handle.split('·')[0].trim()}",\n`;
         if (profile.birthday) {
           const age = Math.floor((new Date() - new Date(profile.birthday)) / (365.25 * 24 * 3600 * 1000));
-          block += `  age:    ${age}, \n`;
+          block += `  age:    ${age}, // int\n`;
         }
         block += `  making: ["Minecraft1.20.1mod", "Web"],\n`;
         block += `  note:   "絡んでくる時はラフな感じでいいですよ",\n`;
