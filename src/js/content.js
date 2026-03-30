@@ -119,7 +119,7 @@ function eduDateStyle(color) {
   if (color.type === 'gradient') {
     const gradStops = makeGradientCss(color);
     const angle = color.angle ?? 90;
-    return `background:linear-gradient(${angle}deg,${gradStops});-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text`;
+    return `display:inline-block;background:linear-gradient(${angle}deg,${gradStops});-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text`;
   }
   if (color.type === 'noise') return `color:${color.base ?? '#888'}`;
   return '';
@@ -270,7 +270,7 @@ fetch('/content.json')
         if (profile.handle) block += `  handle: "${profile.handle.split('·')[0].trim()}",\n`;
         if (profile.birthday) {
           const age = Math.floor((new Date() - new Date(profile.birthday)) / (365.25 * 24 * 3600 * 1000));
-          block += `  age:    ${age}, \n`;
+          block += `  age:    ${age},\n`;
         }
         block += `  making: ["Minecraft1.20.1mod", "Web"],\n`;
         block += `  note:   "絡んでくる時はラフな感じでいいですよ",\n`;
