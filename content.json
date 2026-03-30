@@ -1,6 +1,6 @@
 {
   "hero": {
-    "tag": "// hrmc.ngs.computer",
+    "tag": "// ngs.computer",
     "title": "hrmcngs",
     "sub": "Web・minecraft mod・"
   },
@@ -12,9 +12,16 @@
     "title": "hrmc@ngs: ~",
     "prompt": "hrmc@ngs:~$",
     "colors": {
-      "bg": "#0d0d10", "bar": "#1e1e28", "text": "#aaaabc", "typed": "#e8e8f0",
-      "success": "#3ecfcf", "error": "#f87171", "link": "#7c6af7",
-      "dotRed": "#ff5f57", "dotYellow": "#febc2e", "dotGreen": "#28c840"
+      "bg": "#0d0d10",
+      "bar": "#1e1e28",
+      "text": "#aaaabc",
+      "typed": "#e8e8f0",
+      "success": "#3ecfcf",
+      "error": "#f87171",
+      "link": "#7c6af7",
+      "dotRed": "#ff5f57",
+      "dotYellow": "#febc2e",
+      "dotGreen": "#28c840"
     },
     "build": [
       {
@@ -37,35 +44,138 @@
         "color": "#f87171",
         "tags": ["Minecraft", "Mod", "Java", "mcfunction"],
         "links": ["https://github.com/Drowse-Lab/The-four-primitives-and-Weapons", "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons"]
+      },
+      {
+        "title": "MC-Mod-Utility",
+        "desc": "VSCode plugin / JavaScript",
+        "color": "#696969",
+        "tags": ["Vscode plugin", "JavaScript"],
+        "links": ["https://github.com/hrmcngs/MC-Mod-Utility/", "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility"]
       }
     ],
     "socialLinks": [
-      { "label": "Twitter (main)", "url": "https://x.com/hrmcngs" },
-      { "label": "Twitter (sub)", "url": "https://x.com/0526ngs" },
-      { "label": "GitHub", "url": "https://github.com/hrmcngs" },
-      { "label": "Instagram (main)", "url": "https://instagram.com/hrmcngs" },
-      { "label": "Instagram (sub)", "url": "https://instagram.com/0526ngs" },
-      { "label": "Pixiv", "url": "https://pixiv.net/users/83520943" },
-      { "label": "Bluesky", "url": "https://bsky.app/profile/hrmcngs.bsky.social" },
-      { "label": "Drowse Lab(Twitter)", "url": "https://x.com/Drowse_Lab" },
-      { "label": "Drowse Lab (Instagram)", "url": "https://instagram.com/drowse_lab/" },
-      { "label": "Buy Me a Coffee", "url": "https://buymeacoffee.com/hrmcngs" }
+      {
+        "label": "Twitter (main)",
+        "url": "https://x.com/hrmcngs"
+      },
+      {
+        "label": "Twitter (sub)",
+        "url": "https://x.com/0526ngs"
+      },
+      {
+        "label": "GitHub",
+        "url": "https://github.com/hrmcngs"
+      },
+      {
+        "label": "Instagram (main)",
+        "url": "https://instagram.com/hrmcngs"
+      },
+      {
+        "label": "Instagram (sub)",
+        "url": "https://instagram.com/0526ngs"
+      },
+      {
+        "label": "Pixiv",
+        "url": "https://pixiv.net/users/83520943"
+      },
+      {
+        "label": "Bluesky",
+        "url": "https://bsky.app/profile/hrmcngs.bsky.social"
+      },
+      {
+        "label": "Drowse Lab(Twitter)",
+        "url": "https://x.com/Drowse_Lab"
+      },
+      {
+        "label": "Drowse Lab (Instagram)",
+        "url": "https://instagram.com/drowse_lab/"
+      },
+      {
+        "label": "Buy Me a Coffee",
+        "url": "https://buymeacoffee.com/hrmcngs"
+      }
     ]
   },
   "links": {
     "groupName": "hrmcngs",
     "items": [
-      { "platform": "x", "label": "X / Twitter (main)", "handle": "hrmcngs", "url": "https://x.com/hrmcngs", "color": "#ffffff" },
-      { "platform": "x", "label": "X / Twitter (sub)", "handle": "0526ngs", "url": "https://x.com/0526ngs", "color": "#ffffff" },
-      { "platform": "github", "label": "GitHub", "handle": "hrmcngs", "url": "https://github.com/hrmcngs", "color": "#7c6af7" },
-      { "platform": "instagram (main)", "label": "Instagram", "handle": "hrmcngs", "url": "https://instagram.com/hrmcngs", "color": "#e1306c" },
-      { "platform": "instagram (sub)", "label": "Instagram", "handle": "0526ngs", "url": "https://instagram.com/0526ngs", "color": "#e1306c" },
-      { "platform": "pixiv", "label": "Pixiv", "handle": "hiromichi ngs", "url": "https://pixiv.net/users/83520943", "color": "#0096fa" },
-      { "platform": "bluesky", "label": "Bluesky", "handle": "hrmcngs", "url": "https://bsky.app/profile/hrmcngs.bsky.social", "color": "#0085ff" },
-      { "platform": "x", "label": "Drowse Lab(X)", "handle": "@Drowse_Lab", "url": "https://x.com/Drowse_Lab", "color": "#ffffff" },
-      { "platform": "instagram", "label": "Drowse Lab(Instagram)", "handle": "@drowse_lab", "url": "https://instagram.com/drowse_lab/", "color": "#e1306c" },
-      { "platform": "github", "label": "Drowse Lab (GitHub)", "handle": "Drowse-Lab", "url": "https://github.com/Drowse-Lab", "color": "#7c6af7" },
-      { "platform": "buymeacoffee", "label": "Buy Me a Coffee", "handle": "hrmcngs", "url": "https://buymeacoffee.com/hrmcngs", "color": "#ffdd00" }
+      {
+        "platform": "x",
+        "label": "X / Twitter (main)",
+        "handle": "hrmcngs",
+        "url": "https://x.com/hrmcngs",
+        "color": "#ffffff"
+      },
+      {
+        "platform": "x",
+        "label": "X / Twitter (sub)",
+        "handle": "0526ngs",
+        "url": "https://x.com/0526ngs",
+        "color": "#ffffff"
+      },
+      {
+        "platform": "github",
+        "label": "GitHub",
+        "handle": "hrmcngs",
+        "url": "https://github.com/hrmcngs",
+        "color": "#7c6af7"
+      },
+      {
+        "platform": "instagram (main)",
+        "label": "Instagram",
+        "handle": "hrmcngs",
+        "url": "https://instagram.com/hrmcngs",
+        "color": "#e1306c"
+      },
+      {
+        "platform": "instagram (sub)",
+        "label": "Instagram",
+        "handle": "0526ngs",
+        "url": "https://instagram.com/0526ngs",
+        "color": "#e1306c"
+      },
+      {
+        "platform": "pixiv",
+        "label": "Pixiv",
+        "handle": "hiromichi ngs",
+        "url": "https://pixiv.net/users/83520943",
+        "color": "#0096fa"
+      },
+      {
+        "platform": "bluesky",
+        "label": "Bluesky",
+        "handle": "hrmcngs",
+        "url": "https://bsky.app/profile/hrmcngs.bsky.social",
+        "color": "#0085ff"
+      },
+      {
+        "platform": "x",
+        "label": "Drowse Lab(X)",
+        "handle": "@Drowse_Lab",
+        "url": "https://x.com/Drowse_Lab",
+        "color": "#ffffff"
+      },
+      {
+        "platform": "instagram",
+        "label": "Drowse Lab(Instagram)",
+        "handle": "@drowse_lab",
+        "url": "https://instagram.com/drowse_lab/",
+        "color": "#e1306c"
+      },
+      {
+        "platform": "github",
+        "label": "Drowse Lab (GitHub)",
+        "handle": "Drowse-Lab",
+        "url": "https://github.com/Drowse-Lab",
+        "color": "#7c6af7"
+      },
+      {
+        "platform": "buymeacoffee",
+        "label": "Buy Me a Coffee",
+        "handle": "hrmcngs",
+        "url": "https://buymeacoffee.com/hrmcngs",
+        "color": "#ffdd00"
+      }
     ]
   },
   "about": {
@@ -76,15 +186,55 @@
   "profile": {
     "label": "// ngs.computer",
     "name": "Hiromichi Nagase",
-    "handle": "hrmcngs \u00a0·\u00a0 0526ngs",
+    "handle": "hrmcngs  ·  0526ngs",
     "bio": ["Minecraft 1.20.1のmodとwebを作っています。", "絡んでくる時はラフな感じでいいですよ。", "憂鬱な時は変なポストをしていますが許してください。"],
     "chips": ["mcfunction", "Web", "JavaScript", "CSS", "3D Graphics", "Java"],
     "birthday": "2010-05-26",
     "education": [
-      { "key": "kindergarten", "label": "幼稚園", "entered": "2014-04" },
-      { "key": "elementarySchool", "label": "小学校", "entered": "2017-04", "color": "#f5c400" },
-      { "key": "juniorHighSchool", "label": "中学校", "entered": "2023-04", "color": { "type": "gradient", "angle": 90, "stops": [{ "color": "#f472b6", "pos": 0 }, { "color": "#f472b6", "pos": 66 }, { "color": "#a855f7", "pos": 100 }] } },
-      { "key": "sakuramatiHighSchool", "label": "桜町高校", "entered": "2026-04", "color": { "type": "gradient", "angle": 135, "colors": ["#f472b6", "#fb7aad", "#f472b6"] } }
+      {
+        "key": "kindergarten",
+        "label": "幼稚園",
+        "entered": "2014-04"
+      },
+      {
+        "key": "elementarySchool",
+        "label": "小学校",
+        "entered": "2017-04",
+        "color": "#f5c400"
+      },
+      {
+        "key": "juniorHighSchool",
+        "label": "中学校",
+        "entered": "2023-04",
+        "color": {
+          "type": "gradient",
+          "angle": 90,
+          "stops": [
+            {
+              "color": "#f472b6",
+              "pos": 0
+            },
+            {
+              "color": "#f472b6",
+              "pos": 66
+            },
+            {
+              "color": "#a855f7",
+              "pos": 100
+            }
+          ]
+        }
+      },
+      {
+        "key": "sakuramatiHighSchool",
+        "label": "桜町高校",
+        "entered": "2026-04",
+        "color": {
+          "type": "gradient",
+          "angle": 135,
+          "colors": ["#f472b6", "#fb7aad", "#f472b6"]
+        }
+      }
     ],
     "codeFile": "hrmcngs.js",
     "codeBlock": "// @hrmcngs\n\nconst hrmcngs = {\n name: \"Hiromichi Nagase\",\n handle: \"@hrmcngs\",\n formerly: \"@0526ngs\",\n making: [\"Minecraft1.20.1mod\", \"Web\"],\n note: \"絡んでくる時はラフな感じでいいですよ\",\n};\n\n// alt account\n\nconst ngs0526 = {\n handle: \"@0526ngs\",\n url: \"https://x.com/0526ngs\",\n};\n\n// community\n\nconst drowseLab = {\n handle: \"@Drowse_Lab\",\n role: \"同好会\",\n};"
@@ -119,8 +269,16 @@
       "title": "hrmc.ngs.computer",
       "desc": "Website",
       "url": "https://github.com/hrmcngs/hrmc.ngs.computer",
-      "color": { "type": "noise", "base": "#555566", "colors": ["#00ff88", "#00cc66", "#00ff44"], "intensity": 0.35 },
+      "color": "#555566",
       "tags": ["Web", "JavaScript", "HTML", "CSS", "JSON", "Markdown"]
+    },
+    {
+      "icon": "https://raw.githubusercontent.com/hrmcngs/MC-Mod-Utility/0d379a556a6b5f88a01b8060ea27ddb30859a306/icon.png",
+      "title": "MC-Mod-Utility",
+      "desc": "VSCode plugin / JavaScript",
+      "url": "https://github.com/hrmcngs/MC-Mod-Utility/",
+      "color": "#696969",
+      "tags": ["Vscode plugin", "JavaScript"]
     }
   ]
 }
