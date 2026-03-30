@@ -37,15 +37,7 @@
         "color": "#f87171",
         "tags": ["Minecraft", "Mod", "Java", "mcfunction"],
         "links": ["https://github.com/Drowse-Lab/The-four-primitives-and-Weapons", "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons"]
-      },
-      {
-        "title": "MC-Mod-Utility",
-        "desc": "VSCode plugin / JavaScript",
-        "color": "#696969"
-        "tags": ["Vscode plugin", "JavaScript"]
-        "links": ["https://github.com/hrmcngs/MC-Mod-Utility/", "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility"]
       }
-      
     ],
     "socialLinks": [
       { "label": "Twitter (main)", "url": "https://x.com/hrmcngs" },
@@ -129,14 +121,6 @@
       "url": "https://github.com/hrmcngs/hrmc.ngs.computer",
       "color": { "type": "noise", "base": "#555566", "colors": ["#00ff88", "#00cc66", "#00ff44"], "intensity": 0.35 },
       "tags": ["Web", "JavaScript", "HTML", "CSS", "JSON", "Markdown"]
-    },
-    {
-      "icon": "https://raw.githubusercontent.com/hrmcngs/MC-Mod-Utility/0d379a556a6b5f88a01b8060ea27ddb30859a306/icon.png",
-      "title": "MC-Mod-Utility",
-      "desc": "VSCode plugin / JavaScript",
-      "url": "https://github.com/hrmcngs/MC-Mod-Utility/",
-      "color": "#696969"
-      "tags": ["Vscode plugin", "JavaScript"]
     }
   ]
 }
