@@ -270,7 +270,7 @@ fetch('/content.json')
         if (profile.handle) block += `  handle: "${profile.handle.split('·')[0].trim()}",\n`;
         if (profile.birthday) {
           const age = Math.floor((new Date() - new Date(profile.birthday)) / (365.25 * 24 * 3600 * 1000));
-          block += `  age:    ${age}, // int\n`;
+          block += `  age:    ${age}, \n`;
         }
         block += `  making: ["Minecraft1.20.1mod", "Web"],\n`;
         block += `  note:   "絡んでくる時はラフな感じでいいですよ",\n`;
