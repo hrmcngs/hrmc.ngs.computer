@@ -309,6 +309,13 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
+.links-notice {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  opacity: 0.8;
+}
+
 .links-row {
   display: flex;
   flex-wrap: wrap;

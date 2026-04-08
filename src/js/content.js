@@ -175,6 +175,7 @@ fetch('/content.json')
     // ---- Links ----
     if (links) {
       setText('links-group-name', links.groupName);
+      if (links.notice) setText('links-notice', links.notice);
       const linksEl = document.getElementById('links-row');
       if (linksEl) {
         linksEl.innerHTML = links.items.map((l, i) => `
