@@ -94,6 +94,22 @@
     if (e.key === 'Escape') location.href = '/';
   });
 
+  document.querySelectorAll('.lf-hist-row').forEach((row, i) => {
+    const val = parseFloat(row.dataset.val) || 0;
+    const max = parseFloat(row.dataset.max) || 1;
+    const pct = Math.max(1.2, (val / max) * 100);
+    const bar = row.querySelector('.lf-hist-bar > span');
+    if (!bar) return;
+    bar.style.setProperty('--lf-w', pct.toFixed(2) + '%');
+    bar.style.animationDelay = (0.15 + i * 0.08) + 's';
+  });
+
+  const dateEl = document.getElementById('lf-report-date');
+  if (dateEl) {
+    const d = new Date();
+    dateEl.textContent = d.getFullYear() + '.' + pad(d.getMonth() + 1) + '.' + pad(d.getDate());
+  }
+
   console.error('404 — orphan inode reconnected to /lost+found/');
   console.log('%cfsck: clean, but the page is gone.', 'color:#7c6af7');
 })();

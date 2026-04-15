@@ -220,6 +220,39 @@
 /* Header */
 .lf-header {
   text-align: center;
+  position: relative;
+}
+
+/* Giant ghost watermark of the lost+found glyph */
+.lf-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(620px, 110%);
+  height: auto;
+  transform: translate(-50%, -50%);
+  opacity: 0.05;
+  filter: invert(1)
+          drop-shadow(2px 0 0 rgba(248,113,113,0.6))
+          drop-shadow(-2px 0 0 rgba(62,207,207,0.6));
+  pointer-events: none;
+  z-index: 0;
+  animation: lf-wm-flicker 5.5s infinite;
+}
+
+@keyframes lf-wm-flicker {
+  0%, 100%    { opacity: 0.05; transform: translate(-50%, -50%); }
+  43%         { opacity: 0.05; }
+  43.5%       { opacity: 0.12; transform: translate(calc(-50% + 3px), -50%); }
+  44%         { opacity: 0.05; }
+  92%         { opacity: 0.05; }
+  92.5%       { opacity: 0.1;  transform: translate(calc(-50% - 2px), -50%); }
+  93%         { opacity: 0.05; }
+}
+
+.lf-header > *:not(.lf-watermark) {
+  position: relative;
+  z-index: 1;
 }
 
 .lf-tag {
@@ -440,6 +473,189 @@
 .lf-line--ok   { color: var(--accent2); text-shadow: 0 0 12px rgba(62,207,207,0.35); }
 .lf-line--err  { color: #f87171; text-shadow: 0 0 12px rgba(248,113,113,0.5); }
 
+/* Lost & Found Histogram Report */
+.lf-report {
+  border: 1px solid rgba(124,106,247,0.25);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(124,106,247,0.04), rgba(10,10,14,0.4));
+  padding: 1.4rem 1.6rem;
+  font-family: 'JetBrains Mono', monospace;
+  position: relative;
+  overflow: hidden;
+}
+
+.lf-report::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 2px,
+    rgba(0,0,0,0.15) 2px 3px
+  );
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.lf-report-head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed rgba(124,106,247,0.2);
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.lf-report-icon {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  filter: invert(1) drop-shadow(0 0 12px rgba(124,106,247,0.5));
+  opacity: 0.8;
+}
+
+.lf-report-title {
+  font-size: 0.78rem;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 0.15rem;
+}
+
+.lf-report-sub {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  font-family: var(--font-jp);
+}
+
+.lf-report-date {
+  margin-left: auto;
+  font-size: 0.7rem;
+  color: var(--accent2);
+  letter-spacing: 0.1em;
+  align-self: flex-start;
+  padding: 0.2em 0.55em;
+  border: 1px solid rgba(62,207,207,0.25);
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+.lf-hist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  position: relative;
+}
+
+.lf-hist-row {
+  display: grid;
+  grid-template-columns: 140px 1fr 110px;
+  align-items: center;
+  gap: 0.9rem;
+  font-size: 0.78rem;
+}
+
+.lf-hist-lbl {
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.lf-hist-lbl em {
+  font-style: normal;
+  color: var(--text-muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.15em;
+  margin-left: 0.3rem;
+}
+
+.lf-hist-bar {
+  height: 14px;
+  background:
+    linear-gradient(to right, rgba(255,255,255,0.02), rgba(255,255,255,0.04)),
+    repeating-linear-gradient(
+      to right,
+      transparent 0 calc(100% / 15 - 1px),
+      rgba(124,106,247,0.12) calc(100% / 15 - 1px) calc(100% / 15)
+    );
+  border: 1px solid rgba(124,106,247,0.15);
+  border-radius: 1px;
+  position: relative;
+  overflow: hidden;
+}
+
+.lf-hist-bar > span {
+  display: block;
+  height: 100%;
+  width: var(--lf-w, 0%);
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  box-shadow: 0 0 16px rgba(124,106,247,0.45);
+  transform-origin: left;
+  animation: lf-bar-grow 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  position: relative;
+}
+
+.lf-hist-bar > span::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 2px;
+  height: 100%;
+  background: #fff;
+  opacity: 0.7;
+  box-shadow: 0 0 8px #fff;
+}
+
+@keyframes lf-bar-grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.lf-hist-num {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.lf-hist-num mark {
+  background: transparent;
+  color: #f87171;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  margin-left: 0.3rem;
+  animation: lf-blink 0.9s steps(2) infinite;
+}
+
+.lf-hist-row--you .lf-hist-lbl,
+.lf-hist-row--you .lf-hist-num {
+  color: #f87171;
+}
+
+.lf-hist-row--you .lf-hist-bar {
+  border-color: rgba(248,113,113,0.4);
+}
+
+.lf-hist-row--you .lf-hist-bar > span {
+  background: linear-gradient(90deg, #f87171, #fca5a5);
+  box-shadow: 0 0 16px rgba(248,113,113,0.6);
+}
+
+.lf-report-foot {
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px dashed rgba(124,106,247,0.15);
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+  text-align: center;
+}
+
 /* Actions */
 .lf-actions {
   display: flex;
@@ -551,6 +767,26 @@
   }
 
   .lf-foot { font-size: 0.8rem; }
+
+  .lf-watermark { width: 130%; opacity: 0.04; }
+
+  .lf-report { padding: 1rem 1rem; }
+  .lf-report-head { gap: 0.7rem; padding-bottom: 0.7rem; margin-bottom: 0.7rem; }
+  .lf-report-icon { width: 28px; height: 28px; }
+  .lf-report-title { font-size: 0.62rem; letter-spacing: 0.1em; }
+  .lf-report-sub { font-size: 0.6rem; }
+  .lf-report-date { font-size: 0.55rem; }
+
+  .lf-hist-row {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+    font-size: 0.7rem;
+  }
+
+  .lf-hist-lbl em { font-size: 0.55rem; }
+  .lf-hist-bar   { height: 10px; }
+  .lf-hist-num   { text-align: left; font-size: 0.65rem; }
+  .lf-report-foot { font-size: 0.55rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

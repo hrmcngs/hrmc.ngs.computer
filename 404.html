@@ -30,6 +30,7 @@
     <div class="lf-container">
 
       <div class="lf-header">
+        <img class="lf-watermark" src="/image/lost+found.svg" alt="" aria-hidden="true">
         <p class="lf-tag">
           <span class="lf-blink">▌</span>
           SYSTEM ERROR · STOP 0x00000194
@@ -52,6 +53,28 @@
           <span class="lf-dump">STACK: 0xDEADBEEF 0xC000021A 0x8000FFFF</span>
         </div>
       </div>
+
+      <section class="lf-report" aria-label="京都市遺失物センター 本日の届出">
+        <header class="lf-report-head">
+          <img class="lf-report-icon" src="/image/lost+found.svg" alt="">
+          <div>
+            <p class="lf-report-title">KYOTO MUNICIPAL LOST &amp; FOUND CENTER</p>
+            <p class="lf-report-sub">京都市遺失物センター · 本日の届出 HISTOGRAM</p>
+          </div>
+          <span class="lf-report-date" id="lf-report-date">--</span>
+        </header>
+        <ul class="lf-hist" id="lf-hist">
+          <li class="lf-hist-row" data-cat="umbrella"  data-val="1247" data-max="1500"><span class="lf-hist-lbl">傘 <em>UMBRELLA</em></span><span class="lf-hist-bar"><span></span></span><span class="lf-hist-num">1,247</span></li>
+          <li class="lf-hist-row" data-cat="wallet"    data-val="412"  data-max="1500"><span class="lf-hist-lbl">財布 <em>WALLET</em></span><span class="lf-hist-bar"><span></span></span><span class="lf-hist-num">412</span></li>
+          <li class="lf-hist-row" data-cat="phone"     data-val="298"  data-max="1500"><span class="lf-hist-lbl">携帯 <em>PHONE</em></span><span class="lf-hist-bar"><span></span></span><span class="lf-hist-num">298</span></li>
+          <li class="lf-hist-row" data-cat="keys"      data-val="186"  data-max="1500"><span class="lf-hist-lbl">鍵 <em>KEYS</em></span><span class="lf-hist-bar"><span></span></span><span class="lf-hist-num">186</span></li>
+          <li class="lf-hist-row" data-cat="card"      data-val="94"   data-max="1500"><span class="lf-hist-lbl">証明書 <em>ID CARD</em></span><span class="lf-hist-bar"><span></span></span><span class="lf-hist-num">94</span></li>
+          <li class="lf-hist-row lf-hist-row--you" data-cat="you" data-val="1" data-max="1500"><span class="lf-hist-lbl">このページ <em>THIS PAGE</em></span><span class="lf-hist-bar"><span></span></span><span class="lf-hist-num">1 <mark>← YOU</mark></span></li>
+        </ul>
+        <p class="lf-report-foot">
+          出典: 架空 · データは演出用のダミーです / source: fictional — decorative only
+        </p>
+      </section>
 
       <div class="lf-actions">
         <a class="lf-btn lf-btn--primary" href="/">
