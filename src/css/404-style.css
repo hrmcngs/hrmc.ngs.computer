@@ -221,8 +221,8 @@
 }
 
 .lf-sign-icon {
-  width: 42px;
-  height: 42px;
+  width: 72px;
+  height: 72px;
   flex-shrink: 0;
   /* tint black SVG → sign-blue */
   filter: brightness(0) saturate(100%)
@@ -301,7 +301,7 @@
   }
 
   .lf-sign-arrow { font-size: 2rem; padding-right: 0.2rem; }
-  .lf-sign-icon  { width: 32px; height: 32px; }
+  .lf-sign-icon  { width: 52px; height: 52px; }
   .lf-sign-ja    { font-size: 1rem; }
   .lf-sign-en    { font-size: 0.78rem; }
   .lf-sign-hours { font-size: 0.62rem; }
