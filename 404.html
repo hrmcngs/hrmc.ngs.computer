@@ -4,21 +4,84 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="image/icon.svg">
-  <title>Page Not Found</title>
+  <title>SYSTEM_ERROR · 0x194 — /lost+found/</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Noto+Sans+JP:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="src/css/style.css">
-  <link rel="stylesheet" href="src/css/404-style.css">
-  <link rel="stylesheet" href="src/css/about-style.css">
+  <link rel="stylesheet" href="/src/css/style.css">
+  <link rel="stylesheet" href="/src/css/404-style.css">
 </head>
-  <body>
-    <h1>404 - Page Not Found</h1>
-    <p>The page you are looking for does not exist.</p>
-    <button onclick="window.location.href='/'">Go to Home</button>
-    <script>
+<body class="lf-body">
+
+  <div class="noise"></div>
+  <div class="lf-scanlines" aria-hidden="true"></div>
+  <div class="lf-vignette" aria-hidden="true"></div>
+  <div class="lf-flicker" aria-hidden="true"></div>
+
+  <div class="lf-statusbar lf-statusbar--top" aria-hidden="true">
+    <span class="lf-rec"><span class="lf-rec-dot"></span>REC</span>
+    <span>SIG · <span id="lf-sig">NO INPUT</span></span>
+    <span>CH · 404</span>
+    <span>SYS · hrmc0</span>
+    <span id="lf-clock">--:--:--</span>
+  </div>
+
+  <main class="lf-page">
+    <div class="lf-container">
+
+      <div class="lf-header">
+        <p class="lf-tag">
+          <span class="lf-blink">▌</span>
+          SYSTEM ERROR · STOP 0x00000194
+        </p>
+        <h1 class="lf-code" data-text="404">404</h1>
+        <p class="lf-sub">UNRECOVERABLE · PAGE_FAULT_IN_NONPAGED_AREA</p>
+        <p class="lf-path">/lost+found/<span class="lf-inode" id="lf-inode">inode#00000</span></p>
+      </div>
+
+      <div class="lf-term">
+        <div class="lf-term-bar">
+          <span class="term-dot red"></span>
+          <span class="term-dot yellow"></span>
+          <span class="term-dot green"></span>
+          <span class="lf-term-title">fsck — /dev/hrmc0</span>
+          <span class="lf-term-badge">READ-ONLY</span>
+        </div>
+        <div class="lf-term-body" id="lf-term-body"></div>
+        <div class="lf-term-foot">
+          <span class="lf-dump">STACK: 0xDEADBEEF 0xC000021A 0x8000FFFF</span>
+        </div>
+      </div>
+
+      <div class="lf-actions">
+        <a class="lf-btn lf-btn--primary" href="/">
+          <span class="lf-btn-arrow">←</span>
+          <span>cd /</span>
+        </a>
+        <button class="lf-btn lf-btn--ghost" id="lf-back">
+          <span>history -1</span>
+        </button>
+      </div>
+
+      <p class="lf-foot">
+        この場所は壊れたファイルが集まる所。<br>
+        あなたが探しているページは、きっとどこかで迷子になった。
+      </p>
+
+    </div>
+  </main>
+
+  <div class="lf-statusbar lf-statusbar--bottom" aria-hidden="true">
+    <span>PRESS [ESC] TO DISCONNECT</span>
+    <span class="lf-progress"><span class="lf-progress-bar"></span></span>
+    <span id="lf-bytes">0x0000</span>
+  </div>
+
+  <script>
         console.error("404 - Page Not Found");
         console.log("わざわざ404ページでデバックモードするの暇すぎ、勉強したら？");
-    </script>
-  </body>
+  </script>
+  <script src="/src/js/404.js" defer></script>
+
+</body>
 </html>
