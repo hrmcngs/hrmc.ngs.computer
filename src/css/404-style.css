@@ -187,6 +187,27 @@
     0 0 60px rgba(124,106,247,0.35);
   font-family: 'Noto Sans JP', sans-serif;
   position: relative;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.lf-sign-board:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.2),
+    0 14px 40px rgba(0,0,0,0.6),
+    0 0 90px rgba(124,106,247,0.55);
+}
+
+.lf-sign-board:hover .lf-sign-arrow {
+  animation: lf-arrow-nudge 0.8s ease infinite;
+}
+
+@keyframes lf-arrow-nudge {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(-5px); }
 }
 
 /* Subtle holo shimmer on the sign */
