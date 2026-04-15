@@ -1,4 +1,4 @@
-/* ===== /lost+found/ 404 — meta-world signboard ===== */
+/* ===== /lost+found/ 404 — meta-world wayfinding sign ===== */
 
 .lf-body {
   background:
@@ -7,7 +7,7 @@
   overflow-x: hidden;
 }
 
-/* Scanlines (subtle) */
+/* Scanlines */
 .lf-scanlines {
   position: fixed;
   inset: 0;
@@ -29,7 +29,7 @@
   background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.75) 100%);
 }
 
-/* Floor grid — the meta-world look */
+/* Meta-world perspective floor grid */
 .lf-body::before {
   content: "";
   position: fixed;
@@ -39,8 +39,8 @@
   height: 80vh;
   transform: translateX(-50%) perspective(600px) rotateX(62deg);
   background:
-    linear-gradient(to right, rgba(124,106,247,0.25) 1px, transparent 1px) 0 0 / 60px 60px,
-    linear-gradient(to bottom, rgba(124,106,247,0.25) 1px, transparent 1px) 0 0 / 60px 60px;
+    linear-gradient(to right, rgba(124,106,247,0.28) 1px, transparent 1px) 0 0 / 60px 60px,
+    linear-gradient(to bottom, rgba(124,106,247,0.28) 1px, transparent 1px) 0 0 / 60px 60px;
   mask-image: radial-gradient(ellipse at center top, #000 0%, transparent 70%);
   -webkit-mask-image: radial-gradient(ellipse at center top, #000 0%, transparent 70%);
   pointer-events: none;
@@ -87,7 +87,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2.8rem;
+  gap: 2.6rem;
   animation: lf-boot 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -97,9 +97,7 @@
 }
 
 /* 404 */
-.lf-header {
-  text-align: center;
-}
+.lf-header { text-align: center; }
 
 .lf-code {
   font-family: var(--font-en);
@@ -161,14 +159,10 @@
   color: var(--text-muted);
 }
 
-/* === The Signboard === */
+/* === Wayfinding Signboard (Kyoto station style) === */
 .lf-sign {
   position: relative;
-  width: 100%;
-  max-width: 440px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: inline-block;
   animation: lf-float-sign 5s ease-in-out infinite alternate;
 }
 
@@ -177,166 +171,93 @@
   to   { transform: translateY(-8px); }
 }
 
-.lf-sign-frame {
-  --sign: #7c6af7;
-  --sign2: #3ecfcf;
-  width: 100%;
-  padding: 1.4rem 1.6rem 1.2rem;
-  background: rgba(10, 8, 24, 0.7);
-  border: 1.5px solid var(--sign);
-  border-radius: 3px;
-  backdrop-filter: blur(8px);
+.lf-sign-board {
+  --sign-blue: #1f5bb6;
+  --sign-text: #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  padding: 1rem 1.6rem;
+  background: #f4f4ee;
+  border: 2px solid #d6d6cc;
+  border-radius: 2px;
   box-shadow:
-    0 0 0 1px rgba(124,106,247,0.3),
-    0 0 30px rgba(124,106,247,0.5),
-    0 0 80px rgba(124,106,247,0.3),
-    inset 0 0 30px rgba(124,106,247,0.08);
-  clip-path: polygon(
-    10px 0,
-    100% 0,
-    100% calc(100% - 10px),
-    calc(100% - 10px) 100%,
-    0 100%,
-    0 10px
-  );
+    0 0 0 1px rgba(255,255,255,0.15),
+    0 8px 28px rgba(0,0,0,0.55),
+    0 0 60px rgba(124,106,247,0.35);
+  font-family: 'Noto Sans JP', sans-serif;
   position: relative;
 }
 
-/* Corner brackets */
-.lf-sign-frame::before,
-.lf-sign-frame::after {
+/* Subtle holo shimmer on the sign */
+.lf-sign-board::before {
   content: "";
   position: absolute;
-  width: 12px;
-  height: 12px;
-  border: 2px solid var(--sign2);
-  filter: drop-shadow(0 0 4px var(--sign2));
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(115deg,
+    transparent 30%,
+    rgba(124,106,247,0.12) 48%,
+    rgba(62,207,207,0.12) 52%,
+    transparent 70%);
+  pointer-events: none;
+  mix-blend-mode: screen;
+  animation: lf-shimmer 6s linear infinite;
 }
 
-.lf-sign-frame::before {
-  top: 6px;
-  right: 6px;
-  border-left: none;
-  border-bottom: none;
+@keyframes lf-shimmer {
+  from { transform: translateX(-30%); }
+  to   { transform: translateX(30%); }
 }
 
-.lf-sign-frame::after {
-  bottom: 6px;
-  left: 6px;
-  border-right: none;
-  border-top: none;
-}
-
-/* Sign pole / floating holo base */
-.lf-sign-pole {
-  width: 140px;
-  height: 40px;
-  margin-top: -4px;
-  background:
-    radial-gradient(ellipse at center top,
-      rgba(124,106,247,0.5) 0%,
-      rgba(124,106,247,0.2) 30%,
-      transparent 70%);
-  filter: blur(2px);
-}
-
-.lf-sign-head {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  padding-bottom: 0.8rem;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid rgba(124,106,247,0.25);
+.lf-sign-arrow {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: var(--sign-blue);
+  line-height: 1;
+  padding-right: 0.3rem;
+  border-right: 1px solid rgba(0,0,0,0.12);
 }
 
 .lf-sign-icon {
-  width: 28px;
-  height: 28px;
-  filter: invert(1)
-          drop-shadow(0 0 6px var(--sign))
-          drop-shadow(0 0 12px var(--sign));
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  /* tint black SVG → sign-blue */
+  filter: brightness(0) saturate(100%)
+          invert(26%) sepia(91%) saturate(1520%)
+          hue-rotate(204deg) brightness(92%) contrast(88%);
 }
 
-.lf-sign-title {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.25em;
-  color: #fff;
-  text-shadow:
-    0 0 6px var(--sign),
-    0 0 14px var(--sign);
-  animation: lf-neon 4s infinite;
-}
-
-@keyframes lf-neon {
-  0%, 100%   { opacity: 1; }
-  47%        { opacity: 1; }
-  48%        { opacity: 0.5; }
-  49%        { opacity: 1; }
-  92%        { opacity: 0.7; }
-  93%        { opacity: 1; }
-}
-
-/* Histogram */
-.lf-hist {
-  list-style: none;
+.lf-sign-text {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  gap: 0.1rem;
+  line-height: 1.25;
 }
 
-.lf-hist-row {
-  display: grid;
-  grid-template-columns: 50px 1fr;
-  align-items: center;
-  gap: 0.9rem;
+.lf-sign-ja {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--sign-text);
+  letter-spacing: 0.02em;
+}
+
+.lf-sign-en {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--sign-text);
+  letter-spacing: 0.04em;
+}
+
+.lf-sign-hours {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.82rem;
-}
-
-.lf-hist-lbl {
-  color: #fff;
-  font-family: var(--font-jp);
-  font-size: 0.85rem;
-  letter-spacing: 0.05em;
-}
-
-.lf-hist-bar {
-  height: 10px;
-  background: rgba(124,106,247,0.1);
-  border: 1px solid rgba(124,106,247,0.2);
-  border-radius: 1px;
-  overflow: hidden;
-}
-
-.lf-hist-bar > span {
-  display: block;
-  height: 100%;
-  width: var(--lf-w, 0%);
-  background: linear-gradient(90deg, var(--sign), var(--sign2));
-  box-shadow: 0 0 10px rgba(124,106,247,0.8);
-  transform-origin: left;
-  animation: lf-bar-grow 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-@keyframes lf-bar-grow {
-  from { transform: scaleX(0); }
-  to   { transform: scaleX(1); }
-}
-
-.lf-hist-row--you .lf-hist-lbl { color: #ff7ba8; }
-.lf-hist-row--you .lf-hist-bar { border-color: rgba(255,123,168,0.4); }
-.lf-hist-row--you .lf-hist-bar > span {
-  background: linear-gradient(90deg, #ff5fa7, #ff9ec4);
-  box-shadow: 0 0 10px rgba(255,95,167,0.8);
-  animation: lf-bar-grow 1.1s cubic-bezier(0.16, 1, 0.3, 1) both,
-             lf-you-pulse 1.6s ease-in-out infinite 1.2s;
-}
-
-@keyframes lf-you-pulse {
-  0%, 100% { box-shadow: 0 0 10px rgba(255,95,167,0.8); }
-  50%      { box-shadow: 0 0 20px rgba(255,95,167,1), 0 0 30px rgba(255,95,167,0.6); }
+  font-size: 0.72rem;
+  color: #555;
+  letter-spacing: 0.02em;
+  margin-top: 0.15rem;
 }
 
 /* Home button */
@@ -373,13 +294,19 @@
 @media (max-width: 700px) {
   .lf-page { padding: 3rem 1rem; }
   .lf-container { gap: 2rem; }
-  .lf-sign-frame { padding: 1.1rem 1.2rem 1rem; }
-  .lf-sign-title { font-size: 0.72rem; letter-spacing: 0.2em; }
-  .lf-sign-icon  { width: 22px; height: 22px; }
-  .lf-hist-row   { grid-template-columns: 42px 1fr; gap: 0.7rem; }
-  .lf-hist-lbl   { font-size: 0.78rem; }
-  .lf-hist-bar   { height: 8px; }
-  .lf-btn        { font-size: 0.72rem; padding: 0.7em 1.6em; }
+
+  .lf-sign-board {
+    gap: 0.8rem;
+    padding: 0.8rem 1.1rem;
+  }
+
+  .lf-sign-arrow { font-size: 2rem; padding-right: 0.2rem; }
+  .lf-sign-icon  { width: 32px; height: 32px; }
+  .lf-sign-ja    { font-size: 1rem; }
+  .lf-sign-en    { font-size: 0.78rem; }
+  .lf-sign-hours { font-size: 0.62rem; }
+
+  .lf-btn { font-size: 0.72rem; padding: 0.7em 1.6em; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -387,7 +314,6 @@
   .lf-code::before,
   .lf-code::after,
   .lf-sign,
-  .lf-sign-title,
-  .lf-body::before,
-  .lf-hist-row--you .lf-hist-bar > span { animation: none !important; }
+  .lf-sign-board::before,
+  .lf-body::before { animation: none !important; }
 }
