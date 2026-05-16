@@ -281,6 +281,14 @@
       "url": "https://github.com/hrmcngs/MC-Mod-Utility/",
       "color": "#696969",
       "tags": ["Vscode plugin", "JavaScript"]
+    },
+    {
+      "icon": "https://media.forgecdn.net/avatars/thumbnails/1698/779/256/256/639078773449403777.png",
+      "title": "Extra Video Settings",
+      "desc": "Embeddium拡張 / 映像設定を追加するmod",
+      "url": "https://www.curseforge.com/minecraft/mc-mods/extra-video-settings",
+      "color": "#febc2e",
+      "tags": ["Minecraft", "Mod", "Java"]
     }
   ],
   "stats": [
