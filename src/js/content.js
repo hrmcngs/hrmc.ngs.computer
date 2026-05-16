@@ -160,6 +160,87 @@ function applyColor(el, color, varName = '--link-color') {
   } catch(e) { console.warn('applyColor gradient rule failed', e); }
 }
 
+// ── ダウンロード数を live 取得（天気と同じくブラウザから直接APIを叩く） ──
+// CurseForge → cfwidget API / VS Code Marketplace → extensionquery API /
+// Modrinth → 公式API。いずれも CORS 対応なのでブラウザから直接呼べる。
+// 取得結果は localStorage に1時間キャッシュし、失敗時は古い値にフォールバックする。
+const DL_CACHE_TTL = 60 * 60 * 1000;
+
+function dlCacheGet(url) {
+  try {
+    const v = JSON.parse(localStorage.getItem('dl:' + url));
+    if (v && typeof v.n === 'number' && typeof v.t === 'number') return v;
+  } catch (e) { /* localStorage 無効でも継続 */ }
+  return null;
+}
+function dlCacheSet(url, n) {
+  try { localStorage.setItem('dl:' + url, JSON.stringify({ n, t: Date.now() })); }
+  catch (e) { /* localStorage 無効でも継続 */ }
+}
+
+// 1つのリンクからダウンロード(インストール)数を取得する
+async function fetchOneDownload(url) {
+  let u;
+  try { u = new URL(url); } catch (e) { return null; }
+  const host  = u.hostname.replace(/^www\./, '').toLowerCase();
+  const parts = u.pathname.split('/').filter(Boolean);
+
+  // CurseForge → cfwidget API
+  if (host === 'curseforge.com' && parts.length >= 3) {
+    const res = await fetch(`https://api.cfwidget.com/${parts[0]}/${parts[1]}/${parts[2]}`);
+    if (!res.ok) return null;
+    const d = await res.json();
+    return typeof d?.downloads?.total === 'number' ? d.downloads.total : null;
+  }
+  // Modrinth → 公式API
+  if (host === 'modrinth.com' && parts.length >= 2) {
+    const res = await fetch(`https://api.modrinth.com/v2/project/${encodeURIComponent(parts[1])}`);
+    if (!res.ok) return null;
+    const d = await res.json();
+    return typeof d.downloads === 'number' ? d.downloads : null;
+  }
+  // VS Code Marketplace → extensionquery API
+  if (host === 'marketplace.visualstudio.com') {
+    const id = u.searchParams.get('itemName');
+    if (!id) return null;
+    const res = await fetch('https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json;api-version=3.0-preview.1' },
+      body: JSON.stringify({ filters: [{ criteria: [{ filterType: 7, value: id }] }], flags: 256 }),
+    });
+    if (!res.ok) return null;
+    const d = await res.json();
+    const ext  = d?.results?.[0]?.extensions?.[0];
+    const stat = (ext?.statistics ?? []).find(s => s.statisticName === 'install');
+    return stat ? Math.round(stat.value) : null;
+  }
+  return null; // 未対応プラットフォーム（Planet Minecraft 等）
+}
+
+// キャッシュ込みで1リンクのダウンロード数を返す
+async function getDownloadCount(url) {
+  const cached = dlCacheGet(url);
+  if (cached && Date.now() - cached.t < DL_CACHE_TTL) return cached.n;
+  try {
+    const n = await fetchOneDownload(url);
+    if (typeof n === 'number') { dlCacheSet(url, n); return n; }
+  } catch (e) { /* 取得失敗 */ }
+  return cached ? cached.n : null; // 失敗時は古いキャッシュにフォールバック
+}
+
+// Works カードにダウンロード数バッジを表示する
+async function showDownloadCount(cardEl, links) {
+  const results = await Promise.all(links.map(getDownloadCount));
+  const nums = results.filter(n => typeof n === 'number');
+  if (!nums.length) return;
+  const count = nums.reduce((a, b) => a + b, 0).toLocaleString('en-US');
+  const badge = document.createElement('div');
+  badge.className = 'work-dl';
+  badge.title = `ダウンロード数 合計 ${count}`;
+  badge.innerHTML = `<span class="work-dl-label">ダウンロード：</span><span class="work-dl-count">${count}</span>`;
+  cardEl.appendChild(badge);
+}
+
 fetch('/content.json')
   .then(r => r.json())
   .then(data => {
@@ -329,25 +410,17 @@ fetch('/content.json')
         if (w?.color) applyColor(el, w.color, '--work-color');
       });
 
-      // stats.json と title を突き合わせ、Works カードにダウンロード数を表示
-      fetch('/stats.json', { cache: 'no-cache' })
-        .then(r => (r.ok ? r.json() : null))
-        .then(stats => {
-          if (!stats || !Array.isArray(stats.projects)) return;
-          const byTitle = {};
-          stats.projects.forEach(p => { byTitle[String(p.title).toLowerCase()] = p; });
-          worksEl.querySelectorAll('.work-card').forEach((el, i) => {
-            const sp = byTitle[String(works[i]?.title ?? '').toLowerCase()];
-            if (!sp || typeof sp.total !== 'number' || sp.total <= 0) return;
-            const badge = document.createElement('div');
-            badge.className = 'work-dl';
-            const count = sp.total.toLocaleString('en-US');
-            badge.title = `ダウンロード数 合計 ${count}`;
-            badge.innerHTML = `<span class="work-dl-label">ダウンロード：</span><span class="work-dl-count">${count}</span>`;
-            el.appendChild(badge);
-          });
-        })
-        .catch(() => { /* stats.json 未生成でもWorks表示は継続 */ });
+      // content.json の stats 設定をもとに、各 Works カードへ live でダウンロード数を表示
+      if (Array.isArray(data.stats)) {
+        const statByTitle = {};
+        data.stats.forEach(p => { statByTitle[String(p.title).toLowerCase()] = p; });
+        worksEl.querySelectorAll('.work-card').forEach((el, i) => {
+          const conf = statByTitle[String(works[i]?.title ?? '').toLowerCase()];
+          if (conf && Array.isArray(conf.links) && conf.links.length) {
+            showDownloadCount(el, conf.links);
+          }
+        });
+      }
     }
 
   })
