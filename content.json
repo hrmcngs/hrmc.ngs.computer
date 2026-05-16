@@ -245,10 +245,10 @@
     {
       "icon": "https://raw.githubusercontent.com/hrmcngs/RPGish-HPDisplay/1.20.1/RPGish-HPDisplay-datapack/pack.png",
       "title": "RPGish-HPDisplay",
-      "desc": "RPG風HP表示、ダメージ表示データパック",
+      "desc": "RPG風HP表示、ダメージ表示データパック ∩ mod",
       "url": "https://github.com/hrmcngs/RPGish-HPDisplay",
       "color": "#3ecfcf",
-      "tags": ["DataPack", "mcfunction"]
+      "tags": ["DataPack", "mcfunction","mod","Java"]
     },
     {
       "icon": "https://raw.githubusercontent.com/Drowse-Lab/Drowse-Lab/main/assets/image/DrowseLabIcon.jpg",
