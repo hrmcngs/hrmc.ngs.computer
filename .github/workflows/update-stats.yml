@@ -1,0 +1,45 @@
+name: Update download stats
+
+# content.json の "stats" に貼られたリンクから各プラットフォームのDL数を
+# 集計して stats.json を更新する。数値に変化があったときだけコミットする。
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # 6時間ごと
+  workflow_dispatch:         # 手動実行（Actions タブから）
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-stats
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch download stats
+        run: node scripts/fetch-stats.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit stats.json if changed
+        run: |
+          if [ -n "$(git status --porcelain stats.json)" ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add stats.json
+            git commit -m "chore: update download stats [skip ci]"
+            git push
+          else
+            echo "stats.json に変化なし — コミットしません。"
+          fi

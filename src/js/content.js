@@ -328,6 +328,26 @@ fetch('/content.json')
         const w = works[i];
         if (w?.color) applyColor(el, w.color, '--work-color');
       });
+
+      // stats.json と title を突き合わせ、Works カードにダウンロード数を表示
+      fetch('/stats.json', { cache: 'no-cache' })
+        .then(r => (r.ok ? r.json() : null))
+        .then(stats => {
+          if (!stats || !Array.isArray(stats.projects)) return;
+          const byTitle = {};
+          stats.projects.forEach(p => { byTitle[String(p.title).toLowerCase()] = p; });
+          worksEl.querySelectorAll('.work-card').forEach((el, i) => {
+            const sp = byTitle[String(works[i]?.title ?? '').toLowerCase()];
+            if (!sp || typeof sp.total !== 'number' || sp.total <= 0) return;
+            const badge = document.createElement('div');
+            badge.className = 'work-dl';
+            const count = sp.total.toLocaleString('en-US');
+            badge.title = `ダウンロード数 合計 ${count}`;
+            badge.innerHTML = `<span class="work-dl-label">ダウンロード：</span><span class="work-dl-count">${count}</span>`;
+            el.appendChild(badge);
+          });
+        })
+        .catch(() => { /* stats.json 未生成でもWorks表示は継続 */ });
     }
 
   })

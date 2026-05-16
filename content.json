@@ -282,5 +282,36 @@
       "color": "#696969",
       "tags": ["Vscode plugin", "JavaScript"]
     }
+  ],
+  "stats": [
+    {
+      "title": "RPGish-HPDisplay",
+      "color": "#3ecfcf",
+      "links": [
+        "https://www.curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack",
+        "https://www.curseforge.com/minecraft/mc-mods/rpgish-hpdisplay-mod"
+      ]
+    },
+    {
+      "title": "The-four-primitives-and-Weapons",
+      "color": "#f87171",
+      "links": [
+        "https://www.curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons"
+      ]
+    },
+    {
+      "title": "Extra Video Settings",
+      "color": "#febc2e",
+      "links": [
+        "https://www.curseforge.com/minecraft/mc-mods/extra-video-settings"
+      ]
+    },
+    {
+      "title": "MC-Mod-Utility",
+      "color": "#7c6af7",
+      "links": [
+        "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility"
+      ]
+    }
   ]
 }
