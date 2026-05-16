@@ -26,9 +26,9 @@
     "build": [
       {
         "title": "RPGish-HPDisplay",
-        "desc": "RPG風HP表示、ダメージ表示データパック",
+        "desc": "RPG風HP表示、ダメージ表示datapack ∩ mod",
         "color": "#3ecfcf",
-        "tags": ["Minecraft", "DataPack"],
+        "tags": ["Minecraft", "DataPack","mod"],
         "links": ["https://github.com/hrmcngs/RPGish-HPDisplay", "https://planetminecraft.com/data-pack/rpgish-hpdisplay/", "https://curseforge.com/minecraft/data-packs/r-p-g-ish-hp-display/"]
       },
       {
@@ -243,7 +243,7 @@
   },
   "works": [
     {
-      "icon": "https://raw.githubusercontent.com/hrmcngs/RPGish-HPDisplay/1.20.1/pack.png",
+      "icon": "https://raw.githubusercontent.com/hrmcngs/RPGish-HPDisplay/1.20.1/RPGish-HPDisplay-datapack/pack.png",
       "title": "RPGish-HPDisplay",
       "desc": "RPG風HP表示、ダメージ表示データパック",
       "url": "https://github.com/hrmcngs/RPGish-HPDisplay",
