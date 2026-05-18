@@ -16,7 +16,9 @@
  *             非公開メンバーシップの org だけ手動で指定する。
  *   （任意）集計期間（日数）  : data-period-days="365"（既定 365 = 過去1年）
  *   （任意）草グラフの色      : data-grass-color="#39d353"（既定: GitHub緑）
- *   （任意）Contrib図の種類   : data-contrib-chart="grid|bars3d"（既定: grid）
+ *   （任意）Contrib図の種類   : data-contrib-chart="default|grid|bars3d"（既定: default）
+ *           default は季節で自動配色（ハロウィン=かぼちゃ / クリスマス=赤 / 通常=緑）
+ *   （任意）季節色の上書き    : data-contrib-halloween="#fa7a18" / data-contrib-xmas="#e5484d"
  *   （任意）Activity図の種類  : data-activity-chart="radar|pie|bar|hbar|area"（既定: radar）
  *   （任意）Activity図の色    : data-activity-color="#f0b429"（既定: アクセント色）
  *   （任意）言語図の種類      : data-lang-chart="hbar|pie|bar|area"（既定: hbar）
@@ -293,6 +295,16 @@
       + `${months}${dayLabels}${rects}</svg>`;
   }
 
+  // Contributions「default」用の季節カラー
+  // GitHub と同様ハロウィン期間はかぼちゃ色。クリスマスは GitHub に無いので独自に赤系。
+  function seasonalGrass(root) {
+    const now = new Date();
+    const m = now.getMonth() + 1, day = now.getDate();
+    if (m === 10 && day >= 24) return root.dataset.contribHalloween || '#fa7a18'; // ハロウィン
+    if (m === 12 && day >= 20 && day <= 28) return root.dataset.contribXmas || '#e5484d'; // クリスマス
+    return '#39d353'; // 通常（GitHub緑）
+  }
+
   function render(root, data) {
     const m = data.metrics;
 
@@ -355,9 +367,14 @@
       ? langFn(langItems, { scale: 'linear', accent: langOverride || '#7c6af7' })
       : '<p class="ghs-msg">言語データがありません。</p>';
 
-    // Contributions（種類: data-contrib-chart = grid | bars3d）
-    const contribType = (root.dataset.contribChart || 'grid').toLowerCase();
-    const grassColor = root.dataset.grassColor || '#39d353';
+    // Contributions（種類: data-contrib-chart = default | grid | bars3d）
+    //   default … 草グラフ。色は季節で自動（ハロウィン=かぼちゃ / クリスマス=赤 / 通常=緑）
+    const contribType = (root.dataset.contribChart || 'default').toLowerCase();
+    let grassColor = root.dataset.grassColor || '#39d353';
+    if (contribType === 'default') {
+      grassColor = seasonalGrass(root);
+      root.style.setProperty('--ghs-grass', grassColor); // 草グラフ(CSS)にも反映
+    }
     let contribInner = '';
     if (data.contrib && contribType === 'bars3d' && charts.bars3d) {
       contribInner = `<div class="ghs-chart ghs-chart-anim">${charts.bars3d(data.contrib.days, { accent: grassColor })}</div>`;

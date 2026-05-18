@@ -36,13 +36,21 @@ const CONFIG = {
   //                   （exclude / pin / other で Other 集約を調整可）
   //   contributions : type = bars3d
   charts: [
+    // 見本用（全種類）— SAMPLE.md で使用
+    { file: 'activity-radar.svg', section: 'activity',  type: 'radar', color: '#2f81f7' },
+    { file: 'activity-pie.svg',   section: 'activity',  type: 'pie',   color: '#2f81f7' },
+    { file: 'activity-bar.svg',   section: 'activity',  type: 'bar',   color: '#2f81f7' },
+    { file: 'activity-hbar.svg',  section: 'activity',  type: 'hbar',  color: '#2f81f7' },
+    { file: 'activity-area.svg',  section: 'activity',  type: 'area',  color: '#2f81f7' },
+    { file: 'languages-hbar.svg', section: 'languages', type: 'hbar',  other: 1 },
+    { file: 'languages-pie.svg',  section: 'languages', type: 'pie',   other: 1 },
+    { file: 'languages-bar.svg',  section: 'languages', type: 'bar',   other: 1 },
+    { file: 'languages-area.svg', section: 'languages', type: 'area',  other: 1 },
+    // 既定（README 等で使う推奨セット）
     { file: 'activity.svg',      section: 'activity',      type: 'radar',  color: '#2f81f7' },
-    { file: 'languages.svg',     section: 'languages',     type: 'hbar',   color: '', other: 1,
+    { file: 'languages.svg',     section: 'languages',     type: 'hbar',   other: 1,
       pin: ['Common Lisp', 'NewLisp'], exclude: ['YAML', 'JSON'] },
     { file: 'contributions.svg', section: 'contributions', type: 'bars3d', color: '#39d353' },
-    // 追加例:
-    // { file: 'activity-pie.svg', section: 'activity', type: 'pie', color: '#3ecfcf' },
-    // { file: 'languages-pie.svg', section: 'languages', type: 'pie', exclude: ['JSON'] },
   ],
 };
 // ============================== 設定ここまで ==============================
@@ -204,7 +212,7 @@ async function main() {
   console.log('GitHub からデータを取得中…');
   const data = await fetchData();
   console.log(`  metrics: ${JSON.stringify(data.metrics)}`);
-  console.log(`  languages: ${data.langs.length} 言語 / contributions: ${data.contrib ? data.contrib.length + '日' : 'なし'}`);
+  console.log(`  languages: ${data.langs.length} 言語 / contributions: ${data.contrib ? data.contrib.days.length + '日' : 'なし'}`);
 
   const outDir = path.join(__dirname, '..', CONFIG.outDir);
   fs.mkdirSync(outDir, { recursive: true });
