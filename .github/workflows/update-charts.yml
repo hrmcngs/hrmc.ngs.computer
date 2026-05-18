@@ -1,0 +1,46 @@
+name: Update chart SVGs
+
+# GitHub統計チャートを SVG として生成し charts/ に出力する。
+# .md にはこの SVG を画像として埋め込む（Markdown は JS が動かないため）。
+# 内容に変化があったときだけコミットする。
+
+on:
+  schedule:
+    - cron: '0 */12 * * *'   # 12時間ごと
+  workflow_dispatch:          # 手動実行（Actions タブから）
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-charts
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate chart SVGs
+        run: node scripts/gen-charts.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit charts if changed
+        run: |
+          git add charts
+          if git diff --cached --quiet; then
+            echo "チャートに変化なし — コミットしません。"
+          else
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "chore: update chart SVGs [skip ci]"
+            git push
+          fi
