@@ -305,6 +305,15 @@
     return '#39d353'; // 通常（GitHub緑）
   }
 
+  // 現在の季節（立体棒グラフの装飾用）
+  function currentSeason() {
+    const m = new Date().getMonth() + 1;
+    if (m >= 3 && m <= 5) return 'spring';
+    if (m >= 6 && m <= 8) return 'summer';
+    if (m >= 9 && m <= 11) return 'autumn';
+    return 'winter';
+  }
+
   function render(root, data) {
     const m = data.metrics;
 
@@ -377,7 +386,7 @@
     }
     let contribInner = '';
     if (data.contrib && contribType === 'bars3d' && charts.bars3d) {
-      contribInner = `<div class="ghs-chart ghs-chart-anim">${charts.bars3d(data.contrib.days, { accent: grassColor })}</div>`;
+      contribInner = `<div class="ghs-chart ghs-chart-anim">${charts.bars3d(data.contrib.days, { accent: grassColor, season: currentSeason() })}</div>`;
     } else if (data.contrib) {
       contribInner = `<div class="ghs-cal-scroll">${renderCalendar(data.contrib)}</div>`
         + '<div class="ghs-cal-legend"><span class="ghs-cal-ltext">Less</span>'

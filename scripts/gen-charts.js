@@ -86,6 +86,38 @@ async function repoList(ownerPath) {
   return repos;
 }
 
+// 現在の季節（北半球基準）
+function currentSeason() {
+  const m = new Date().getMonth() + 1;
+  if (m >= 3 && m <= 5) return 'spring';
+  if (m >= 6 && m <= 8) return 'summer';
+  if (m >= 9 && m <= 11) return 'autumn';
+  return 'winter';
+}
+
+// オーナーの地域（GitHub の location）から現在の天気を判定（Open-Meteo・無料・認証不要）
+async function fetchWeather(location) {
+  if (!location || !String(location).trim()) return 'clear';
+  try {
+    const geo = await fetch(
+      `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1`,
+    ).then((r) => r.json());
+    const place = geo && geo.results && geo.results[0];
+    if (!place) return 'clear';
+    const w = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&current=weather_code`,
+    ).then((r) => r.json());
+    const code = w && w.current && w.current.weather_code;
+    if (code == null) return 'clear';
+    // WMO天気コード: 51-67/80-82=雨, 71-77/85-86=雪
+    if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return 'rain';
+    if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) return 'snow';
+    return 'clear';
+  } catch (e) {
+    return 'clear';
+  }
+}
+
 // GitHub と jogruber から統計データをまとめて取得する
 async function fetchData() {
   const user = CONFIG.user;
@@ -150,6 +182,10 @@ async function fetchData() {
     }
   } catch (e) { /* 草グラフなしで続行 */ }
 
+  // 季節（日付）と天気（オーナーの地域）— 立体棒グラフの装飾に使う
+  const season = currentSeason();
+  const weather = await fetchWeather(info.location);
+
   // github-stats.js の render() が期待する形に揃える（HTML側のフォールバック用）
   return {
     name: info.name || user,
@@ -160,6 +196,8 @@ async function fetchData() {
     langs,
     orgs,
     contrib,
+    season,
+    weather,
     generatedAt: new Date().toISOString(),
   };
 }
@@ -230,7 +268,9 @@ async function main() {
         svg = items.length ? fn(items, { scale: 'linear', accent: ch.color || '#7c6af7' }) : '';
       } else if (ch.section === 'contributions') {
         if (!data.contrib) { console.warn(`  スキップ ${ch.file}: contribution データなし`); continue; }
-        svg = GHSCharts.bars3d(data.contrib.days, { accent: ch.color || '#39d353' });
+        svg = GHSCharts.bars3d(data.contrib.days, {
+          accent: ch.color || '#39d353', season: data.season, weather: data.weather,
+        });
       } else {
         console.warn(`  スキップ ${ch.file}: 未知の section "${ch.section}"`);
         continue;

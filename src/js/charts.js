@@ -232,11 +232,24 @@
     return svg(W, H, rings + axes + scaleLabels + labels + data);
   }
 
+  // ── 季節・天気で bars3d の色を決める（色だけ・粒子アニメは無し） ──
+  // season: spring|summer|autumn|winter / weather: rain|snow|clear
+  function seasonWeatherColor(season, weather) {
+    if (weather === 'rain') return '#5a9bd4';   // 雨 — 青
+    if (weather === 'snow') return '#9fc6e8';   // 雪 — 氷青
+    if (season === 'spring') return '#ec9bb5';  // 春 — 桜ピンク
+    if (season === 'summer') return '#3fb950';  // 夏 — 緑
+    if (season === 'autumn') return '#e0813a';  // 秋 — 紅葉オレンジ
+    if (season === 'winter') return '#6f9fd8';  // 冬 — 冬空の青
+    return null;
+  }
+
   // ── Contributions 立体棒グラフ（アイソメトリック） ───
   // days: [{ date, count, level }] / 棒の高さ＝コミット数・色の濃淡＝level
   function bars3d(days, o) {
     o = o || {};
-    const accent = o.accent || '#39d353';
+    // 季節・天気が指定されていればその色を、なければ accent を使う
+    const accent = seasonWeatherColor(o.season, o.weather) || o.accent || '#39d353';
     if (!days || !days.length) return svg(240, 90, '');
 
     // 先頭を日曜に合わせてパディングし、7日ごとの週（列）に並べる
