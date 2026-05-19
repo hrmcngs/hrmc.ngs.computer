@@ -177,6 +177,7 @@
         '  <span class="term-cmd">./about.sh</span>         プロフィールを表示',
         '  <span class="term-cmd">./user-count.sh</span>    GitHub PR・コミット数を集計',
         '  <span class="term-cmd">cat links.txt</span>      リンク一覧',
+        '  <span class="term-cmd">./md2img.sh</span>        .md を画像(PNG)に変換',
         '  <span class="term-cmd">clear</span>              ターミナルをクリア',
       ],
 
@@ -365,7 +366,18 @@
     }
 
     let savedBodyContent=null;
-    function closeViewer(){if(!activeViewer)return;body.innerHTML=savedBodyContent;savedBodyContent=null;activeViewer=null;body.scrollTop=body.scrollHeight;input.focus({ preventScroll: true });}
+    let viewerCleanup=null;
+    function closeViewer(){if(!activeViewer)return;if(viewerCleanup){try{viewerCleanup();}catch(e){}viewerCleanup=null;}body.innerHTML=savedBodyContent;savedBodyContent=null;activeViewer=null;body.scrollTop=body.scrollHeight;input.focus({ preventScroll: true });}
+    function showMd2Img(){
+      if(!window.MD2IMG||typeof window.MD2IMG.mount!=='function'){
+        appendLines([{type:'error',message:'md2img: モジュールを読み込めませんでした。'}],body);
+        return;
+      }
+      savedBodyContent=body.innerHTML;
+      body.innerHTML='';
+      activeViewer=true;
+      viewerCleanup=window.MD2IMG.mount(body,{onClose:()=>closeViewer()});
+    }
     function parseGithubUrl(links){for(const url of(links??[])){const m=url.match(/github\.com\/([^/]+)\/([^/]+)/);if(m)return{owner:m[1],repo:m[2]};}return null;}
     function hasGithubLink(p){return!!parseGithubUrl(p.links);}
     async function fetchReadme(project){
@@ -406,6 +418,7 @@
         handleUserCountInput(cmd);
         return;
       }
+      if (cmd === './md2img.sh') { showMd2Img(); return; }
       if (activeViewer) { print([{ type: 'error', message: `command not found: ${cmd}  (./stop で戻る)` }], cmd); return; }
       if (buildActive && /^\d+$/.test(cmd)) {
         const n = parseInt(cmd, 10);
