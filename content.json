@@ -255,6 +255,7 @@
       "title": "Drowse-Lab",
       "desc": "なんとなく作っているweb",
       "url": "https://github.com/Drowse-Lab/Drowse-Lab",
+      "url": "https://drowse-lab.github.io/Drowse-Lab/",
       "color": "#7c6af7",
       "tags": ["Web", "JavaScript", "HTML", "CSS", "JSON", "Markdown", "YAML"]
     },
@@ -262,7 +263,7 @@
       "icon": "https://raw.githubusercontent.com/Drowse-Lab/The-four-primitives-and-Weapons/1.20.1/src/main/resources/logo.png",
       "title": "The-four-primitives-and-Weapons",
       "desc": "Drowse-Lab / Minecraft mod",
-      "url": "https://github.com/Drowse-Lab/The-four-primitives-and-Weapons",
+      "url": "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons",
       "color": "#f87171",
       "tags": ["Minecraft", "Mod", "Java", "mcfunction"]
     },
@@ -278,7 +279,7 @@
       "icon": "https://raw.githubusercontent.com/hrmcngs/MC-Mod-Utility/0d379a556a6b5f88a01b8060ea27ddb30859a306/icon.png",
       "title": "MC-Mod-Utility",
       "desc": "VSCode plugin / JavaScript",
-      "url": "https://github.com/hrmcngs/MC-Mod-Utility/",
+      "url": "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility",
       "color": "#696969",
       "tags": ["Vscode plugin", "JavaScript"]
     },
