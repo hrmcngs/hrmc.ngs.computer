@@ -3,5 +3,6 @@
   "git.fetchOnPull": true,
   "git.confirmSync": false,
   "git.postCommitCommand": "sync",
-  "git.rebaseWhenSync": true
+  "git.rebaseWhenSync": true,
+  "task.allowAutomaticTasks": "on"
 }
