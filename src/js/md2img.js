@@ -139,7 +139,12 @@
   }
 
   function mdToHtml(md) {
-    md = String(md).replace(/\r\n?/g, '\n').replace(/<!--[\s\S]*?-->/g, '');
+    md = String(md).replace(/\r\n?/g, '\n');
+    // HTML コメントの除去：入れ子 (例: <!<!---->-->) や閉じが無いコメントで
+    // 1 回のパスでは取り切れないため、変化がなくなるまで繰り返す。
+    // `-->` が無い場合は文字列末尾まで除去する（CodeQL js/incomplete-multi-character-sanitization）。
+    let prev;
+    do { prev = md; md = md.replace(/<!--[\s\S]*?(?:-->|$)/g, ''); } while (md !== prev);
     const lines = md.split('\n'), out = [];
     let i = 0;
     while (i < lines.length) {

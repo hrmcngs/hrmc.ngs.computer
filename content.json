@@ -51,6 +51,13 @@
         "color": "#696969",
         "tags": ["Vscode plugin", "JavaScript"],
         "links": ["https://github.com/hrmcngs/MC-Mod-Utility/", "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility"]
+      },
+      {
+        "title": "github-stats-charts",
+        "desc": "GitHub活動のチャート表示ウィジェット（HTML/Markdown両対応・テンプレート）",
+        "color": "#4dabf7",
+        "tags": ["GitHub", "Template", "SVG", "Actions"],
+        "links": ["https://github.com/hrmcngs/github-stats-charts"]
       }
     ],
     "socialLinks": [
@@ -290,6 +297,14 @@
       "url": "https://curseforge.com/minecraft/mc-mods/extra-video-settings",
       "color": "#febc2e",
       "tags": ["Minecraft", "Mod", "Java"]
+    },
+    {
+      "icon": "https://raw.githubusercontent.com/hrmcngs/github-stats-charts/main/charts/activity.svg",
+      "title": "github-stats-charts",
+      "desc": "GitHub活動のチャート表示ウィジェット（テンプレート）",
+      "url": "https://github.com/hrmcngs/github-stats-charts",
+      "color": "#4dabf7",
+      "tags": ["GitHub", "Template", "SVG", "Actions"]
     }
   ],
   "stats": [
