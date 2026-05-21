@@ -1,0 +1,7 @@
+{
+  "git.autofetch": true,
+  "git.fetchOnPull": true,
+  "git.confirmSync": false,
+  "git.postCommitCommand": "sync",
+  "git.rebaseWhenSync": true
+}
