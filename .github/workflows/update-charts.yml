@@ -5,8 +5,10 @@ name: Update chart SVGs
 # 内容に変化があったときだけコミットする。
 
 on:
+  push:
+    branches: [main]          # main へのコミットごと（自身の [skip ci] コミットでは再実行されない）
   schedule:
-    - cron: '0 */12 * * *'   # 12時間ごと
+    - cron: '0 * * * *'       # 1時間ごと（毎時00分）
   workflow_dispatch:          # 手動実行（Actions タブから）
 
 permissions:
