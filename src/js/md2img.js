@@ -666,7 +666,8 @@
         const res = await fetch(src, { mode: 'cors' });
         if (!res.ok) throw 0;
         const blob = await res.blob();
-        if (blob.size > 3 * 1024 * 1024) throw 0;
+        // README 画像は数 MB あるのが普通なので 15 MB まで許容
+        if (blob.size > 15 * 1024 * 1024) throw 0;
         const data = await blobToDataUrl(blob);
         imgCache.set(src, data);
         im.setAttribute('src', data);
