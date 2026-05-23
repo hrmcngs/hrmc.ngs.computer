@@ -9,72 +9,48 @@
     "issues": 21,
     "reviews": 2,
     "involved": 179,
-    "repos": 15
+    "repos": 11
   },
   "langs": [
     [
-      "Java",
-      12477610
+      "JavaScript",
+      358963
     ],
     [
-      "JavaScript",
-      506184
+      "Java",
+      214426
     ],
     [
       "JSON",
-      329996
-    ],
-    [
-      "mcfunction",
-      232412
-    ],
-    [
-      "Markdown",
-      151297
+      44238
     ],
     [
       "CSS",
-      127243
-    ],
-    [
-      "Python",
-      93608
-    ],
-    [
-      "HTML",
-      87590
-    ],
-    [
-      "Common Lisp",
-      31372
+      41123
     ],
     [
       "Shell",
-      23454
+      25116
     ],
     [
-      "Batchfile",
-      12509
+      "Markdown",
+      24123
+    ],
+    [
+      "HTML",
+      14847
+    ],
+    [
+      "PowerShell",
+      10995
     ],
     [
       "Swift",
       10735
     ],
     [
-      "NewLisp",
-      3435
-    ],
-    [
-      "YAML",
-      863
-    ],
-    [
-      "Ruby",
-      830
-    ],
-    [
-      "TypeScript",
-      2
+      "Batchfile",
+      9065
     ]
   ],
   "orgs": [
@@ -1942,5 +1918,5 @@
   },
   "season": "spring",
   "weather": "clear",
-  "generatedAt": "2026-05-23T11:08:16.392Z"
+  "generatedAt": "2026-05-23T13:19:34.349Z"
 }
