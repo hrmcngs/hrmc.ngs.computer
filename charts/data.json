@@ -8,13 +8,13 @@
     "prs": 178,
     "issues": 21,
     "reviews": 2,
-    "involved": 0,
+    "involved": 179,
     "repos": 15
   },
   "langs": [
     [
       "Java",
-      12556333
+      12477610
     ],
     [
       "JavaScript",
@@ -22,7 +22,7 @@
     ],
     [
       "JSON",
-      329998
+      329996
     ],
     [
       "mcfunction",
@@ -45,20 +45,16 @@
       87590
     ],
     [
-      "Shell",
-      32348
-    ],
-    [
       "Common Lisp",
       31372
     ],
     [
-      "Batchfile",
-      11975
+      "Shell",
+      23454
     ],
     [
-      "PowerShell",
-      10995
+      "Batchfile",
+      12509
     ],
     [
       "Swift",
@@ -1946,5 +1942,5 @@
   },
   "season": "spring",
   "weather": "clear",
-  "generatedAt": "2026-05-23T09:49:34.000Z"
+  "generatedAt": "2026-05-23T11:08:16.392Z"
 }
