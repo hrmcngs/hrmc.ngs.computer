@@ -3,13 +3,21 @@ name: Update chart SVGs
 # GitHub統計チャートを SVG として生成し charts/ に出力する。
 # .md にはこの SVG を画像として埋め込む（Markdown は JS が動かないため）。
 # 内容に変化があったときだけコミットする。
+#
+# トリガー設計（C案：ハイブリッド）:
+#   - 主要リポからの repository_dispatch (user-commit) → 即時実行
+#   - schedule (15分ごと) → 早期 exit で「前回チャート commit 以降に
+#     hrmcngs の push イベントが無ければ何もしない」
+#   - push (このリポ自身の main) / workflow_dispatch も従来通り
 
 on:
   push:
-    branches: [main]          # main へのコミットごと（自身の [skip ci] コミットでは再実行されない）
+    branches: [main]
+  repository_dispatch:
+    types: [user-commit]
   schedule:
-    - cron: '0 * * * *'       # 1時間ごと（毎時00分）
-  workflow_dispatch:          # 手動実行（Actions タブから）
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -24,18 +32,53 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # git log で前回 commit 時刻を引くため
+
+      - name: Skip if no new activity (schedule polling only)
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # schedule 以外（push / dispatch / 手動）は常に実行
+          if [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "trigger=${{ github.event_name }} — proceeding"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # 前回 charts/ への commit 時刻
+          LAST="$(git log -1 --format=%aI -- charts/ 2>/dev/null || echo '')"
+          [ -z "$LAST" ] && LAST="1970-01-01T00:00:00Z"
+          echo "last chart commit: $LAST"
+
+          # hrmcngs の直近 PushEvent の時刻（public events、最大100件）
+          LATEST="$(gh api 'users/hrmcngs/events?per_page=100' \
+            --jq '[.[] | select(.type=="PushEvent")][0].created_at // empty')"
+          echo "latest push event: ${LATEST:-(none)}"
+
+          if [ -z "$LATEST" ] || [ "$LATEST" \< "$LAST" ] || [ "$LATEST" = "$LAST" ]; then
+            echo "no new activity since last chart commit — skipping"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "new activity detected — proceeding"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Setup Node.js
+        if: steps.check.outputs.skip != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Generate chart SVGs
+        if: steps.check.outputs.skip != 'true'
         run: node scripts/gen-charts.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit charts if changed
+        if: steps.check.outputs.skip != 'true'
         run: |
           git add charts
           if git diff --cached --quiet; then
