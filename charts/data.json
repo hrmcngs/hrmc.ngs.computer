@@ -9,7 +9,7 @@
     "issues": 21,
     "reviews": 2,
     "involved": 179,
-    "repos": 15
+    "repos": 17
   },
   "langs": [
     [
@@ -53,6 +53,10 @@
       31372
     ],
     [
+      "Swift",
+      18072
+    ],
+    [
       "Batchfile",
       12598
     ],
@@ -61,24 +65,24 @@
       10995
     ],
     [
-      "Swift",
-      10735
-    ],
-    [
       "NewLisp",
       3435
+    ],
+    [
+      "Ruby",
+      902
     ],
     [
       "YAML",
       863
     ],
     [
-      "Ruby",
-      830
+      "TypeScript",
+      579
     ],
     [
-      "TypeScript",
-      2
+      "Makefile",
+      69
     ]
   ],
   "orgs": [
@@ -1916,5 +1920,5 @@
   },
   "season": "spring",
   "weather": "clear",
-  "generatedAt": "2026-05-24T14:32:11.722Z"
+  "generatedAt": "2026-05-24T14:32:38.913Z"
 }
