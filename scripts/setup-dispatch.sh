@@ -84,7 +84,10 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
-WORKFLOW_BODY=$(cat <<'YAML'
+# NOTE: bash の `$(cat <<...)` 構文は `\<改行>` を line-continuation として
+# 解釈して取り除いてしまうため、関数定義として書いてパイプで base64 に流す。
+workflow_body() {
+  cat <<'YAML'
 name: Notify chart updater
 
 # このリポジトリへの push を hrmcngs/hrmc.ngs.computer にディスパッチして
@@ -120,9 +123,9 @@ jobs:
             https://api.github.com/repos/hrmcngs/hrmc.ngs.computer/dispatches \
             -d '{"event_type":"user-commit","client_payload":{"repo":"${{ github.repository }}","sha":"${{ github.sha }}"}}'
 YAML
-)
+}
 
-ENCODED=$(printf '%s\n' "$WORKFLOW_BODY" | base64 | tr -d '\n')
+ENCODED=$(workflow_body | base64 | tr -d '\n')
 
 FAILED=()
 for NAME in "$@"; do
