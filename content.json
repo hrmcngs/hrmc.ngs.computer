@@ -291,7 +291,7 @@
       "tags": ["Vscode plugin", "JavaScript"]
     },
     {
-      "icon": "https://raw.githubusercontent.com/hrmcngs/extra_video_settings/main/src/main/resources/icon.png",
+      "icon": "https://raw.githubusercontent.com/hrmcngs/extra_video_settings/main/forge/forge/src/main/resources/icon.png",
       "title": "Extra Video Settings",
       "desc": "Embeddium拡張 / 映像設定を追加するmod",
       "url": "https://curseforge.com/minecraft/mc-mods/extra-video-settings",
