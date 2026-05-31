@@ -4,7 +4,7 @@
   "avatar": "https://avatars.githubusercontent.com/u/78349683?v=4",
   "htmlUrl": "https://github.com/hrmcngs",
   "metrics": {
-    "commits": 2018,
+    "commits": 2015,
     "prs": 179,
     "issues": 22,
     "reviews": 2,
@@ -90,41 +90,6 @@
   ],
   "contrib": {
     "days": [
-      {
-        "date": "2025-05-25",
-        "count": 0,
-        "level": 0
-      },
-      {
-        "date": "2025-05-26",
-        "count": 7,
-        "level": 1
-      },
-      {
-        "date": "2025-05-27",
-        "count": 16,
-        "level": 2
-      },
-      {
-        "date": "2025-05-28",
-        "count": 0,
-        "level": 0
-      },
-      {
-        "date": "2025-05-29",
-        "count": 2,
-        "level": 1
-      },
-      {
-        "date": "2025-05-30",
-        "count": 5,
-        "level": 1
-      },
-      {
-        "date": "2025-05-31",
-        "count": 9,
-        "level": 1
-      },
       {
         "date": "2025-06-01",
         "count": 13,
@@ -1944,11 +1909,16 @@
         "date": "2026-05-30",
         "count": 8,
         "level": 1
+      },
+      {
+        "date": "2026-05-31",
+        "count": 10,
+        "level": 1
       }
     ],
-    "total": 2522
+    "total": 2532
   },
   "season": "spring",
   "weather": "clear",
-  "generatedAt": "2026-05-30T19:19:18.752Z"
+  "generatedAt": "2026-05-31T06:21:03.502Z"
 }
