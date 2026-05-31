@@ -1,3 +1,13 @@
+/* ===== Monaspace Argon (variable, hosted on jsDelivr from githubnext/monaspace) ===== */
+@font-face {
+  font-family: 'Monaspace Argon';
+  src: url('https://cdn.jsdelivr.net/gh/githubnext/monaspace@v1.400/fonts/Web%20Fonts/Variable%20Web%20Fonts/Monaspace%20Argon/Monaspace%20Argon%20Var.woff2') format('woff2-variations'),
+       url('https://cdn.jsdelivr.net/gh/githubnext/monaspace@v1.400/fonts/Web%20Fonts/Variable%20Web%20Fonts/Monaspace%20Argon/Monaspace%20Argon%20Var.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: oblique -12deg 0deg;
+  font-display: swap;
+}
+
 /* ===== Reset & Base ===== */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -14,8 +24,10 @@
   --accent2: #3ecfcf;
   --text: #e8e8f0;
   --text-muted: #888896;
-  --font-en: 'Space Grotesk', sans-serif;
-  --font-jp: 'Noto Sans JP', sans-serif;
+  /* Monaspace Argon を全体で使用。Argon は CJK を含まないため日本語は Noto Sans JP にフォールバック */
+  --font-en:   'Monaspace Argon', ui-monospace, Menlo, Consolas, monospace;
+  --font-jp:   'Monaspace Argon', 'Noto Sans JP', ui-monospace, Menlo, monospace;
+  --font-mono: 'Monaspace Argon', ui-monospace, Menlo, Consolas, monospace;
 }
 
 html {
@@ -491,7 +503,7 @@ body {
 }
 
 .work-dl-count {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--text);
@@ -572,7 +584,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 14px;
   overflow: hidden;
-  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-family: var(--font-mono);
   font-size: 0.85rem;
   line-height: 1.7;
   max-width: 720px;

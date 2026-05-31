@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -sI -o /dev/null -w \"Variable: %{http_code}\\\\n\" \"https://cdn.jsdelivr.net/gh/githubnext/monaspace@v1.200/fonts/variable/MonaspaceArgonVarVF.woff2\")",
+      "Bash(curl -sI -o /dev/null -w \"Regular:  %{http_code}\\\\n\" \"https://cdn.jsdelivr.net/gh/githubnext/monaspace@v1.200/fonts/webfonts/MonaspaceArgon-Regular.woff2\")",
+      "Bash(curl -sI -o /dev/null -w '__TRACKED_VAR__: %{http_code}\\\\n' https://cdn.jsdelivr.net/gh/githubnext/monaspace@v1.400/fonts/webfonts/MonaspaceArgon-__TRACKED_VAR__.woff2)",
+      "Bash(curl -sI -o /dev/null -w \"Italic:     %{http_code}\\\\n\" \"https://cdn.jsdelivr.net/gh/githubnext/monaspace@v1.400/fonts/webfonts/MonaspaceArgon-Italic.woff2\")",
+      "Bash(curl -sI -o /dev/null -w \"BoldItalic: %{http_code}\\\\n\" \"https://cdn.jsdelivr.net/gh/githubnext/monaspace@v1.400/fonts/webfonts/MonaspaceArgon-BoldItalic.woff2\")",
+      "Bash(curl -sI -o /dev/null -w \"frozen/variable: %{http_code}\\\\n\" \"https://cdn.jsdelivr.net/gh/githubnext/monaspace@v1.400/fonts/frozen/MonaspaceArgon-Regular.woff2\")",
+      "Bash(curl -sI -o /dev/null -w \"MonaspaceArgon.woff2: %{http_code}\\\\n\" \"https://cdn.jsdelivr.net/gh/githubnext/monaspace@v1.400/fonts/MonaspaceArgon.woff2\")",
+      "Bash(curl -s \"https://data.jsdelivr.com/v1/packages/gh/githubnext/monaspace@1.200/tree?path=fonts/webfonts\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(f['name']\\) for f in d.get\\('files',[]\\) if 'Argon' in f.get\\('name',''\\)]\")",
+      "Bash(curl -s \"https://data.jsdelivr.com/v1/packages/gh/githubnext/monaspace@1.400/tree?path=fonts\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(f.get\\('name'\\)\\) for f in d.get\\('files',[]\\)]\")"
+    ]
+  }
+}

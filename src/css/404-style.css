@@ -153,7 +153,7 @@
 
 .lf-sub {
   margin-top: 0.6rem;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 0.85rem;
   letter-spacing: 0.15em;
   color: var(--text-muted);
@@ -185,7 +185,7 @@
     0 0 0 1px rgba(255,255,255,0.15),
     0 8px 28px rgba(0,0,0,0.55),
     0 0 60px rgba(124,106,247,0.35);
-  font-family: 'Noto Sans JP', sans-serif;
+  font-family: var(--font-jp);
   position: relative;
   text-decoration: none;
   color: inherit;
@@ -232,7 +232,7 @@
 }
 
 .lf-sign-arrow {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: var(--font-en);
   font-size: 2.6rem;
   font-weight: 700;
   color: var(--sign-blue);
@@ -266,7 +266,7 @@
 }
 
 .lf-sign-en {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: var(--font-en);
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--sign-text);
@@ -274,7 +274,7 @@
 }
 
 .lf-sign-hours {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 0.72rem;
   color: #555;
   letter-spacing: 0.02em;
@@ -286,7 +286,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.2em;
