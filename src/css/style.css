@@ -1,10 +1,44 @@
-/* ===== Monaspace Argon (variable, hosted on jsDelivr from githubnext/monaspace) ===== */
+/* ===== Monocraft (Minecraft 風ピクセル系モノスペース, hosted on jsDelivr from IdreesInc/Monocraft) ===== */
 @font-face {
-  font-family: 'Monaspace Argon';
-  src: url('https://cdn.jsdelivr.net/gh/githubnext/monaspace@v1.400/fonts/Web%20Fonts/Variable%20Web%20Fonts/Monaspace%20Argon/Monaspace%20Argon%20Var.woff2') format('woff2-variations'),
-       url('https://cdn.jsdelivr.net/gh/githubnext/monaspace@v1.400/fonts/Web%20Fonts/Variable%20Web%20Fonts/Monaspace%20Argon/Monaspace%20Argon%20Var.woff2') format('woff2');
-  font-weight: 100 900;
-  font-style: oblique -12deg 0deg;
+  font-family: 'Monocraft';
+  src: url('https://cdn.jsdelivr.net/gh/IdreesInc/Monocraft/dist/Monocraft-ttf/Monocraft.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Monocraft';
+  src: url('https://cdn.jsdelivr.net/gh/IdreesInc/Monocraft/dist/Monocraft-ttf/weights/Monocraft-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Monocraft';
+  src: url('https://cdn.jsdelivr.net/gh/IdreesInc/Monocraft/dist/Monocraft-ttf/weights/Monocraft-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Monocraft';
+  src: url('https://cdn.jsdelivr.net/gh/IdreesInc/Monocraft/dist/Monocraft-ttf/weights/Monocraft-Bold-Italic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Monocraft';
+  src: url('https://cdn.jsdelivr.net/gh/IdreesInc/Monocraft/dist/Monocraft-ttf/weights/Monocraft-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Monocraft';
+  src: url('https://cdn.jsdelivr.net/gh/IdreesInc/Monocraft/dist/Monocraft-ttf/weights/Monocraft-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
   font-display: swap;
 }
 
@@ -24,10 +58,10 @@
   --accent2: #3ecfcf;
   --text: #e8e8f0;
   --text-muted: #888896;
-  /* Monaspace Argon を全体で使用。Argon は CJK を含まないため日本語は Noto Sans JP にフォールバック */
-  --font-en:   'Monaspace Argon', ui-monospace, Menlo, Consolas, monospace;
-  --font-jp:   'Monaspace Argon', 'Noto Sans JP', ui-monospace, Menlo, monospace;
-  --font-mono: 'Monaspace Argon', ui-monospace, Menlo, Consolas, monospace;
+  /* Monocraft を全体で使用。Monocraft は CJK を含まないため日本語は Noto Sans JP にフォールバック */
+  --font-en:   'Monocraft', ui-monospace, Menlo, Consolas, monospace;
+  --font-jp:   'Monocraft', 'Noto Sans JP', ui-monospace, Menlo, monospace;
+  --font-mono: 'Monocraft', ui-monospace, Menlo, Consolas, monospace;
 }
 
 html {
