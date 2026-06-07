@@ -4,7 +4,7 @@
   "avatar": "https://avatars.githubusercontent.com/u/78349683?v=4",
   "htmlUrl": "https://github.com/hrmcngs",
   "metrics": {
-    "commits": 2037,
+    "commits": 2021,
     "prs": 183,
     "issues": 22,
     "reviews": 2,
@@ -14,7 +14,7 @@
   "langs": [
     [
       "Java",
-      12625080
+      12627277
     ],
     [
       "JavaScript",
@@ -90,41 +90,6 @@
   ],
   "contrib": {
     "days": [
-      {
-        "date": "2025-06-01",
-        "count": 13,
-        "level": 2
-      },
-      {
-        "date": "2025-06-02",
-        "count": 8,
-        "level": 1
-      },
-      {
-        "date": "2025-06-03",
-        "count": 7,
-        "level": 1
-      },
-      {
-        "date": "2025-06-04",
-        "count": 11,
-        "level": 1
-      },
-      {
-        "date": "2025-06-05",
-        "count": 2,
-        "level": 1
-      },
-      {
-        "date": "2025-06-06",
-        "count": 1,
-        "level": 1
-      },
-      {
-        "date": "2025-06-07",
-        "count": 17,
-        "level": 2
-      },
       {
         "date": "2025-06-08",
         "count": 33,
@@ -1942,13 +1907,18 @@
       },
       {
         "date": "2026-06-06",
-        "count": 3,
+        "count": 4,
+        "level": 1
+      },
+      {
+        "date": "2026-06-07",
+        "count": 2,
         "level": 1
       }
     ],
-    "total": 2562
+    "total": 2565
   },
   "season": "summer",
-  "weather": "clear",
-  "generatedAt": "2026-06-06T13:47:26.846Z"
+  "weather": "rain",
+  "generatedAt": "2026-06-07T15:52:53.384Z"
 }
