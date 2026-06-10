@@ -5,3 +5,6 @@ gh workflow run update-charts.yml
 
 gh run watch 
 > 途中経過を見る
+
+action
+./scripts/setup-dispatch.sh --all

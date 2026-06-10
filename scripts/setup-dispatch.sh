@@ -31,19 +31,48 @@ DEFAULT_OWNER="hrmcngs"
 DEFAULT_ALL_OWNERS=("hrmcngs" "Drowse-Lab")
 CENTRAL="hrmcngs/hrmc.ngs.computer"
 
+# --force: 既に notify-charts.yml がある repo も上書き更新する
+# （未指定だと既存ファイルがあればスキップ＝idempotent）
+FORCE=0
+ARGS=()
+for a in "$@"; do
+  case "$a" in
+    --force|-f) FORCE=1 ;;
+    *) ARGS+=("$a") ;;
+  esac
+done
+set -- "${ARGS[@]:-}"
+# bash 3 で空配列展開を避けるための置換
+[ "${1:-}" = "" ] && [ ${#ARGS[@]} -eq 0 ] && set --
+
+# PAT は環境変数 PAT で明示指定可。未指定なら gh CLI の auth token に
+# 自動フォールバック（`gh auth token` が repo スコープを持っていれば dispatch 可）
+PAT_SOURCE="env PAT"
+if [ -z "${PAT:-}" ]; then
+  if command -v gh >/dev/null 2>&1; then
+    PAT="$(gh auth token 2>/dev/null || true)"
+    PAT_SOURCE="gh auth token"
+  fi
+fi
 if [ -z "${PAT:-}" ]; then
   cat <<EOF >&2
-ERROR: 環境変数 PAT が未設定です。
+ERROR: 認証トークンが取得できません。
+
+どちらかを満たしてください:
+  (A) gh CLI でログイン:   gh auth login   (scope: repo / workflow)
+  (B) PAT を明示指定:      PAT=ghp_xxxxxxxx $0 ...
+
+PAT 作成: https://github.com/settings/tokens
+  scope: classic→repo / fine-grained→Actions: Read & write on ${CENTRAL}
 
 Usage:
-  PAT=ghp_xxxxxxxxxxxxxxxxxx $0 repo1 [repo2 ...]
-  PAT=ghp_xxxxxxxxxxxxxxxxxx $0 --all
-
-PAT は ${CENTRAL} の Actions を起動できる Personal Access Token です。
-作成: https://github.com/settings/tokens
+  $0 repo1 [repo2 ...]
+  $0 --all                # 未設置のリポだけ自動で設置（既存はスキップ）
+  $0 --all --force        # 既存も上書き更新
 EOF
   exit 1
 fi
+echo "→ 認証トークン: ${PAT:0:7}…  (取得元: $PAT_SOURCE)" >&2
 
 # --all [owner...]: 指定 owner 群（省略時はデフォルト）の全リポを対象にする
 # 除外: archive / fork / 中央リポ自身 / 名前が "-" で始まる / .github 系 (org meta)
@@ -128,8 +157,13 @@ YAML
 ENCODED=$(workflow_body | base64 | tr -d '\n')
 
 FAILED=()
-for NAME in "$@"; do
-  FULL="$OWNER/$NAME"
+SKIPPED_EXISTING=0
+for ARG in "$@"; do
+  # bare 名は DEFAULT_OWNER を補完、OWNER/REPO 形式ならそのまま
+  case "$ARG" in
+    */*) FULL="$ARG" ;;
+    *)   FULL="$DEFAULT_OWNER/$ARG" ;;
+  esac
   echo
   echo "──────── $FULL ────────"
 
@@ -137,7 +171,7 @@ for NAME in "$@"; do
   REPO_JSON="$(gh api "repos/$FULL" 2>/dev/null || true)"
   if [ -z "$REPO_JSON" ]; then
     echo "  ✗ リポジトリが見つからないかアクセスできません — スキップ"
-    FAILED+=("$NAME (not found)")
+    FAILED+=("$FULL (not found)")
     continue
   fi
 
@@ -153,6 +187,18 @@ for NAME in "$@"; do
     echo "  ⊘ コミットが1つも無い（空リポ）のでスキップ"
     continue
   fi
+
+  # 既存ファイルチェック → デフォルトでは設置済みリポをスキップ（idempotent）
+  EXISTING_SHA="$(gh api "repos/$FULL/contents/.github/workflows/notify-charts.yml?ref=$DEFAULT_BRANCH" \
+    --jq '.sha // empty' 2>/dev/null || true)"
+  if [[ ! "$EXISTING_SHA" =~ ^[a-f0-9]{40,64}$ ]]; then
+    EXISTING_SHA=""
+  fi
+  if [ -n "$EXISTING_SHA" ] && [ "$FORCE" -eq 0 ]; then
+    echo "  ⊘ notify-charts.yml 設置済み — スキップ (--force で上書き)"
+    SKIPPED_EXISTING=$((SKIPPED_EXISTING+1))
+    continue
+  fi
   echo "  · default branch = $DEFAULT_BRANCH"
 
   echo "  · CHARTS_TRIGGER_TOKEN secret を設定…"
@@ -164,14 +210,6 @@ for NAME in "$@"; do
     echo "      $SEC_ERR" | head -3 | sed 's/^/      /'
     FAILED+=("$FULL (secret)")
     continue
-  fi
-
-  # 既存ファイルの sha（あれば update、無ければ create）
-  # 404 のとき jq は "null" を出すため、SHA 形式を厳格にチェック
-  EXISTING_SHA="$(gh api "repos/$FULL/contents/.github/workflows/notify-charts.yml?ref=$DEFAULT_BRANCH" \
-    --jq '.sha // empty' 2>/dev/null || true)"
-  if [[ ! "$EXISTING_SHA" =~ ^[a-f0-9]{40,64}$ ]]; then
-    EXISTING_SHA=""
   fi
 
   if [ -n "$EXISTING_SHA" ]; then
@@ -198,8 +236,11 @@ for NAME in "$@"; do
 done
 
 echo
+if [ "$SKIPPED_EXISTING" -gt 0 ]; then
+  echo "⊘ 既に設置済みでスキップ: $SKIPPED_EXISTING 件 (上書きするなら --force)"
+fi
 if [ ${#FAILED[@]} -eq 0 ]; then
-  echo "✅ 全リポジトリ設置完了"
+  echo "✅ 完了"
 else
   echo "⚠ 失敗したリポジトリ: ${FAILED[*]}"
 fi
