@@ -4,90 +4,72 @@
   "avatar": "https://avatars.githubusercontent.com/u/78349683?v=4",
   "htmlUrl": "https://github.com/hrmcngs",
   "metrics": {
-    "commits": 1916,
+    "commits": 1917,
     "prs": 183,
     "issues": 22,
     "reviews": 2,
     "involved": 184,
-    "repos": 18
+    "repos": 14
   },
   "langs": [
     [
       "Java",
-      12715871
+      479370
     ],
     [
       "JavaScript",
-      585027
-    ],
-    [
-      "JSON",
-      331645
-    ],
-    [
-      "mcfunction",
-      232412
-    ],
-    [
-      "Markdown",
-      151297
-    ],
-    [
-      "CSS",
-      128917
-    ],
-    [
-      "Python",
-      97779
-    ],
-    [
-      "HTML",
-      87359
+      363914
     ],
     [
       "Shell",
-      74798
+      53481
     ],
     [
-      "Common Lisp",
-      31372
+      "JSON",
+      45930
+    ],
+    [
+      "CSS",
+      42797
+    ],
+    [
+      "Markdown",
+      24123
     ],
     [
       "Batchfile",
-      24473
+      20940
     ],
     [
       "Swift",
       18072
     ],
     [
+      "HTML",
+      14616
+    ],
+    [
       "PowerShell",
       10995
     ],
     [
-      "NewLisp",
-      3435
-    ],
-    [
-      "Ruby",
-      902
-    ],
-    [
-      "YAML",
-      863
+      "Python",
+      4171
     ],
     [
       "TypeScript",
-      579
+      577
+    ],
+    [
+      "Ruby",
+      72
     ],
     [
       "Makefile",
       69
     ]
   ],
-  "orgs": [
-    "Drowse-Lab"
-  ],
+  "orgs": [],
   "contrib": {
     "days": [
       {
@@ -1935,5 +1917,5 @@
   },
   "season": "summer",
   "weather": "clear",
-  "generatedAt": "2026-06-10T15:05:19.467Z"
+  "generatedAt": "2026-06-10T15:14:14.418Z"
 }
