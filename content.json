@@ -58,6 +58,16 @@
         "color": "#4dabf7",
         "tags": ["GitHub", "Template", "SVG", "Actions"],
         "links": ["https://github.com/hrmcngs/github-stats-charts"]
+      },
+      {
+        "title": "Backpack-Arsenal",
+        "desc": "Minecraft mod — バックパック型の装備拡張",
+        "color": "#ff9933",
+        "tags": ["Minecraft", "Mod", "Java"],
+        "links": [
+          "https://github.com/hrmcngs/Backpack-Arsenal",
+          "https://www.curseforge.com/minecraft/mc-mods/arsenal-backpack"
+        ]
       }
     ],
     "socialLinks": [
@@ -305,6 +315,14 @@
       "url": "https://github.com/hrmcngs/github-stats-charts",
       "color": "#4dabf7",
       "tags": ["GitHub", "Template", "SVG", "Actions"]
+    },
+    {
+      "icon": "https://raw.githubusercontent.com/hrmcngs/Backpack-Arsenal/main/src/main/resources/assets/backpack_arsenal/textures/icon.png",
+      "title": "Backpack-Arsenal",
+      "desc": "Minecraft mod — バックパック型の装備拡張",
+      "url": "https://www.curseforge.com/minecraft/mc-mods/arsenal-backpack",
+      "color": "#ff9933",
+      "tags": ["Minecraft", "Mod", "Java"]
     }
   ],
   "stats": [
@@ -335,6 +353,13 @@
       "color": "#7c6af7",
       "links": [
         "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility"
+      ]
+    },
+    {
+      "title": "Backpack-Arsenal",
+      "color": "#ff9933",
+      "links": [
+        "https://www.curseforge.com/minecraft/mc-mods/arsenal-backpack"
       ]
     }
   ]
