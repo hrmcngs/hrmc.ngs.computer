@@ -128,3 +128,4 @@ git config --global --unset alias.pr-quick
 
 - 常時 hook 版（**今は無効**）: `~/.git-hooks/prepare-commit-msg` ファイル自体は残っている。再度全 commit に co-author を自動付与したい場合は `git config --global core.hooksPath "$HOME/.git-hooks"`
 - Achievement 一覧: <https://github.com/users/hrmcngs/achievements>
+
