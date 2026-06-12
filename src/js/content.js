@@ -160,11 +160,16 @@ function applyColor(el, color, varName = '--link-color') {
   } catch(e) { console.warn('applyColor gradient rule failed', e); }
 }
 
-// ── ダウンロード数を live 取得（天気と同じくブラウザから直接APIを叩く） ──
-// CurseForge → cfwidget API / VS Code Marketplace → extensionquery API /
-// Modrinth → 公式API。いずれも CORS 対応なのでブラウザから直接呼べる。
-// 取得結果は localStorage に1時間キャッシュし、失敗時は古い値にフォールバックする。
+// ── ダウンロード数を live 取得（ブラウザから直接APIを叩く・Actions 不要） ──
+// CurseForge → cfwidget API（Project ID 指定があれば slug 索引待ちを回避）
+// Modrinth → 公式API / VS Code Marketplace → extensionquery API
+// いずれも CORS 対応なのでブラウザから直接呼べる。
+// 結果は localStorage に1時間キャッシュし、失敗時は古い値にフォールバックする。
 const DL_CACHE_TTL = 60 * 60 * 1000;
+
+// content.json の stats から作る URL → cfProjectId のマップ
+// （DOMContentLoaded 後の content.json fetch 時にセットされる）
+const CF_PROJECT_IDS = new Map();
 
 function dlCacheGet(url) {
   try {
@@ -185,12 +190,23 @@ async function fetchOneDownload(url) {
   const host  = u.hostname.replace(/^www\./, '').toLowerCase();
   const parts = u.pathname.split('/').filter(Boolean);
 
-  // CurseForge → cfwidget API
-  if (host === 'curseforge.com' && parts.length >= 3) {
-    const res = await fetch(`https://api.cfwidget.com/${parts[0]}/${parts[1]}/${parts[2]}`);
-    if (!res.ok) return null;
-    const d = await res.json();
-    return typeof d?.downloads?.total === 'number' ? d.downloads.total : null;
+  // CurseForge: Project ID があれば最優先で ID 直叩き（cfwidget が slug を索引してなくても確実に取れる）
+  if (host === 'curseforge.com') {
+    const pid = CF_PROJECT_IDS.get(url);
+    if (pid) {
+      const res = await fetch(`https://api.cfwidget.com/${pid}`);
+      if (res.ok) {
+        const d = await res.json();
+        if (typeof d?.downloads?.total === 'number') return d.downloads.total;
+      }
+    }
+    if (parts.length >= 3) {
+      const res = await fetch(`https://api.cfwidget.com/${parts[0]}/${parts[1]}/${parts[2]}`);
+      if (!res.ok) return null;
+      const d = await res.json();
+      return typeof d?.downloads?.total === 'number' ? d.downloads.total : null;
+    }
+    return null;
   }
   // Modrinth → 公式API
   if (host === 'modrinth.com' && parts.length >= 2) {
@@ -413,7 +429,15 @@ fetch('/content.json')
       // content.json の stats 設定をもとに、各 Works カードへ live でダウンロード数を表示
       if (Array.isArray(data.stats)) {
         const statByTitle = {};
-        data.stats.forEach(p => { statByTitle[String(p.title).toLowerCase()] = p; });
+        data.stats.forEach(p => {
+          statByTitle[String(p.title).toLowerCase()] = p;
+          // cfProjectId 指定があれば URL → ID のマップを構築（cfwidget 索引待ちを回避）
+          if (p.cfProjectId && Array.isArray(p.links)) {
+            p.links.forEach(url => {
+              if (/curseforge\.com/.test(url)) CF_PROJECT_IDS.set(url, p.cfProjectId);
+            });
+          }
+        });
         worksEl.querySelectorAll('.work-card').forEach((el, i) => {
           const conf = statByTitle[String(works[i]?.title ?? '').toLowerCase()];
           if (conf && Array.isArray(conf.links) && conf.links.length) {
