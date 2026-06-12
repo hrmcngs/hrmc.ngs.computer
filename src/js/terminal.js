@@ -28,123 +28,84 @@
     // PR:     /search/issues?q=type:pr+author:USERNAME
     // Commit: /search/commits?q=author:USERNAME
     // どちらも total_count を返すので repos ループ不要
-    async function runUserCount(username, year, month, opt = '') {
-      let since = '', until = '', createdQ = '';
-      let periodLabel = '全期間';
+    // Network-resilient JSON fetch: 1 リトライ + Failed to fetch を判別可能なメッセージ化
+    async function ghJson(url) {
+      const headers = { 'Accept': 'application/vnd.github+json' };
+      let lastErr;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          const res = await fetch(url, { headers, cache: 'no-store' });
+          let data; try { data = await res.json(); } catch { data = {}; }
+          if (!res.ok) throw new Error(`${res.status}: ${data?.message ?? res.statusText}`);
+          return data;
+        } catch (err) {
+          lastErr = err;
+          // TypeError (Failed to fetch) のみ短い待機後にリトライ
+          if (err instanceof TypeError && attempt === 0) {
+            await new Promise(r => setTimeout(r, 600));
+            continue;
+          }
+          break;
+        }
+      }
+      throw lastErr;
+    }
 
-      if (year && month) {
-        since    = `${year}-${month}-01T00:00:00Z`;
+    async function runUserCount(username, year, month, opt = '') {
+      let createdQ = '', commitDateQ = '';
+      let periodLabel = '全期間';
+      const isAllTime = !(year && month);
+
+      if (!isAllTime) {
+        const ms = `${year}-${month}-01`;
         const em = month === '12' ? '01' : String(Number(month) + 1).padStart(2, '0');
         const ey = month === '12' ? String(Number(year) + 1) : year;
-        until    = `${ey}-${em}-01T00:00:00Z`;
-        createdQ = `+created:${since}..${until}`;
+        const me = `${ey}-${em}-01`;
+        createdQ    = `+created:${ms}..${me}`;
+        commitDateQ = `+author-date:${ms}..${me}`;
         periodLabel = `${year}年${Number(month)}月`;
-      } else {
-        // アカウント作成日を取得して全期間の範囲を表示
-        try {
-          const res  = await fetch(`https://api.github.com/users/${username}`, { headers });
-          const data = await res.json();
-          if (res.ok && data.created_at) periodLabel = `全期間（${data.created_at.slice(0, 10)} 〜）`;
-        } catch {}
       }
 
-      // opt: '' = publicのみ / 'org' = org含む / 'private' = private含む / 'org.private' = 全て
-      const includeOrg     = opt === 'org'     || opt === 'org.private';
-      const includePrivate = opt === 'private' || opt === 'org.private';
-      const headers = {};
-      // リポジトリ取得タイプ
-      // /users/{name}/repos は 'all' | 'owner' | 'member'
-      // /orgs/{name}/repos  は 'all' | 'public' | 'private' | 'forks' | 'sources' | 'member'
-      const userRepoType = includePrivate ? 'all' : 'owner';
-      const orgRepoType  = includePrivate ? 'all' : 'public';
-
+      const u = encodeURIComponent(username);
+      const labelId = `pl-${Date.now().toString(36)}${Math.random().toString(36).slice(2,6)}`;
       appendLines([
         '',
-        `<span class="success">▶ 集計開始</span>  <span style="opacity:0.6">${escHtml(username)} / ${escHtml(periodLabel)}</span>`,
+        `<span class="success">▶ 集計開始</span>  <span style="opacity:0.6">${escHtml(username)} / <span id="${labelId}">${escHtml(periodLabel)}</span></span>`,
         '<span style="opacity:0.3">────────────────────────────────────</span>',
       ], body);
 
       const ld = makeLoadingLine('取得中...');
       body.appendChild(ld); body.scrollTop = body.scrollHeight;
 
-      // PR 数（user_count.js と同じ）
       setLoading(ld, 'Pull Requests を取得中...');
       let prCount = 0;
       try {
-        const res  = await fetch(
-          `https://api.github.com/search/issues?q=type:pr+author:${username}${createdQ}`,
-          { headers }
-        );
-        const data = await res.json();
-        if (!res.ok) throw new Error(`${res.status}: ${data?.message ?? ''}`);
+        const data = await ghJson(`https://api.github.com/search/issues?q=type:pr+author:${u}${createdQ}`);
         prCount = data.total_count ?? 0;
       } catch (err) {
         setLoading(ld, `<span class="error">PR取得エラー: ${escHtml(err.message)}</span>`);
         return;
       }
 
-      // コミット数（user_count.js と同じ：全リポジトリをループ）
+      setLoading(ld, 'Commits を取得中...');
       let commitCount = 0;
       try {
-        let page = 1, hasNext = true;
-        while (hasNext) {
-          setLoading(ld, `コミット集計中... (page ${page} / ${commitCount} commits)`);
-          const repoRes = await fetch(
-            `https://api.github.com/users/${username}/repos?per_page=100&page=${page}&type=${userRepoType}`,
-            { headers }
-          );
-          const repos = await repoRes.json();
-          if (!Array.isArray(repos) || !repos.length) break;
-          for (const repo of repos) {
-            let cPage = 1, cHasNext = true;
-            while (cHasNext) {
-              let url = `https://api.github.com/repos/${repo.owner.login}/${repo.name}/commits?author=${username}&per_page=100&page=${cPage}`;
-              if (since) url += `&since=${since}`;
-              if (until) url += `&until=${until}`;
-              const commitRes = await fetch(url, { headers });
-              const commits   = await commitRes.json();
-              if (!Array.isArray(commits) || !commits.length) break;
-              commitCount += commits.length;
-              cHasNext     = commits.length === 100;
-              cPage++;
-            }
-          }
-          hasNext = repos.length === 100;
-          page++;
-        }
-        // org含む場合：参加組織のリポジトリも取得
-        if (includeOrg) {
-          const orgRes  = await fetch(`https://api.github.com/users/${username}/orgs?per_page=100`, { headers });
-          const orgs    = await orgRes.json();
-          if (Array.isArray(orgs)) {
-            for (const org of orgs) {
-              let oPage = 1, oNext = true;
-              while (oNext) {
-                const or = await fetch(`https://api.github.com/orgs/${org.login}/repos?per_page=100&page=${oPage}&type=${orgRepoType}`, { headers });
-                const orepos = await or.json();
-                if (!Array.isArray(orepos) || !orepos.length) break;
-                for (const repo of orepos) {
-                  let cPage = 1, cHasNext = true;
-                  while (cHasNext) {
-                    let url = `https://api.github.com/repos/${repo.owner.login}/${repo.name}/commits?author=${username}&per_page=100&page=${cPage}`;
-                    if (since) url += `&since=${since}`;
-                    if (until) url += `&until=${until}`;
-                    const cr = await fetch(url, { headers });
-                    const cs = await cr.json();
-                    if (!Array.isArray(cs) || !cs.length) break;
-                    commitCount += cs.length;
-                    cHasNext = cs.length === 100;
-                    cPage++;
-                  }
-                }
-                oNext = orepos.length === 100;
-                oPage++;
-              }
-            }
+        // 全期間時は author-date 昇順で最古コミットも一緒に取得（per_page=1 で payload 最小）
+        const sortQ = isAllTime ? '&sort=author-date&order=asc&per_page=1' : '&per_page=1';
+        const data  = await ghJson(`https://api.github.com/search/commits?q=author:${u}${commitDateQ}${sortQ}`);
+        commitCount = data.total_count ?? 0;
+        if (isAllTime) {
+          const firstDate = data.items?.[0]?.commit?.author?.date;
+          if (firstDate) {
+            const el = document.getElementById(labelId);
+            if (el) el.textContent = `全期間（${firstDate.slice(0, 10)} 〜）`;
           }
         }
       } catch (err) {
-        setLoading(ld, `<span class="error">コミット取得エラー: ${escHtml(err.message)}</span>`);
+        const hint = err instanceof TypeError
+          ? '（ネットワークまたはブラウザ拡張で api.github.com への接続がブロックされた可能性があります）'
+          : '';
+        setLoading(ld, `<span class="error">コミット取得エラー: ${escHtml(err.message)}${escHtml(hint)}</span>`);
         return;
       }
 
@@ -240,9 +201,9 @@
           '  <span class="term-cmd">private</span>     → private含む',
           '  <span class="term-cmd">org.private</span> → org・private全て含む',
           '',
-          '  例: <span style="opacity:0.7">hrmcngs</span>',
-          '  例: <span style="opacity:0.7">hrmcngs org</span>',
-          '  例: <span style="opacity:0.7">hrmcngs org.private 2024 05</span>',
+          '  例: <span style="opacity:0.7">octocat</span>',
+          '  例: <span style="opacity:0.7">octocat org</span>',
+          '  例: <span style="opacity:0.7">octocat org.private 2024 05</span>',
           '',
           '<span style="opacity:0.45">キャンセル: ./stop</span>',
           '',
