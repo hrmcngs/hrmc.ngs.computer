@@ -53,7 +53,10 @@
       const includePrivate = opt === 'private' || opt === 'org.private';
       const headers = {};
       // リポジトリ取得タイプ
-      const repoType = includePrivate ? 'all' : (includeOrg ? 'public' : 'public');
+      // /users/{name}/repos は 'all' | 'owner' | 'member'
+      // /orgs/{name}/repos  は 'all' | 'public' | 'private' | 'forks' | 'sources' | 'member'
+      const userRepoType = includePrivate ? 'all' : 'owner';
+      const orgRepoType  = includePrivate ? 'all' : 'public';
 
       appendLines([
         '',
@@ -87,7 +90,7 @@
         while (hasNext) {
           setLoading(ld, `コミット集計中... (page ${page} / ${commitCount} commits)`);
           const repoRes = await fetch(
-            `https://api.github.com/users/${username}/repos?per_page=100&page=${page}&type=${repoType}`,
+            `https://api.github.com/users/${username}/repos?per_page=100&page=${page}&type=${userRepoType}`,
             { headers }
           );
           const repos = await repoRes.json();
@@ -117,7 +120,7 @@
             for (const org of orgs) {
               let oPage = 1, oNext = true;
               while (oNext) {
-                const or = await fetch(`https://api.github.com/orgs/${org.login}/repos?per_page=100&page=${oPage}&type=${repoType}`, { headers });
+                const or = await fetch(`https://api.github.com/orgs/${org.login}/repos?per_page=100&page=${oPage}&type=${orgRepoType}`, { headers });
                 const orepos = await or.json();
                 if (!Array.isArray(orepos) || !orepos.length) break;
                 for (const repo of orepos) {
