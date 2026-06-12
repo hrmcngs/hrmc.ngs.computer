@@ -129,3 +129,19 @@ git config --global --unset alias.pr-quick
 - 常時 hook 版（**今は無効**）: `~/.git-hooks/prepare-commit-msg` ファイル自体は残っている。再度全 commit に co-author を自動付与したい場合は `git config --global core.hooksPath "$HOME/.git-hooks"`
 - Achievement 一覧: <https://github.com/users/hrmcngs/achievements>
 
+
+## 達成度の確認
+
+現在のティアと残り PR 数を確認するには：
+
+```bash
+gh api graphql -f query='{ viewer { login } }'   # 自分のログインを確認
+```
+
+GitHub プロフィール → Achievements タブ で Pair Extraordinaire のティアが表示される。残り PR 数の早見：
+
+| 次のティア | あと何回 |
+|---|---|
+| Default → Bronze | 9 |
+| Bronze → Silver | 14 |
+| Silver → Gold | 24 |
