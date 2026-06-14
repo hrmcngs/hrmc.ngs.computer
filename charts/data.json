@@ -4,11 +4,11 @@
   "avatar": "https://avatars.githubusercontent.com/u/78349683?v=4",
   "htmlUrl": "https://github.com/hrmcngs",
   "metrics": {
-    "commits": 2004,
-    "prs": 310,
+    "commits": 2000,
+    "prs": 314,
     "issues": 22,
     "reviews": 2,
-    "involved": 311,
+    "involved": 315,
     "repos": 19
   },
   "langs": [
@@ -30,7 +30,7 @@
     ],
     [
       "CSS",
-      188233
+      188685
     ],
     [
       "Markdown",
@@ -90,41 +90,6 @@
   ],
   "contrib": {
     "days": [
-      {
-        "date": "2025-06-08",
-        "count": 33,
-        "level": 3
-      },
-      {
-        "date": "2025-06-09",
-        "count": 74,
-        "level": 4
-      },
-      {
-        "date": "2025-06-10",
-        "count": 50,
-        "level": 4
-      },
-      {
-        "date": "2025-06-11",
-        "count": 18,
-        "level": 2
-      },
-      {
-        "date": "2025-06-12",
-        "count": 22,
-        "level": 2
-      },
-      {
-        "date": "2025-06-13",
-        "count": 5,
-        "level": 1
-      },
-      {
-        "date": "2025-06-14",
-        "count": 17,
-        "level": 2
-      },
       {
         "date": "2025-06-15",
         "count": 0,
@@ -1944,11 +1909,16 @@
         "date": "2026-06-13",
         "count": 48,
         "level": 4
+      },
+      {
+        "date": "2026-06-14",
+        "count": 59,
+        "level": 4
       }
     ],
-    "total": 2763
+    "total": 2822
   },
   "season": "summer",
   "weather": "clear",
-  "generatedAt": "2026-06-13T19:53:54.394Z"
+  "generatedAt": "2026-06-14T02:59:01.478Z"
 }
