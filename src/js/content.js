@@ -445,6 +445,27 @@ fetch('/content.json')
           }
         });
       }
+
+      // github-stats-charts カードに「Use template / bootstrap.sh 利用回数」を表示
+      fetch('/charts/usage.json', { cache: 'no-store' })
+        .then(r => r.ok ? r.json() : null)
+        .then(usage => {
+          if (!usage || typeof usage.total !== 'number') return;
+          worksEl.querySelectorAll('.work-card').forEach((el, i) => {
+            const title = String(works[i]?.title ?? '').toLowerCase();
+            if (title !== 'github-stats-charts') return;
+            const badge = document.createElement('div');
+            badge.className = 'work-dl';
+            const tmpl = usage.template || 0;
+            const boot = usage.bootstrap || 0;
+            badge.title = `Use this template: ${tmpl} / bootstrap.sh: ${boot}`;
+            badge.innerHTML =
+              `<span class="work-dl-label">使用：</span>` +
+              `<span class="work-dl-count">${usage.total.toLocaleString('en-US')}</span>`;
+            el.appendChild(badge);
+          });
+        })
+        .catch(() => { /* usage.json 未生成でも無視 */ });
     }
 
   })

@@ -77,6 +77,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Generate usage counter
+        if: steps.check.outputs.skip != 'true'
+        run: node scripts/gen-usage.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Commit charts if changed
         if: steps.check.outputs.skip != 'true'
         run: |
