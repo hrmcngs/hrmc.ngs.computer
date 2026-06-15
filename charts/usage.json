@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "total": 0,
-  "template": 0,
+  "total": 2,
+  "template": 2,
   "bootstrap": 0,
   "breakdown": {
     "forks": 0,
     "usedBy": 0,
-    "codeRefs": 0,
-    "rawRefs": 0
+    "codeRefs": 2,
+    "rawRefs": 1
   },
-  "generatedAt": "2026-06-15T02:59:17.287Z"
+  "generatedAt": "2026-06-15T03:21:09.118Z"
 }
