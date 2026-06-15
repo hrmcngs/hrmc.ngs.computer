@@ -81,6 +81,10 @@ jobs:
         if: steps.check.outputs.skip != 'true'
         run: node scripts/gen-usage.js
         env:
+          # USAGE_TOKEN（repo スコープの PAT）が設定されていれば cross-repo
+          # の /search/code が叩ける。未設定なら GITHUB_TOKEN にフォールバック
+          # するが、その場合 search は 429 で失敗し forks/Used by のみで集計。
+          USAGE_TOKEN: ${{ secrets.USAGE_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit charts if changed

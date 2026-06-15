@@ -24,13 +24,18 @@ const TEMPLATE_REPO = 'hrmcngs/github-stats-charts';
 const BOOTSTRAP_URL = 'raw.githubusercontent.com/hrmcngs/hrmcngs/main/bootstrap.sh';
 const SELF_EXCLUDE = ['hrmcngs/hrmcngs', 'hrmcngs/hrmc.ngs.computer'];
 
-const TOKEN = process.env.GITHUB_TOKEN || '';
+// 注意: /search/code は Actions の GITHUB_TOKEN では cross-repo 検索ができず
+// 429 で失敗する。USAGE_TOKEN（repo スコープの PAT）をリポジトリ secret に
+// 設定するとフル検索が動く。未設定時は GITHUB_TOKEN にフォールバック。
+const TOKEN = process.env.USAGE_TOKEN || process.env.GITHUB_TOKEN || '';
 const UA = 'hrmcngs-usage-counter';
 const HEADERS = {
   'Accept': 'application/vnd.github+json',
   'User-Agent': UA,
   ...(TOKEN ? { 'Authorization': 'Bearer ' + TOKEN } : {}),
 };
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function api(p) {
   const r = await fetch('https://api.github.com' + p, { headers: HEADERS });
@@ -41,6 +46,7 @@ async function api(p) {
   return r.json();
 }
 
+// /search/code は二次レート制限が厳しい。呼び出し間に小休止を挟む。
 async function searchCount(q) {
   try {
     const d = await api('/search/code?q=' + encodeURIComponent(q) + '&per_page=1');
@@ -48,6 +54,8 @@ async function searchCount(q) {
   } catch (e) {
     console.warn('search failed (' + q + '):', e.message);
     return 0;
+  } finally {
+    await sleep(2500);
   }
 }
 
