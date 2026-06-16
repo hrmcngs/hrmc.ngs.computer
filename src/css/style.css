@@ -1,11 +1,13 @@
 /* ===== 数式フォント (キユマヤ園 / saphhire.hacca.jp) - 個人利用許諾済み ===== */
 /* readme: src/fonts/README-sushikifont.txt */
+/* unicode-range でひらがな・カタカナのみに適用。ローマ字や漢字はフォールバックへ */
 @font-face {
   font-family: 'Sushikifont';
   src: url('../fonts/sushikifont.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+3040-309F, U+30A0-30FF, U+31F0-31FF, U+FF65-FF9F;
 }
 
 /* ===== Monocraft (Minecraft 風ピクセル系モノスペース, hosted on jsDelivr from IdreesInc/Monocraft) ===== */
@@ -68,10 +70,10 @@
   --accent2: #3ecfcf;
   --text: #e8e8f0;
   --text-muted: #888896;
-  /* 英字は数式フォント、CJK / コードは Monocraft → Noto Sans JP の順でフォールバック */
-  --font-en:   'Sushikifont', 'Monocraft', ui-monospace, Menlo, Consolas, monospace;
-  --font-jp:   'Monocraft', 'Noto Sans JP', ui-monospace, Menlo, monospace;
-  --font-mono: 'Monocraft', ui-monospace, Menlo, Consolas, monospace;
+  /* ローマ字: Monocraft / ひらがな・カタカナ: 数式フォント (unicode-range で限定) / 漢字: Noto Sans JP */
+  --font-en:   'Monocraft', 'Sushikifont', ui-monospace, Menlo, Consolas, monospace;
+  --font-jp:   'Monocraft', 'Sushikifont', 'Noto Sans JP', ui-monospace, Menlo, monospace;
+  --font-mono: 'Monocraft', 'Sushikifont', ui-monospace, Menlo, Consolas, monospace;
 }
 
 html {
