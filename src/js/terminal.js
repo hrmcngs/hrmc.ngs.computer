@@ -90,16 +90,19 @@
       setLoading(ld, 'Commits を取得中...');
       let commitCount = 0;
       try {
-        // 全期間時は author-date 昇順で最古コミットも一緒に取得（per_page=1 で payload 最小）
-        const sortQ = isAllTime ? '&sort=author-date&order=asc&per_page=1' : '&per_page=1';
-        const data  = await ghJson(`https://api.github.com/search/commits?q=author:${u}${commitDateQ}${sortQ}`);
+        // PR と同じシンプルな形に揃える（sort/per_page を付けるとブロックされるケースがあった）
+        const data = await ghJson(`https://api.github.com/search/commits?q=author:${u}${commitDateQ}`);
         commitCount = data.total_count ?? 0;
         if (isAllTime) {
-          const firstDate = data.items?.[0]?.commit?.author?.date;
-          if (firstDate) {
-            const el = document.getElementById(labelId);
-            if (el) el.textContent = `全期間（${firstDate.slice(0, 10)} 〜）`;
-          }
+          // best-effort: 取れたら最古日を後追いでラベルに反映、失敗は無視
+          ghJson(`https://api.github.com/search/commits?q=author:${u}&sort=author-date&order=asc&per_page=1`)
+            .then(d => {
+              const firstDate = d?.items?.[0]?.commit?.author?.date;
+              if (!firstDate) return;
+              const el = document.getElementById(labelId);
+              if (el) el.textContent = `全期間（${firstDate.slice(0, 10)} 〜）`;
+            })
+            .catch(() => {});
         }
       } catch (err) {
         const hint = err instanceof TypeError
