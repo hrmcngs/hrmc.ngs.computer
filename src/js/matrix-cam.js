@@ -6,7 +6,20 @@
   'use strict';
   if (window.MATRIX_CAM) return;
 
-  const CHARS = '!@#$%^&*()_+-=[]{}|;:,.<>?/`~ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+  // 多言語ミックス: Latin / 半角カタカナ / ギリシャ / キリル / ヘブライ /
+  // アラビア / デーヴァナーガリー / ハングル / 常用漢字 / 記号
+  const CHARS = [
+    ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+    ...'!@#$%^&*()_+-=[]{}|;:,.<>?/`~',
+    ...'ｦｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ',
+    ...'ΑΒΓΔΕΖΗΘΛΞΠΣΦΨΩαβγδεζηθλμπστφψω',
+    ...'БГДЖЗИЙЛПФЦЧШЩЫЭЮЯбгджзийлпфцчшщэю',
+    ...'אבגדהוזחטיכלמנסעפצקרשת',
+    ...'ابجدحخسشصضطظعغفقكلمنهوي',
+    ...'अआइईउऊएऐओकखगघचजटठडढतथदधनपफबभमयरलवशसह',
+    ...'가나다라마바사아자차카타파하거너더러머버서어저허호규뉴듀',
+    ...'日月火水木金土山川田人本一二三四五六七八九十空風雷電光闇',
+  ];
   const pickChar = () => CHARS[(Math.random() * CHARS.length) | 0];
 
   function mount(container, opts = {}) {
@@ -105,7 +118,7 @@
       return { root: row, input };
     }
 
-    const tileRow = makeSlider('Tile Size', 8, 60, 18, v => v);
+    const tileRow = makeSlider('Tile Size', 4, 40, 10, v => v);
     const fadeRow = makeSlider('Fade Factor', 0, 60, 12, v => (v / 100).toFixed(2));
 
     const fsBtn = document.createElement('button');
@@ -235,13 +248,13 @@
         for (let c = 0; c < cols; c++) {
           const i = (r * cols + c) * 4;
           const lum = (px[i] * 0.299 + px[i+1] * 0.587 + px[i+2] * 0.114) / 255;
-          if (lum < 0.06) continue;
 
           if (++cellAge[r][c] > 5 + Math.random() * 16) {
             cellChars[r][c] = pickChar();
             cellAge[r][c] = 0;
           }
-          const g = (80 + lum * 200) | 0;
+          // 暗い場所も完全には消えないように下限を設定（飛びを防ぐ）
+          const g = (30 + lum * 220) | 0;
           ctx.fillStyle = `rgb(0,${g},0)`;
           ctx.fillText(cellChars[r][c], c * tileSize, r * tileSize);
         }
