@@ -77,6 +77,10 @@
     shotBtn.style.cssText = iconBtnCss + ';color:#f55;border-color:rgba(255,80,80,0.5);font-size:20px;';
     shotBtn.title = '撮影 (PNG 保存)'; shotBtn.textContent = '●';
 
+    const swapBtn = document.createElement('button');
+    swapBtn.type = 'button'; swapBtn.style.cssText = iconBtnCss;
+    swapBtn.title = '前後カメラ切替'; swapBtn.textContent = '⇄';
+
     const gearBtn = document.createElement('button');
     gearBtn.type = 'button'; gearBtn.style.cssText = iconBtnCss;
     gearBtn.title = '設定'; gearBtn.textContent = '⚙';
@@ -85,7 +89,7 @@
     xBtn.type = 'button'; xBtn.style.cssText = iconBtnCss;
     xBtn.title = '閉じる'; xBtn.textContent = '✕';
 
-    topBar.append(shotBtn, gearBtn, xBtn);
+    topBar.append(shotBtn, swapBtn, gearBtn, xBtn);
 
     // ── 撮影フラッシュ用オーバーレイ ─────────────────
     const flash = document.createElement('div');
@@ -144,6 +148,8 @@
     let stream   = null;
     let running  = false;
     let mirror   = true;
+    let currentFacing = 'environment'; // 'environment' = 外カメ / 'user' = 内カメ
+    let switching = false;
     let cellChars = [], cellAge = [];
 
     tileRow.input.addEventListener('input', () => {
@@ -261,26 +267,35 @@
       }
     }
 
-    async function start() {
-      if (!navigator.mediaDevices?.getUserMedia) {
-        status.textContent = 'このブラウザは getUserMedia に未対応です';
-        return;
-      }
+    async function startCamera(facing) {
+      // 既存ストリームを止める
+      running = false;
+      cancelAnimationFrame(rafId);
+      stream?.getTracks().forEach(t => t.stop());
+      stream = null;
+
       let chosen;
       try {
-        chosen = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } });
-        const t = chosen.getVideoTracks()[0];
-        mirror = (t?.getSettings?.().facingMode ?? 'user') !== 'environment';
+        chosen = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: facing } }
+        });
       } catch (_) {
         try {
           chosen = await navigator.mediaDevices.getUserMedia({ video: true });
-          mirror = true;
         } catch (err) {
           status.textContent = 'カメラを開けませんでした: ' + (err?.message ?? err);
           return;
         }
       }
       stream = chosen;
+      const t = stream.getVideoTracks()[0];
+      const actualFacing = t?.getSettings?.().facingMode ?? facing ?? 'user';
+      currentFacing = actualFacing;
+      mirror = actualFacing !== 'environment';
+      swapBtn.title = actualFacing === 'environment'
+        ? '前後カメラ切替（現在: 外カメ）'
+        : '前後カメラ切替（現在: 内カメ）';
+
       video.srcObject = stream;
       try { await video.play(); } catch {}
       status.textContent = '';
@@ -288,6 +303,24 @@
       running = true;
       draw();
     }
+
+    async function start() {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        status.textContent = 'このブラウザは getUserMedia に未対応です';
+        return;
+      }
+      await startCamera('environment');
+    }
+
+    async function switchCamera() {
+      if (switching) return;
+      switching = true;
+      const next = currentFacing === 'environment' ? 'user' : 'environment';
+      status.textContent = '切替中...';
+      try { await startCamera(next); }
+      finally { switching = false; }
+    }
+    swapBtn.addEventListener('click', switchCamera);
 
     const onResize = () => resizeCanvas();
     window.addEventListener('resize', onResize);
