@@ -145,6 +145,7 @@
         '  <span class="term-cmd">./user-count.sh</span>    GitHub PR・コミット数を集計',
         '  <span class="term-cmd">cat links.txt</span>      リンク一覧',
         '  <span class="term-cmd">./md2img.sh</span>        .md を画像(PNG)に変換',
+        '  <span class="term-cmd">./matrix.sh</span>        カメラ → ASCII Matrix オーバーレイ (AR)',
         '  <span class="term-cmd">clear</span>              ターミナルをクリア',
       ],
 
@@ -345,6 +346,20 @@
       activeViewer=true;
       viewerCleanup=window.MD2IMG.mount(body,{onClose:()=>closeViewer()});
     }
+    function showMatrixCam(){
+      if(!window.MATRIX_CAM||typeof window.MATRIX_CAM.mount!=='function'){
+        appendLines([{type:'error',message:'matrix: モジュールを読み込めませんでした。'}],body);
+        return;
+      }
+      if(!window.isSecureContext){
+        appendLines([{type:'error',message:'matrix: カメラ利用には HTTPS または localhost が必要です。'}],body);
+        return;
+      }
+      savedBodyContent=body.innerHTML;
+      body.innerHTML='';
+      activeViewer=true;
+      viewerCleanup=window.MATRIX_CAM.mount(body,{onClose:()=>closeViewer()});
+    }
     function parseGithubUrl(links){for(const url of(links??[])){const m=url.match(/github\.com\/([^/]+)\/([^/]+)/);if(m)return{owner:m[1],repo:m[2]};}return null;}
     function hasGithubLink(p){return!!parseGithubUrl(p.links);}
     async function fetchReadme(project){
@@ -386,6 +401,7 @@
         return;
       }
       if (cmd === './md2img.sh') { showMd2Img(); return; }
+      if (cmd === './matrix.sh') { showMatrixCam(); return; }
       if (activeViewer) { print([{ type: 'error', message: `command not found: ${cmd}  (./stop で戻る)` }], cmd); return; }
       if (buildActive && /^\d+$/.test(cmd)) {
         const n = parseInt(cmd, 10);
