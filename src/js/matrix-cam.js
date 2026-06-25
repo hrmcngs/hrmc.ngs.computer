@@ -122,15 +122,17 @@
       return { root: row, input };
     }
 
-    const tileRow = makeSlider('Tile Size', 4, 40, 10, v => v);
-    const fadeRow = makeSlider('Fade Factor', 0, 60, 12, v => (v / 100).toFixed(2));
+    const tileRow   = makeSlider('Tile Size', 4, 40, 10, v => v);
+    const fadeRow   = makeSlider('Fade Factor', 0, 60, 12, v => (v / 100).toFixed(2));
+    // 動き検出ブースト: 雨など低コントラストで動くものを浮き上がらせる
+    const motionRow = makeSlider('Motion', 0, 200, 80, v => (v / 100).toFixed(2));
 
     const fsBtn = document.createElement('button');
     fsBtn.type = 'button';
     fsBtn.textContent = '⛶  Toggle Fullscreen';
     fsBtn.style.cssText = 'background:transparent;color:#0f0;border:1px solid rgba(0,255,0,0.35);padding:0.45rem 0.6rem;font:inherit;cursor:pointer;border-radius:6px;text-align:center;';
 
-    panel.append(tileRow.root, fadeRow.root, fsBtn);
+    panel.append(tileRow.root, fadeRow.root, motionRow.root, fsBtn);
     root.appendChild(panel);
 
     let panelOpen = false;
@@ -144,6 +146,7 @@
     // ── 状態 ────────────────────────────────────────
     let tileSize = Number(tileRow.input.value);
     let fade     = Number(fadeRow.input.value) / 100;
+    let motionBoost = Number(motionRow.input.value) / 100;
     let rafId    = 0;
     let stream   = null;
     let running  = false;
@@ -151,13 +154,17 @@
     let currentFacing = 'environment'; // 'environment' = 外カメ / 'user' = 内カメ
     let switching = false;
     let cellChars = [], cellAge = [];
+    let prevPx   = null;
 
     tileRow.input.addEventListener('input', () => {
       tileSize = Number(tileRow.input.value);
-      cellChars = []; cellAge = [];
+      cellChars = []; cellAge = []; prevPx = null;
     });
     fadeRow.input.addEventListener('input', () => {
       fade = Number(fadeRow.input.value) / 100;
+    });
+    motionRow.input.addEventListener('input', () => {
+      motionBoost = Number(motionRow.input.value) / 100;
     });
     // ── フルスクリーン（iOS Safari は要素 requestFullscreen 非対応なので CSS で疑似化）
     let fakeFull = false;
@@ -241,6 +248,7 @@
       offCtx.restore();
 
       const px = offCtx.getImageData(0, 0, cols, rows).data;
+      const hasPrev = prevPx && prevPx.length === px.length;
 
       if (cellChars.length !== rows || (cellChars[0] && cellChars[0].length !== cols)) {
         cellChars = Array.from({length: rows}, () => Array.from({length: cols}, pickChar));
@@ -254,17 +262,29 @@
         for (let c = 0; c < cols; c++) {
           const i = (r * cols + c) * 4;
           const lum = (px[i] * 0.299 + px[i+1] * 0.587 + px[i+2] * 0.114) / 255;
+          // フレーム差分（雨など低コントラストの動きを浮かせる）
+          let motion = 0;
+          if (hasPrev) {
+            const dr = px[i]   - prevPx[i];
+            const dg = px[i+1] - prevPx[i+1];
+            const db = px[i+2] - prevPx[i+2];
+            motion = Math.sqrt(dr*dr + dg*dg + db*db) / 442; // 0..1 正規化
+          }
+          // motionBoost 適用後の有効輝度（lum と motion のどちらかが強ければ明るく）
+          const eff = Math.min(1, Math.max(lum, motion * motionBoost));
 
           if (++cellAge[r][c] > 5 + Math.random() * 16) {
             cellChars[r][c] = pickChar();
             cellAge[r][c] = 0;
           }
-          // 暗い場所も完全には消えないように下限を設定（飛びを防ぐ）
-          const g = (30 + lum * 220) | 0;
+          const g = (30 + eff * 220) | 0;
           ctx.fillStyle = `rgb(0,${g},0)`;
           ctx.fillText(cellChars[r][c], c * tileSize, r * tileSize);
         }
       }
+
+      // 次フレーム差分用にコピー保持
+      prevPx = new Uint8ClampedArray(px);
     }
 
     async function startCamera(facing) {
