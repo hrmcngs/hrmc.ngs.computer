@@ -126,13 +126,15 @@
     const fadeRow   = makeSlider('Fade Factor', 0, 60, 12, v => (v / 100).toFixed(2));
     // 動き検出ブースト: 雨など低コントラストで動くものを浮き上がらせる
     const motionRow = makeSlider('Motion', 0, 200, 80, v => (v / 100).toFixed(2));
+    // Detail: タイル内の最大値プーリング倍率（細い雨粒など小さい対象を拾う）
+    const detailRow = makeSlider('Detail', 1, 6, 1, v => `${v}x`);
 
     const fsBtn = document.createElement('button');
     fsBtn.type = 'button';
     fsBtn.textContent = '⛶  Toggle Fullscreen';
     fsBtn.style.cssText = 'background:transparent;color:#0f0;border:1px solid rgba(0,255,0,0.35);padding:0.45rem 0.6rem;font:inherit;cursor:pointer;border-radius:6px;text-align:center;';
 
-    panel.append(tileRow.root, fadeRow.root, motionRow.root, fsBtn);
+    panel.append(tileRow.root, fadeRow.root, motionRow.root, detailRow.root, fsBtn);
     root.appendChild(panel);
 
     let panelOpen = false;
@@ -147,6 +149,7 @@
     let tileSize = Number(tileRow.input.value);
     let fade     = Number(fadeRow.input.value) / 100;
     let motionBoost = Number(motionRow.input.value) / 100;
+    let detail   = Number(detailRow.input.value);
     let rafId    = 0;
     let stream   = null;
     let running  = false;
@@ -165,6 +168,10 @@
     });
     motionRow.input.addEventListener('input', () => {
       motionBoost = Number(motionRow.input.value) / 100;
+    });
+    detailRow.input.addEventListener('input', () => {
+      detail = Number(detailRow.input.value);
+      prevPx = null; // 解像度が変わるので前フレームは破棄
     });
     // ── フルスクリーン（iOS Safari は要素 requestFullscreen 非対応なので CSS で疑似化）
     let fakeFull = false;
@@ -232,8 +239,11 @@
 
       const cols = Math.max(1, Math.floor(w / tileSize));
       const rows = Math.max(1, Math.floor(h / tileSize));
-      if (off.width !== cols || off.height !== rows) {
-        off.width = cols; off.height = rows;
+      // 1タイルあたり detail×detail のサブピクセルを取って max プーリング
+      const subCols = cols * detail;
+      const subRows = rows * detail;
+      if (off.width !== subCols || off.height !== subRows) {
+        off.width = subCols; off.height = subRows;
       }
 
       const vw = video.videoWidth, vh = video.videoHeight;
@@ -243,11 +253,11 @@
       else                   { sh = vw / tAspect; sy = (vh - sh) / 2; }
 
       offCtx.save();
-      if (mirror) { offCtx.translate(cols, 0); offCtx.scale(-1, 1); }
-      offCtx.drawImage(video, sx, sy, sw, sh, 0, 0, cols, rows);
+      if (mirror) { offCtx.translate(subCols, 0); offCtx.scale(-1, 1); }
+      offCtx.drawImage(video, sx, sy, sw, sh, 0, 0, subCols, subRows);
       offCtx.restore();
 
-      const px = offCtx.getImageData(0, 0, cols, rows).data;
+      const px = offCtx.getImageData(0, 0, subCols, subRows).data;
       const hasPrev = prevPx && prevPx.length === px.length;
 
       if (cellChars.length !== rows || (cellChars[0] && cellChars[0].length !== cols)) {
@@ -260,18 +270,24 @@
 
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-          const i = (r * cols + c) * 4;
-          const lum = (px[i] * 0.299 + px[i+1] * 0.587 + px[i+2] * 0.114) / 255;
-          // フレーム差分（雨など低コントラストの動きを浮かせる）
-          let motion = 0;
-          if (hasPrev) {
-            const dr = px[i]   - prevPx[i];
-            const dg = px[i+1] - prevPx[i+1];
-            const db = px[i+2] - prevPx[i+2];
-            motion = Math.sqrt(dr*dr + dg*dg + db*db) / 442; // 0..1 正規化
+          // 1タイル分のサブ領域から max(lum) と max(motion) を取る
+          let maxLum = 0, maxMotion = 0;
+          for (let dy = 0; dy < detail; dy++) {
+            const sr = r * detail + dy;
+            for (let dx = 0; dx < detail; dx++) {
+              const i = (sr * subCols + (c * detail + dx)) * 4;
+              const lum = (px[i] * 0.299 + px[i+1] * 0.587 + px[i+2] * 0.114) / 255;
+              if (lum > maxLum) maxLum = lum;
+              if (hasPrev) {
+                const dr = px[i]   - prevPx[i];
+                const dg = px[i+1] - prevPx[i+1];
+                const db = px[i+2] - prevPx[i+2];
+                const m = Math.sqrt(dr*dr + dg*dg + db*db) / 442;
+                if (m > maxMotion) maxMotion = m;
+              }
+            }
           }
-          // motionBoost 適用後の有効輝度（lum と motion のどちらかが強ければ明るく）
-          const eff = Math.min(1, Math.max(lum, motion * motionBoost));
+          const eff = Math.min(1, Math.max(maxLum, maxMotion * motionBoost));
 
           if (++cellAge[r][c] > 5 + Math.random() * 16) {
             cellChars[r][c] = pickChar();
