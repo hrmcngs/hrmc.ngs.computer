@@ -198,7 +198,7 @@
   },
   "about": {
     "name": "hrmcngs",
-    "bio": ["Minecraft1.20.1のmodとwebを作っています。", "刀が好きです。"],
+    "bio": ["Minecraft1.20.1modとwebを作っています。", "刀が好きです。"],
     "chips": ["Minecraft Mod", "Web", "JavaScript", "3D Graphics", "Canvas", "Java"]
   },
   "profile": {
