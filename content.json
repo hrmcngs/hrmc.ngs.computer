@@ -289,7 +289,7 @@
       "title": "hrmc.ngs.computer",
       "desc": "Website",
       "url": "https://github.com/hrmcngs/hrmc.ngs.computer",
-      "color": "#555566",
+      "color": "#4ACFD8",
       "tags": ["Web", "JavaScript", "HTML", "CSS", "JSON", "Markdown"]
     },
     {
@@ -305,7 +305,7 @@
       "title": "Extra Video Settings",
       "desc": "Embeddium拡張 / 映像設定を追加するmod",
       "url": "https://curseforge.com/minecraft/mc-mods/extra-video-settings",
-      "color": "#febc2e",
+      "color": "#2e58fe",
       "tags": ["Minecraft", "Mod", "Java"]
     },
     {
@@ -321,7 +321,7 @@
       "title": "Backpack-Arsenal",
       "desc": "Minecraft mod — バックパック型の装備拡張",
       "url": "https://www.curseforge.com/minecraft/mc-mods/arsenal-backpack",
-      "color": "#ff9933",
+      "color": "#d6ff33",
       "tags": ["Minecraft", "Mod", "Java"]
     }
   ],
@@ -343,21 +343,21 @@
     },
     {
       "title": "Extra Video Settings",
-      "color": "#febc2e",
+      "color": "#2e58fe",
       "links": [
         "https://curseforge.com/minecraft/mc-mods/extra-video-settings"
       ]
     },
     {
       "title": "MC-Mod-Utility",
-      "color": "#7c6af7",
+      "color": "#696969",
       "links": [
         "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility"
       ]
     },
     {
       "title": "Backpack-Arsenal",
-      "color": "#ff9933",
+      "color": "#d6ff33",
       "cfProjectId": 1564519,
       "links": [
         "https://www.curseforge.com/minecraft/mc-mods/arsenal-backpack"
