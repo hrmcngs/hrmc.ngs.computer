@@ -4,12 +4,12 @@
   "avatar": "https://avatars.githubusercontent.com/u/78349683?v=4",
   "htmlUrl": "https://github.com/hrmcngs",
   "metrics": {
-    "commits": 2076,
+    "commits": 2051,
     "prs": 408,
     "issues": 22,
     "reviews": 2,
     "involved": 409,
-    "repos": 21
+    "repos": 20
   },
   "langs": [
     [
@@ -46,7 +46,7 @@
     ],
     [
       "Shell",
-      90016
+      83022
     ],
     [
       "Common Lisp",
@@ -63,10 +63,6 @@
     [
       "PowerShell",
       10995
-    ],
-    [
-      "GLSL",
-      7452
     ],
     [
       "NewLisp",
@@ -1918,11 +1914,16 @@
         "date": "2026-06-28",
         "count": 24,
         "level": 2
+      },
+      {
+        "date": "2026-06-29",
+        "count": 4,
+        "level": 1
       }
     ],
-    "total": 2881
+    "total": 2794
   },
   "season": "summer",
-  "weather": "rain",
-  "generatedAt": "2026-06-28T16:12:16.849Z"
+  "weather": "clear",
+  "generatedAt": "2026-06-29T03:41:22.022Z"
 }
