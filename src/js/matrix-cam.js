@@ -129,12 +129,23 @@
     // Detail: タイル内の最大値プーリング倍率（細い雨粒など小さい対象を拾う）
     const detailRow = makeSlider('Detail', 1, 6, 1, v => `${v}x`);
 
+    const btnCssPanel = 'background:transparent;color:#0f0;border:1px solid rgba(0,255,0,0.35);padding:0.45rem 0.6rem;font:inherit;cursor:pointer;border-radius:6px;text-align:center;';
+
     const fsBtn = document.createElement('button');
     fsBtn.type = 'button';
     fsBtn.textContent = '⛶  Toggle Fullscreen';
-    fsBtn.style.cssText = 'background:transparent;color:#0f0;border:1px solid rgba(0,255,0,0.35);padding:0.45rem 0.6rem;font:inherit;cursor:pointer;border-radius:6px;text-align:center;';
+    fsBtn.style.cssText = btnCssPanel;
 
-    panel.append(tileRow.root, fadeRow.root, motionRow.root, detailRow.root, fsBtn);
+    // ── プリセット行 ─────────────────────────────────
+    const presetRow = document.createElement('div');
+    presetRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;';
+    const moonBtn = document.createElement('button');
+    moonBtn.type = 'button'; moonBtn.style.cssText = btnCssPanel; moonBtn.textContent = '☾  Moon';
+    const resetBtn = document.createElement('button');
+    resetBtn.type = 'button'; resetBtn.style.cssText = btnCssPanel; resetBtn.textContent = '↺  Reset';
+    presetRow.append(moonBtn, resetBtn);
+
+    panel.append(tileRow.root, fadeRow.root, motionRow.root, detailRow.root, presetRow, fsBtn);
     root.appendChild(panel);
 
     let panelOpen = false;
@@ -150,6 +161,8 @@
     let fade     = Number(fadeRow.input.value) / 100;
     let motionBoost = Number(motionRow.input.value) / 100;
     let detail   = Number(detailRow.input.value);
+    let gamma    = 1;   // Moon プリセットで暗部を潰す
+    let bgFloor  = 30;  // 暗いセルの下限緑値（デフォルト=飛び防止 / Moon=0）
     let rafId    = 0;
     let stream   = null;
     let running  = false;
@@ -217,6 +230,56 @@
       }, 'image/png');
     }
     shotBtn.addEventListener('click', capture);
+
+    // ── プリセット ──────────────────────────────────
+    function setSlider(row, val) {
+      row.input.value = String(val);
+      row.input.dispatchEvent(new Event('input'));
+    }
+    async function applyCameraConstraints(mode) {
+      const track = stream?.getVideoTracks()?.[0];
+      if (!track?.applyConstraints) return;
+      const caps = track.getCapabilities?.() ?? {};
+      const advanced = [];
+      if (mode === 'moon') {
+        // 露出: 手動最短にして月が飛ばないように
+        if (caps.exposureMode?.includes?.('manual')) advanced.push({ exposureMode: 'manual' });
+        if (caps.exposureTime?.min != null) advanced.push({ exposureTime: caps.exposureTime.min });
+        if (caps.exposureCompensation?.min != null) advanced.push({ exposureCompensation: caps.exposureCompensation.min });
+        // フォーカス: 手動で遠景（focusDistance 大 = 遠く）
+        if (caps.focusMode?.includes?.('manual')) advanced.push({ focusMode: 'manual' });
+        if (caps.focusDistance?.max != null) advanced.push({ focusDistance: caps.focusDistance.max });
+        // ホワイトバランス: 太陽光相当
+        if (caps.whiteBalanceMode?.includes?.('manual')) advanced.push({ whiteBalanceMode: 'manual' });
+        // ズーム: 端末に応じて（最大の 60%）
+        if (caps.zoom?.max != null) advanced.push({ zoom: Math.min(caps.zoom.max, Math.max(2, caps.zoom.max * 0.6)) });
+      } else {
+        // Reset: すべて continuous に戻す
+        if (caps.exposureMode?.includes?.('continuous')) advanced.push({ exposureMode: 'continuous' });
+        if (caps.focusMode?.includes?.('continuous')) advanced.push({ focusMode: 'continuous' });
+        if (caps.whiteBalanceMode?.includes?.('continuous')) advanced.push({ whiteBalanceMode: 'continuous' });
+        if (caps.zoom?.min != null) advanced.push({ zoom: caps.zoom.min });
+      }
+      try { await track.applyConstraints({ advanced }); } catch {}
+    }
+    moonBtn.addEventListener('click', async () => {
+      setSlider(tileRow, 8);
+      setSlider(fadeRow, 25);
+      setSlider(motionRow, 0);
+      setSlider(detailRow, 3);
+      gamma = 3.0;
+      bgFloor = 0;
+      await applyCameraConstraints('moon');
+    });
+    resetBtn.addEventListener('click', async () => {
+      setSlider(tileRow, 10);
+      setSlider(fadeRow, 12);
+      setSlider(motionRow, 80);
+      setSlider(detailRow, 1);
+      gamma = 1;
+      bgFloor = 30;
+      await applyCameraConstraints('reset');
+    });
 
     function resizeCanvas() {
       const dpr = window.devicePixelRatio || 1;
@@ -287,13 +350,15 @@
               }
             }
           }
-          const eff = Math.min(1, Math.max(maxLum, maxMotion * motionBoost));
+          let eff = Math.min(1, Math.max(maxLum, maxMotion * motionBoost));
+          if (gamma !== 1) eff = Math.pow(eff, gamma);
 
           if (++cellAge[r][c] > 5 + Math.random() * 16) {
             cellChars[r][c] = pickChar();
             cellAge[r][c] = 0;
           }
-          const g = (30 + eff * 220) | 0;
+          const g = (bgFloor + eff * (255 - bgFloor)) | 0;
+          if (g <= 2) continue; // 真っ黒なセルは描画スキップ（Moon モードでコスト削減）
           ctx.fillStyle = `rgb(0,${g},0)`;
           ctx.fillText(cellChars[r][c], c * tileSize, r * tileSize);
         }
