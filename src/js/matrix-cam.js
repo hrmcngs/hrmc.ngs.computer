@@ -139,11 +139,15 @@
     // ── プリセット行 ─────────────────────────────────
     const presetRow = document.createElement('div');
     presetRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;';
-    const moonBtn = document.createElement('button');
-    moonBtn.type = 'button'; moonBtn.style.cssText = btnCssPanel; moonBtn.textContent = '☾  Moon';
+    const moonBtn  = document.createElement('button');
+    moonBtn.type  = 'button'; moonBtn.style.cssText  = btnCssPanel; moonBtn.textContent  = '☾  Moon';
+    const nightBtn = document.createElement('button');
+    nightBtn.type = 'button'; nightBtn.style.cssText = btnCssPanel; nightBtn.textContent = '✦  Night';
     const resetBtn = document.createElement('button');
-    resetBtn.type = 'button'; resetBtn.style.cssText = btnCssPanel; resetBtn.textContent = '↺  Reset';
-    presetRow.append(moonBtn, resetBtn);
+    resetBtn.type = 'button';
+    resetBtn.style.cssText = btnCssPanel + ';grid-column:1 / -1;';
+    resetBtn.textContent = '↺  Reset';
+    presetRow.append(moonBtn, nightBtn, resetBtn);
 
     panel.append(tileRow.root, fadeRow.root, motionRow.root, detailRow.root, presetRow, fsBtn);
     root.appendChild(panel);
@@ -246,13 +250,27 @@
         if (caps.exposureMode?.includes?.('manual')) advanced.push({ exposureMode: 'manual' });
         if (caps.exposureTime?.min != null) advanced.push({ exposureTime: caps.exposureTime.min });
         if (caps.exposureCompensation?.min != null) advanced.push({ exposureCompensation: caps.exposureCompensation.min });
-        // フォーカス: 手動で遠景（focusDistance 大 = 遠く）
         if (caps.focusMode?.includes?.('manual')) advanced.push({ focusMode: 'manual' });
         if (caps.focusDistance?.max != null) advanced.push({ focusDistance: caps.focusDistance.max });
-        // ホワイトバランス: 太陽光相当
         if (caps.whiteBalanceMode?.includes?.('manual')) advanced.push({ whiteBalanceMode: 'manual' });
-        // ズーム: 端末に応じて（最大の 60%）
         if (caps.zoom?.max != null) advanced.push({ zoom: Math.min(caps.zoom.max, Math.max(2, caps.zoom.max * 0.6)) });
+      } else if (mode === 'night') {
+        // 露出: できるだけ長く / ISO 上げる（明るく取り込む）
+        if (caps.exposureMode?.includes?.('manual')) advanced.push({ exposureMode: 'manual' });
+        if (caps.exposureTime?.max != null) advanced.push({ exposureTime: caps.exposureTime.max });
+        if (caps.exposureCompensation?.max != null) advanced.push({ exposureCompensation: caps.exposureCompensation.max });
+        if (caps.iso?.max != null) advanced.push({ iso: caps.iso.max });
+        // フォーカスは中〜遠景寄りに手動
+        if (caps.focusMode?.includes?.('manual') && caps.focusDistance?.max != null) {
+          advanced.push({ focusMode: 'manual' });
+          advanced.push({ focusDistance: caps.focusDistance.max * 0.7 });
+        } else if (caps.focusMode?.includes?.('continuous')) {
+          advanced.push({ focusMode: 'continuous' });
+        }
+        // ホワイトバランスは continuous（街灯の色を活かす）
+        if (caps.whiteBalanceMode?.includes?.('continuous')) advanced.push({ whiteBalanceMode: 'continuous' });
+        // ズームは等倍
+        if (caps.zoom?.min != null) advanced.push({ zoom: caps.zoom.min });
       } else {
         // Reset: すべて continuous に戻す
         if (caps.exposureMode?.includes?.('continuous')) advanced.push({ exposureMode: 'continuous' });
@@ -270,6 +288,16 @@
       gamma = 3.0;
       bgFloor = 0;
       await applyCameraConstraints('moon');
+    });
+    nightBtn.addEventListener('click', async () => {
+      // 夜景: 暗部を持ち上げ、光の残像を長めに、動きは軽く
+      setSlider(tileRow, 10);
+      setSlider(fadeRow, 40);
+      setSlider(motionRow, 20);
+      setSlider(detailRow, 2);
+      gamma = 0.5;   // < 1 で暗部を持ち上げる
+      bgFloor = 15;  // 微かに全体を照らす
+      await applyCameraConstraints('night');
     });
     resetBtn.addEventListener('click', async () => {
       setSlider(tileRow, 10);
