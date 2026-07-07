@@ -218,7 +218,7 @@
   // ── カード本体の CSS ─────────────────────────────────
   const CARD_CSS = `
 .md2img-card{box-sizing:border-box;width:680px;padding:42px 46px;margin:0;
- font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;
+ font-family:MisakiGothic,-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;
  font-size:15px;line-height:1.72;font-weight:400;font-style:normal;
  letter-spacing:normal;word-spacing:normal;text-align:left;text-indent:0;text-transform:none;
  white-space:normal;word-wrap:break-word;overflow-wrap:break-word;

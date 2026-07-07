@@ -65,7 +65,7 @@
     s.textContent = `
 .ghs{--ghs-accent:#2f81f7;--ghs-bg:#161b22;--ghs-border:#30363d;
  --ghs-text:#e6edf3;--ghs-muted:#7d8590;--ghs-grass:#39d353;
- font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans JP',Helvetica,Arial,sans-serif;
+ font-family:var(--font-jp);
  color:var(--ghs-text)}
 .ghs-head{display:flex;align-items:center;gap:.85rem;margin-bottom:1.8rem}
 .ghs-avatar{width:46px;height:46px;border-radius:50%;border:1px solid var(--ghs-border);flex-shrink:0}

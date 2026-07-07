@@ -1,3 +1,12 @@
+/* ===== Misaki Gothic (8x8 Japanese bitmap font) ===== */
+@font-face {
+  font-family: 'MisakiGothic';
+  src: url('../fonts/misaki_gothic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ===== Monocraft (Minecraft 風ピクセル系モノスペース, hosted on jsDelivr from IdreesInc/Monocraft) ===== */
 @font-face {
   font-family: 'Monocraft';
@@ -58,11 +67,10 @@
   --accent2: #3ecfcf;
   --text: #e8e8f0;
   --text-muted: #888896;
-  /* Monocraft (Latin pixel) + DotGothic16 (Japanese pixel) で全体ピクセル統一 */
-  /* Monocraft は CJK 無しなので日本語は DotGothic16 → Noto Sans JP の順でフォールバック */
-  --font-en:   'Monocraft', 'DotGothic16', 'Noto Sans JP', ui-monospace, Menlo, Consolas, monospace;
-  --font-jp:   'Monocraft', 'DotGothic16', 'Noto Sans JP', ui-monospace, Menlo, monospace;
-  --font-mono: 'Monocraft', 'DotGothic16', 'Noto Sans JP', ui-monospace, Menlo, Consolas, monospace;
+  /* Monocraft has no CJK glyphs, so Japanese text falls through to Misaki Gothic. */
+  --font-en:   'Monocraft', 'MisakiGothic', 'Noto Sans JP', ui-monospace, Menlo, Consolas, monospace;
+  --font-jp:   'Monocraft', 'MisakiGothic', 'Noto Sans JP', ui-monospace, Menlo, monospace;
+  --font-mono: 'Monocraft', 'MisakiGothic', 'Noto Sans JP', ui-monospace, Menlo, Consolas, monospace;
 }
 
 html {
