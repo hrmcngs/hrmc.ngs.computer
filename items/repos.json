@@ -1,0 +1,10 @@
+{
+  "// 使い方": "repos にGitHubリポジトリのURLを足すだけで、そのItem一覧がページに表示されます。文字列だけでもOK、表示名やブランチ・サブパスを指定したい場合はオブジェクトで書きます。",
+  "repos": [
+    "https://github.com/Chikuwa7800/Data-Resourse-Pack-Sample",
+    "https://github.com/Drowse-Lab/The-four-primitives-and-Weapons",
+    
+    "https://github.com/hrmcngs/Backpack-Arsenal"
+    
+  ]
+}

@@ -260,6 +260,14 @@
   },
   "works": [
     {
+      "icon": "<svg width='28' height='28' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linejoin='round'><path d='M12 2l9 5v10l-9 5-9-5V7z'/><path d='M12 12l9-5M12 12v10M12 12L3 7'/></svg>",
+      "title": "Item Viewer",
+      "desc": "GitHubのMod/DatapackのURLを貼るとItemを一覧表示するツール",
+      "url": "/items/",
+      "color": "#7c6af7",
+      "tags": ["Web", "Tool", "GitHub API", "JavaScript"]
+    },
+    {
       "icon": "https://raw.githubusercontent.com/hrmcngs/RPGish-HPDisplay/1.20.1/RPGish-HPDisplay-datapack/pack.png",
       "title": "RPGish-HPDisplay",
       "desc": "RPG風HP表示、ダメージ表示データパック ∩ mod",

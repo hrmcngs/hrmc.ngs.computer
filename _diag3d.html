@@ -1,0 +1,20 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+body{background:#1a1a22;margin:0;font-family:monospace;color:#eee;font-size:11px}
+.row{display:flex;gap:10px;padding:10px}figure{text-align:center}
+canvas{background:#26262f;border:1px solid #555;width:150px;height:150px}
+</style></head><body><div id="s">loading…</div><div class="row" id="root"></div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script src="mc-item-viewer.js?v=1"></script>
+<script>
+(async()=>{
+  const items=await McItems.fetchItems('https://github.com/Drowse-Lab/The-four-primitives-and-Weapons',{onProgress:m=>s.textContent=m});
+  s.textContent='';
+  for(const id of ['tyokutou_saya','saya','tyokuto_saya','sword_saya']){
+    const it=items.find(i=>i.id===id);const fig=document.createElement('figure');
+    const cv=document.createElement('canvas');cv.width=cv.height=320;fig.append(cv);
+    fig.append(Object.assign(document.createElement('figcaption'),{textContent:id}));root.append(fig);
+    if(it&&it.render3d)await McModel3D.render(cv,it.render3d);
+  }
+  document.title='DONE';
+})().catch(e=>{s.textContent='ERR '+e.message;});
+</script></body></html>

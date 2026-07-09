@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="../image/icon.svg">
+  <title>Items — hrmc.ngs.computer</title>
+  <meta name="description" content="GitHub の Minecraft Mod / Datapack リポジトリから Item を取得して表示する。repos.json に URL を書くだけ。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../src/css/style.css">
+</head>
+<body>
+
+  <div class="noise"></div>
+
+  <section class="items-page">
+    <div class="container">
+
+      <div class="items-head">
+        <h1>Item Viewer</h1>
+        <p class="lead">
+          <a href="repos.json"><code>items/repos.json</code></a> に GitHub の Mod / Datapack の URL を書き足すだけで、
+          その Item 一覧がここに表示されます。<br>
+          外部サイトでも <code>&lt;script src="/mc-item-viewer.js" data-repos="owner/repo"&gt;</code> の 1 行で同じものが作れます。
+        </p>
+      </div>
+
+      <!-- ビューア本体（mc-item-viewer.js が repos.json を読んでここに描画）-->
+      <div data-mc-item-viewer></div>
+
+      <a class="items-back" href="/">Back</a>
+
+    </div>
+  </section>
+
+  <!-- JS はこの 1 本だけ（McItems + McModel3D + UI を同梱。three.js も自動ロード）-->
+  <script src="../mc-item-viewer.js"></script>
+</body>
+</html>
