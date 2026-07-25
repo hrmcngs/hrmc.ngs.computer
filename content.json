@@ -32,13 +32,6 @@
         "links": ["https://github.com/hrmcngs/RPGish-HPDisplay", "https://planetminecraft.com/data-pack/rpgish-hpdisplay/", "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack","https://planetminecraft.com/mod/rpgish-hpdisplay-mod/","https://www.curseforge.com/minecraft/mc-mods/rpgish-hpdisplay-mod/"]
       },
       {
-        "title": "Drowse-Lab",
-        "desc": "なんとなく作っているweb",
-        "color": "#7c6af7",
-        "tags": ["Web", "JavaScript"],
-        "links": ["https://github.com/Drowse-Lab/Drowse-Lab"]
-      },
-      {
         "title": "The-four-primitives-and-Weapons",
         "desc": "Minecraft mod / Drowse-Lab",
         "color": "#f87171",
@@ -279,29 +272,12 @@
       "tags": ["DataPack", "mcfunction","mod","Java"]
     },
     {
-      "icon": "https://raw.githubusercontent.com/Drowse-Lab/Drowse-Lab/main/assets/image/DrowseLabIcon.jpg",
-      "title": "Drowse-Lab",
-      "desc": "なんとなく作っているweb",
-      "url": "https://github.com/Drowse-Lab/Drowse-Lab",
-      "url": "https://drowse-lab.github.io/Drowse-Lab/",
-      "color": "#b4a2dc",
-      "tags": ["Web", "JavaScript", "HTML", "CSS", "JSON", "Markdown", "YAML"]
-    },
-    {
       "icon": "https://raw.githubusercontent.com/Drowse-Lab/The-four-primitives-and-Weapons/1.20.1/src/main/resources/logo.png",
       "title": "The-four-primitives-and-Weapons",
       "desc": "Drowse-Lab / Minecraft mod",
       "url": "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons",
       "color": "#f87171",
       "tags": ["Minecraft", "Mod", "Java", "mcfunction"]
-    },
-    {
-      "icon": "https://raw.githubusercontent.com/hrmcngs/hrmc.ngs.computer/399199355028e2dad4a7cbe6f7ee1514c705a532/image/icon.svg",
-      "title": "hrmc.ngs.computer",
-      "desc": "Website",
-      "url": "https://github.com/hrmcngs/hrmc.ngs.computer",
-      "color": "#DC6666",
-      "tags": ["Web", "JavaScript", "HTML", "CSS", "JSON", "Markdown"]
     },
     {
       "icon": "https://raw.githubusercontent.com/hrmcngs/MC-Mod-Utility/0d379a556a6b5f88a01b8060ea27ddb30859a306/icon.png",
