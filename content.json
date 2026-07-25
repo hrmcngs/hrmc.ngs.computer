@@ -62,11 +62,21 @@
       {
         "title": "Backpack-Arsenal",
         "desc": "Minecraft mod — バックパック型の装備拡張",
-        "color": "#ff9933",
+        "color": "#d6ff33",
         "tags": ["Minecraft", "Mod", "Java"],
         "links": [
           "https://github.com/hrmcngs/Backpack-Arsenal",
           "https://www.curseforge.com/minecraft/mc-mods/arsenal-backpack"
+        ]
+      },
+      {
+        "title": "gun_and_weapon",
+        "desc": "Minecraft mod",
+        "color": "#00004d",
+        "tags": ["Minecraft", "Mod", "Java"],
+        "links": [
+          "https://github.com/hrmcngs/gun_and_weapon",
+          "https://www.curseforge.com/minecraft/mc-mods/gun-and-weapons"
         ]
       }
     ],
@@ -259,14 +269,7 @@
     "codeBlock": "const log = {\n  birth:                 20100526,\n  kindergarten:          201404,\n  elementarySchool:      201704,\n  juniorHighSchool:      202304,\n  sakuramatiHighSchool:  202604,\n};"
   },
   "works": [
-    {
-      "icon": "<svg width='28' height='28' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linejoin='round'><path d='M12 2l9 5v10l-9 5-9-5V7z'/><path d='M12 12l9-5M12 12v10M12 12L3 7'/></svg>",
-      "title": "Item Viewer",
-      "desc": "GitHubのMod/DatapackのURLを貼るとItemを一覧表示するツール",
-      "url": "/items/",
-      "color": "#7c6af7",
-      "tags": ["Web", "Tool", "GitHub API", "JavaScript"]
-    },
+
     {
       "icon": "https://raw.githubusercontent.com/hrmcngs/RPGish-HPDisplay/1.20.1/RPGish-HPDisplay-datapack/pack.png",
       "title": "RPGish-HPDisplay",
@@ -330,6 +333,14 @@
       "desc": "Minecraft mod — バックパック型の装備拡張",
       "url": "https://www.curseforge.com/minecraft/mc-mods/arsenal-backpack",
       "color": "#d6ff33",
+      "tags": ["Minecraft", "Mod", "Java"]
+    },
+    {
+      "icon": "https://raw.githubusercontent.com/hrmcngs/gun_and_weapon/main/src/main/resources/assets/gun_and_weapon/textures/icon.png",
+      "title": "gun_and_weapon",
+      "desc": "Minecraft mod",
+      "url": "https://www.curseforge.com/minecraft/mc-mods/gun-and-weapons",
+      "color": "#00004d",
       "tags": ["Minecraft", "Mod", "Java"]
     }
   ],
