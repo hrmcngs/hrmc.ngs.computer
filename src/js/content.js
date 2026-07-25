@@ -257,6 +257,33 @@ async function showDownloadCount(cardEl, links) {
   cardEl.appendChild(badge);
 }
 
+// URLだけでDL数を取得できる配布プラットフォームか判定する
+function supportsDownloadCount(url) {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, '').toLowerCase();
+    return host === 'curseforge.com'
+      || host === 'modrinth.com'
+      || host === 'marketplace.visualstudio.com';
+  } catch (e) {
+    return false;
+  }
+}
+
+// www の有無や末尾スラッシュだけが違う同一URLを二重カウントしない
+function uniqueDownloadLinks(links) {
+  const seen = new Set();
+  return links.filter(url => {
+    if (!supportsDownloadCount(url)) return false;
+    const u = new URL(url);
+    u.hostname = u.hostname.replace(/^www\./, '').toLowerCase();
+    u.pathname = u.pathname.replace(/\/+$/, '');
+    const key = u.toString();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 fetch('/content.json')
   .then(r => r.json())
   .then(data => {
@@ -426,9 +453,16 @@ fetch('/content.json')
         if (w?.color) applyColor(el, w.color, '--work-color');
       });
 
-      // content.json の stats 設定をもとに、各 Works カードへ live でダウンロード数を表示
+      // Works と terminal.build の全リンクからDL数を自動取得する。
+      // stats は追加リンクや CurseForge Project ID の明示が必要な場合だけ使う。
+      const statByTitle = {};
+      const buildByTitle = {};
+      if (Array.isArray(terminal?.build)) {
+        terminal.build.forEach(item => {
+          buildByTitle[String(item.title).toLowerCase()] = item;
+        });
+      }
       if (Array.isArray(data.stats)) {
-        const statByTitle = {};
         data.stats.forEach(p => {
           statByTitle[String(p.title).toLowerCase()] = p;
           // cfProjectId 指定があれば URL → ID のマップを構築（cfwidget 索引待ちを回避）
@@ -438,13 +472,23 @@ fetch('/content.json')
             });
           }
         });
-        worksEl.querySelectorAll('.work-card').forEach((el, i) => {
-          const conf = statByTitle[String(works[i]?.title ?? '').toLowerCase()];
-          if (conf && Array.isArray(conf.links) && conf.links.length) {
-            showDownloadCount(el, conf.links);
-          }
-        });
       }
+      worksEl.querySelectorAll('.work-card').forEach((el, i) => {
+        const work = works[i];
+        const titleKey = String(work?.title ?? '').toLowerCase();
+        const conf = statByTitle[titleKey];
+        const build = buildByTitle[titleKey];
+        const configuredLinks = conf && Array.isArray(conf.links) ? conf.links : [];
+        const workLinks = Array.isArray(work?.links) ? work.links : [];
+        const buildLinks = Array.isArray(build?.links) ? build.links : [];
+        const downloadLinks = uniqueDownloadLinks([
+          work?.url,
+          ...workLinks,
+          ...buildLinks,
+          ...configuredLinks,
+        ]);
+        if (downloadLinks.length) showDownloadCount(el, downloadLinks);
+      });
 
       // github-stats-charts カードに「Use template / bootstrap.sh 利用回数」を表示
       fetch('/charts/usage.json', { cache: 'no-store' })
