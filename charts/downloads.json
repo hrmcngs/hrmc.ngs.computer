@@ -1,9 +1,9 @@
 {
-  "generated": "2026-07-27T19:54:50.063Z",
+  "generated": "2026-07-27T21:11:12.595Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 40,
-      "source": "curseforge-html"
+      "source": "cfwidget"
     },
     "https://curseforge.com/minecraft/mc-mods/rpgish-hpdisplay-mod": {
       "count": 84,
