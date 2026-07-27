@@ -4,8 +4,7 @@
  * gen-downloads.js — content.json の stats 配列から CurseForge / Modrinth / VS Code
  * のダウンロード数を集計し charts/downloads.json として書き出す。
  *
- * クライアント（content.js）は cfwidget の代わりにこの JSON を読み込むため、
- * cfwidget がまだ索引していない新しい mod でも即座にダウンロード数を表示できる。
+ * CurseForge URL の game/category/slug からダウンロード数を取得する。
  *
  * GitHub Actions (.github/workflows/update-charts.yml) から定期実行される想定。
  * Node 20+ のグローバル fetch を使用。
@@ -20,10 +19,17 @@ const UA = 'Mozilla/5.0 (compatible; hrmc-stats-bot/1.0; +https://hrmc.ngs.compu
 
 // ── CurseForge cfwidget API（指標がある mod 用） ──────────────
 async function cfwidget(game, category, slug) {
-  const r = await fetch(`https://api.cfwidget.com/${game}/${category}/${slug}`);
-  if (!r.ok) return null;
-  const d = await r.json();
-  return typeof d?.downloads?.total === 'number' ? d.downloads.total : null;
+  const endpoint = `https://api.cfwidget.com/${encodeURIComponent(game)}/${encodeURIComponent(category)}/${encodeURIComponent(slug)}`;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const r = await fetch(endpoint);
+    if (r.ok) {
+      const d = await r.json();
+      return typeof d?.downloads?.total === 'number' ? d.downloads.total : null;
+    }
+    if (r.status !== 202) return null;
+    await new Promise(resolve => setTimeout(resolve, 1500));
+  }
+  return null;
 }
 
 // ── CurseForge HTML を直接パース（cfwidget 未索引の新規 mod 用） ──
@@ -91,17 +97,8 @@ async function vscode(id) {
   return stat ? Math.round(stat.value) : null;
 }
 
-// ── cfwidget を Project ID で叩く（最も信頼できる方法） ───────
-async function cfwidgetById(id) {
-  const r = await fetch(`https://api.cfwidget.com/${id}`);
-  if (!r.ok) return null;
-  const d = await r.json();
-  return typeof d?.downloads?.total === 'number' ? d.downloads.total : null;
-}
-
 // ── URL から数を取得（複数戦略） ──────────────────────────────
-// projectId が分かっていれば最優先で ID 直叩き → エラー出にくい
-async function fetchCount(url, projectId) {
+async function fetchCount(url) {
   let u;
   try { u = new URL(url); } catch { return null; }
   const host  = u.hostname.replace(/^www\./, '').toLowerCase();
@@ -111,15 +108,9 @@ async function fetchCount(url, projectId) {
   if (host === 'curseforge.com' && parts.length >= 3) {
     const [game, category, slug] = parts;
     let n = null, source = null;
-    // ① Project ID 指定があれば最優先（cfwidget が slug を索引してなくても確実に取れる）
-    if (projectId) {
-      try { n = await cfwidgetById(projectId); if (n != null) source = 'cfwidget-id'; } catch (_) {}
-    }
-    // ② slug ベース cfwidget
-    if (n == null) {
-      try { n = await cfwidget(game, category, slug); if (n != null) source = 'cfwidget'; } catch (_) {}
-    }
-    // ③ CurseForge HTML 直接スクレイプ
+    // ① slug ベース cfwidget
+    try { n = await cfwidget(game, category, slug); if (n != null) source = 'cfwidget'; } catch (_) {}
+    // ② CurseForge HTML 直接スクレイプ
     if (n == null) {
       try { n = await curseforgeHtml(game, category, slug); if (n != null) source = 'curseforge-html'; } catch (_) {}
     }
@@ -140,22 +131,39 @@ async function fetchCount(url, projectId) {
 (async () => {
   const content = JSON.parse(fs.readFileSync(CONTENT_PATH, 'utf8'));
   const stats = Array.isArray(content.stats) ? content.stats : [];
+  let previousEntries = {};
+  try {
+    previousEntries = JSON.parse(fs.readFileSync(OUT_PATH, 'utf8'))?.entries ?? {};
+  } catch (_) {}
   const out = { generated: new Date().toISOString(), entries: {} };
 
   for (const s of stats) {
     const title = s.title || '(no title)';
-    const pid   = s.cfProjectId || null;
     for (const url of s.links || []) {
       process.stdout.write(`→ ${title}: ${url} … `);
       let r = null;
-      try { r = await fetchCount(url, pid); } catch (e) { console.log('err:', e.message); continue; }
+      try { r = await fetchCount(url); } catch (e) { console.log('err:', e.message); continue; }
       if (r) {
+        const previousCount = previousEntries[url]?.count;
+        if (typeof previousCount === 'number' && previousCount > r.count) {
+          r = { count: previousCount, source: 'cached-newer' };
+        }
         out.entries[url] = r;
         console.log(`${r.count.toLocaleString('en-US')}  (${r.source})`);
+      } else if (previousEntries[url] && typeof previousEntries[url].count === 'number') {
+        out.entries[url] = { ...previousEntries[url], source: 'cached-fallback' };
+        console.log(`${previousEntries[url].count.toLocaleString('en-US')}  (cached fallback)`);
       } else {
         console.log('not found');
       }
     }
+  }
+
+  // 数値が変わっていない場合は generated も維持し、不要な定期コミットを防ぐ
+  let previous = null;
+  try { previous = JSON.parse(fs.readFileSync(OUT_PATH, 'utf8')); } catch (_) {}
+  if (previous && JSON.stringify(previous.entries) === JSON.stringify(out.entries)) {
+    out.generated = previous.generated;
   }
 
   fs.mkdirSync(path.dirname(OUT_PATH), { recursive: true });

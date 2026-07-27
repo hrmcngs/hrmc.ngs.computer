@@ -6,8 +6,8 @@ name: Update chart SVGs
 #
 # トリガー設計（C案：ハイブリッド）:
 #   - 主要リポからの repository_dispatch (user-commit) → 即時実行
-#   - schedule (15分ごと) → 早期 exit で「前回チャート commit 以降に
-#     hrmcngs の push イベントが無ければ何もしない」
+#   - schedule (15分ごと) → DL数は毎回確認し、GitHubチャートは
+#     hrmcngs の新しいpushがある場合だけ再生成
 #   - push (このリポ自身の main) / workflow_dispatch も従来通り
 
 on:
@@ -35,7 +35,7 @@ jobs:
         with:
           fetch-depth: 0    # git log で前回 commit 時刻を引くため
 
-      - name: Skip if no new activity (schedule polling only)
+      - name: Check whether charts need updating
         id: check
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -66,10 +66,12 @@ jobs:
           fi
 
       - name: Setup Node.js
-        if: steps.check.outputs.skip != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      - name: Update download counts
+        run: node scripts/gen-downloads.js
 
       - name: Generate chart SVGs
         if: steps.check.outputs.skip != 'true'
@@ -88,7 +90,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit charts if changed
-        if: steps.check.outputs.skip != 'true'
         run: |
           git add charts
           if git diff --cached --quiet; then

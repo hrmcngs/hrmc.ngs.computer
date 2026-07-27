@@ -161,15 +161,15 @@ function applyColor(el, color, varName = '--link-color') {
 }
 
 // ── ダウンロード数を live 取得（ブラウザから直接APIを叩く・Actions 不要） ──
-// CurseForge → cfwidget API（Project ID 指定があれば slug 索引待ちを回避）
+// CurseForge → URL の game/category/slug から cfwidget API
 // Modrinth → 公式API / VS Code Marketplace → extensionquery API
 // いずれも CORS 対応なのでブラウザから直接呼べる。
-// 結果は localStorage に1時間キャッシュし、失敗時は古い値にフォールバックする。
-const DL_CACHE_TTL = 60 * 60 * 1000;
-
-// content.json の stats から作る URL → cfProjectId のマップ
-// （DOMContentLoaded 後の content.json fetch 時にセットされる）
-const CF_PROJECT_IDS = new Map();
+// 結果は localStorage に5分キャッシュし、失敗時は古い値にフォールバックする。
+const DL_CACHE_TTL = 5 * 60 * 1000;
+const GENERATED_DOWNLOADS = fetch('/charts/downloads.json', { cache: 'no-store' })
+  .then(r => r.ok ? r.json() : null)
+  .then(d => d?.entries ?? {})
+  .catch(() => ({}));
 
 function dlCacheGet(url) {
   try {
@@ -183,6 +183,21 @@ function dlCacheSet(url, n) {
   catch (e) { /* localStorage 無効でも継続 */ }
 }
 
+async function fetchCfwidgetByPath(parts) {
+  const endpoint = `https://api.cfwidget.com/${parts.slice(0, 3).map(encodeURIComponent).join('/')}`;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const res = await fetch(endpoint);
+    if (res.ok) {
+      const d = await res.json();
+      return typeof d?.downloads?.total === 'number' ? d.downloads.total : null;
+    }
+    // 未登録のslugは初回アクセスで処理待ち(202)になることがある
+    if (res.status !== 202) return null;
+    await new Promise(resolve => setTimeout(resolve, 1500));
+  }
+  return null;
+}
+
 // 1つのリンクからダウンロード(インストール)数を取得する
 async function fetchOneDownload(url) {
   let u;
@@ -190,21 +205,10 @@ async function fetchOneDownload(url) {
   const host  = u.hostname.replace(/^www\./, '').toLowerCase();
   const parts = u.pathname.split('/').filter(Boolean);
 
-  // CurseForge: Project ID があれば最優先で ID 直叩き（cfwidget が slug を索引してなくても確実に取れる）
+  // CurseForge: URLだけから game/category/slug を取り出して取得
   if (host === 'curseforge.com') {
-    const pid = CF_PROJECT_IDS.get(url);
-    if (pid) {
-      const res = await fetch(`https://api.cfwidget.com/${pid}`);
-      if (res.ok) {
-        const d = await res.json();
-        if (typeof d?.downloads?.total === 'number') return d.downloads.total;
-      }
-    }
     if (parts.length >= 3) {
-      const res = await fetch(`https://api.cfwidget.com/${parts[0]}/${parts[1]}/${parts[2]}`);
-      if (!res.ok) return null;
-      const d = await res.json();
-      return typeof d?.downloads?.total === 'number' ? d.downloads.total : null;
+      return fetchCfwidgetByPath(parts);
     }
     return null;
   }
@@ -236,12 +240,30 @@ async function fetchOneDownload(url) {
 // キャッシュ込みで1リンクのダウンロード数を返す
 async function getDownloadCount(url) {
   const cached = dlCacheGet(url);
-  if (cached && Date.now() - cached.t < DL_CACHE_TTL) return cached.n;
+  const generated = await GENERATED_DOWNLOADS;
+  const fallback = generated?.[url]?.count;
+  const known = [
+    cached?.n,
+    typeof fallback === 'number' ? fallback : null,
+  ].filter(n => typeof n === 'number');
+  if (known.length) {
+    const current = Math.max(...known);
+    // 取得済みの値を即表示し、期限切れなら裏側で更新する
+    if (!cached || Date.now() - cached.t >= DL_CACHE_TTL) {
+      fetchOneDownload(url).then(n => {
+        if (typeof n === 'number') dlCacheSet(url, Math.max(current, n));
+      }).catch(() => {});
+    }
+    return current;
+  }
   try {
     const n = await fetchOneDownload(url);
-    if (typeof n === 'number') { dlCacheSet(url, n); return n; }
+    if (typeof n === 'number') {
+      dlCacheSet(url, n);
+      return n;
+    }
   } catch (e) { /* 取得失敗 */ }
-  return cached ? cached.n : null; // 失敗時は古いキャッシュにフォールバック
+  return null;
 }
 
 // Works カードにダウンロード数バッジを表示する
@@ -284,7 +306,7 @@ function uniqueDownloadLinks(links) {
   });
 }
 
-fetch('/content.json')
+fetch('/content.json', { cache: 'no-store' })
   .then(r => r.json())
   .then(data => {
     const { hero, footer, terminal, links, about, profile, works } = data;
@@ -454,7 +476,7 @@ fetch('/content.json')
       });
 
       // Works と terminal.build の全リンクからDL数を自動取得する。
-      // stats は追加リンクや CurseForge Project ID の明示が必要な場合だけ使う。
+      // stats は追加リンクを指定する場合だけ使う。
       const statByTitle = {};
       const buildByTitle = {};
       if (Array.isArray(terminal?.build)) {
@@ -465,12 +487,6 @@ fetch('/content.json')
       if (Array.isArray(data.stats)) {
         data.stats.forEach(p => {
           statByTitle[String(p.title).toLowerCase()] = p;
-          // cfProjectId 指定があれば URL → ID のマップを構築（cfwidget 索引待ちを回避）
-          if (p.cfProjectId && Array.isArray(p.links)) {
-            p.links.forEach(url => {
-              if (/curseforge\.com/.test(url)) CF_PROJECT_IDS.set(url, p.cfProjectId);
-            });
-          }
         });
       }
       worksEl.querySelectorAll('.work-card').forEach((el, i) => {
