@@ -16,6 +16,25 @@ const path = require('path');
 const CONTENT_PATH = path.join(__dirname, '..', 'content.json');
 const OUT_PATH     = path.join(__dirname, '..', 'charts', 'downloads.json');
 const UA = 'Mozilla/5.0 (compatible; hrmc-stats-bot/1.0; +https://hrmc.ngs.computer)';
+const CURSEFORGE_API_KEY = process.env.CURSEFORGE_API_KEY || '';
+
+// ── CurseForge公式API（ページと同じ最新値・slug検索） ─────────
+async function curseforgeOfficial(slug) {
+  if (!CURSEFORGE_API_KEY) return null;
+  const endpoint = `https://api.curseforge.com/v1/mods/search?gameId=432&slug=${encodeURIComponent(slug)}&pageSize=1`;
+  const r = await fetch(endpoint, {
+    headers: {
+      'Accept': 'application/json',
+      'x-api-key': CURSEFORGE_API_KEY,
+    },
+  });
+  if (!r.ok) return null;
+  const d = await r.json();
+  const project = d?.data?.[0];
+  return typeof project?.downloadCount === 'number'
+    ? { count: project.downloadCount, projectId: project.id }
+    : null;
+}
 
 // ── CurseForge cfwidget API（指標がある mod 用） ──────────────
 async function cfwidget(game, category, slug) {
@@ -107,14 +126,25 @@ async function fetchCount(url) {
   // CurseForge: /<game>/<category>/<slug>  例) minecraft/mc-mods/foo, minecraft/data-packs/bar
   if (host === 'curseforge.com' && parts.length >= 3) {
     const [game, category, slug] = parts;
-    let n = null, source = null;
-    // ① slug ベース cfwidget
-    try { n = await cfwidget(game, category, slug); if (n != null) source = 'cfwidget'; } catch (_) {}
-    // ② CurseForge HTML 直接スクレイプ
+    let n = null, source = null, projectId = null;
+    // ① 公式APIをslug検索（Project IDの手書き不要）
+    try {
+      const official = await curseforgeOfficial(slug);
+      if (official) {
+        n = official.count;
+        projectId = official.projectId;
+        source = 'curseforge-api';
+      }
+    } catch (_) {}
+    // ② CurseForge本体のページ
     if (n == null) {
       try { n = await curseforgeHtml(game, category, slug); if (n != null) source = 'curseforge-html'; } catch (_) {}
     }
-    return n != null ? { count: n, source } : null;
+    // ③ ページ取得が拒否された場合だけcfwidgetへフォールバック
+    if (n == null) {
+      try { n = await cfwidget(game, category, slug); if (n != null) source = 'cfwidget'; } catch (_) {}
+    }
+    return n != null ? { count: n, source, ...(projectId ? { projectId } : {}) } : null;
   }
   if (host === 'modrinth.com' && parts[1]) {
     try { const n = await modrinth(parts[1]); if (n != null) return { count: n, source: 'modrinth' }; } catch (_) {}

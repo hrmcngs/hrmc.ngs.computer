@@ -72,6 +72,8 @@ jobs:
 
       - name: Update download counts
         run: node scripts/gen-downloads.js
+        env:
+          CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
 
       - name: Generate chart SVGs
         if: steps.check.outputs.skip != 'true'
