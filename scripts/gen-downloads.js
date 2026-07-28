@@ -105,15 +105,28 @@ async function vscode(id) {
     headers: {
       'User-Agent': UA,
       'Content-Type': 'application/json',
-      'Accept': 'application/json;api-version=3.0-preview.1',
+      'Accept': 'application/json;api-version=7.2-preview.1',
     },
-    body: JSON.stringify({ filters: [{ criteria: [{ filterType: 7, value: id }] }], flags: 256 }),
+    body: JSON.stringify({
+      filters: [{
+        criteria: [{ filterType: 7, value: id }],
+        pageNumber: 1, pageSize: 1, sortBy: 0, sortOrder: 0,
+      }],
+      assetTypes: [],
+      flags: 914,
+    }),
   });
   if (!r.ok) return null;
   const d = await r.json();
   const ext  = d?.results?.[0]?.extensions?.[0];
-  const stat = (ext?.statistics ?? []).find(s => s.statisticName === 'install');
-  return stat ? Math.round(stat.value) : null;
+  const stats = ext?.statistics ?? [];
+  const downloads = stats.find(s => s.statisticName === 'downloadCount');
+  const installs = stats.find(s => s.statisticName === 'install');
+  if (!downloads && !installs) return null;
+  return {
+    count: downloads ? Math.round(downloads.value) : Math.round(installs.value),
+    ...(installs ? { installs: Math.round(installs.value) } : {}),
+  };
 }
 
 // ── URL から数を取得（複数戦略） ──────────────────────────────
@@ -152,7 +165,10 @@ async function fetchCount(url) {
   if (host === 'marketplace.visualstudio.com') {
     const id = u.searchParams.get('itemName');
     if (id) {
-      try { const n = await vscode(id); if (n != null) return { count: n, source: 'vscode-marketplace' }; } catch (_) {}
+      try {
+        const stats = await vscode(id);
+        if (stats) return { ...stats, source: 'vscode-marketplace' };
+      } catch (_) {}
     }
   }
   return null;
@@ -174,12 +190,24 @@ async function fetchCount(url) {
       let r = null;
       try { r = await fetchCount(url); } catch (e) { console.log('err:', e.message); continue; }
       if (r) {
-        const previousCount = previousEntries[url]?.count;
+        const previous = previousEntries[url] ?? {};
+        const previousCount = previous.count;
+        let usedCache = false;
         if (typeof previousCount === 'number' && previousCount > r.count) {
-          r = { count: previousCount, source: 'cached-newer' };
+          r.count = previousCount;
+          usedCache = true;
         }
+        if (typeof previous.installs === 'number' &&
+            (typeof r.installs !== 'number' || previous.installs > r.installs)) {
+          r.installs = previous.installs;
+          usedCache = true;
+        }
+        if (usedCache) r.source = 'cached-newer';
         out.entries[url] = r;
-        console.log(`${r.count.toLocaleString('en-US')}  (${r.source})`);
+        const installText = typeof r.installs === 'number'
+          ? ` / ${r.installs.toLocaleString('en-US')} installs`
+          : '';
+        console.log(`${r.count.toLocaleString('en-US')} downloads${installText}  (${r.source})`);
       } else if (previousEntries[url] && typeof previousEntries[url].count === 'number') {
         out.entries[url] = { ...previousEntries[url], source: 'cached-fallback' };
         console.log(`${previousEntries[url].count.toLocaleString('en-US')}  (cached fallback)`);

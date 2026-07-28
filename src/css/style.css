@@ -551,6 +551,8 @@ body {
 .work-dl {
   display: flex;
   align-items: baseline;
+  flex-wrap: wrap;
+  column-gap: 0.2rem;
   margin-top: 0.6rem;
   font-size: 0.72rem;
 }
@@ -564,6 +566,10 @@ body {
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--text);
+}
+
+.work-dl-count + .work-dl-label {
+  margin-left: 0.45rem;
 }
 
 .omake-section {
