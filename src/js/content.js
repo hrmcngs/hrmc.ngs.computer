@@ -164,8 +164,8 @@ function applyColor(el, color, varName = '--link-color') {
 // CurseForge → URL の game/category/slug から cfwidget API
 // Modrinth → 公式API / VS Code Marketplace → extensionquery API
 // いずれも CORS 対応なのでブラウザから直接呼べる。
-// 結果は localStorage に1分キャッシュし、失敗時は古い値にフォールバックする。
-const DL_CACHE_TTL = 60 * 1000;
+// 15秒ごとに最新値を取得し、失敗時だけ保存済みの値へフォールバックする。
+const DL_CACHE_TTL = 15 * 1000;
 const GENERATED_DOWNLOADS = fetch('/charts/downloads.json', { cache: 'no-store' })
   .then(r => r.ok ? r.json() : null)
   .then(d => d?.entries ?? {})
@@ -232,9 +232,18 @@ async function fetchOneDownload(url) {
   if (host === 'marketplace.visualstudio.com') {
     const id = u.searchParams.get('itemName');
     if (!id) return null;
-    const res = await fetch('https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery', {
+    const endpoint =
+      `https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery` +
+      `?api-version=7.2-preview.1&nocache=${Date.now()}`;
+    const res = await fetch(endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json;api-version=7.2-preview.1' },
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json;api-version=7.2-preview.1',
+        'Cache-Control': 'no-cache, no-store, max-age=0',
+        'Pragma': 'no-cache',
+      },
       body: JSON.stringify({
         filters: [{
           criteria: [{ filterType: 7, value: id }],
@@ -287,7 +296,7 @@ async function getDownloadStats(url) {
   const fallback = generated?.[url];
   const current = newestDownloadStats(cached, fallback);
   if (current) {
-    // 1分以内のライブ取得値があれば即表示する。
+    // 15秒以内のライブ取得値があれば即表示する。
     if (cached && Date.now() - cached.t < DL_CACHE_TTL) return current;
     // キャッシュが古い場合は最新値を待ち、開いている画面にも反映する。
     try {

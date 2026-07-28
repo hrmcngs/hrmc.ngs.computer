@@ -100,12 +100,17 @@ async function modrinth(slug) {
 
 // ── VS Code Marketplace ───────────────────────────────────────
 async function vscode(id) {
-  const r = await fetch('https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery', {
+  const endpoint =
+    `https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery` +
+    `?api-version=7.2-preview.1&nocache=${Date.now()}`;
+  const r = await fetch(endpoint, {
     method: 'POST',
     headers: {
       'User-Agent': UA,
       'Content-Type': 'application/json',
       'Accept': 'application/json;api-version=7.2-preview.1',
+      'Cache-Control': 'no-cache, no-store, max-age=0',
+      'Pragma': 'no-cache',
     },
     body: JSON.stringify({
       filters: [{
