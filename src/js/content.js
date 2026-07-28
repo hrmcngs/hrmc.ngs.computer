@@ -164,8 +164,8 @@ function applyColor(el, color, varName = '--link-color') {
 // CurseForge → URL の game/category/slug から cfwidget API
 // Modrinth → 公式API / VS Code Marketplace → extensionquery API
 // いずれも CORS 対応なのでブラウザから直接呼べる。
-// 結果は localStorage に5分キャッシュし、失敗時は古い値にフォールバックする。
-const DL_CACHE_TTL = 5 * 60 * 1000;
+// 結果は localStorage に1分キャッシュし、失敗時は古い値にフォールバックする。
+const DL_CACHE_TTL = 60 * 1000;
 const GENERATED_DOWNLOADS = fetch('/charts/downloads.json', { cache: 'no-store' })
   .then(r => r.ok ? r.json() : null)
   .then(d => d?.entries ?? {})
@@ -174,12 +174,21 @@ const GENERATED_DOWNLOADS = fetch('/charts/downloads.json', { cache: 'no-store' 
 function dlCacheGet(url) {
   try {
     const v = JSON.parse(localStorage.getItem('dl:' + url));
-    if (v && typeof v.n === 'number' && typeof v.t === 'number') return v;
+    if (v && typeof v.n === 'number' && typeof v.t === 'number') {
+      return { count: v.n, installs: typeof v.i === 'number' ? v.i : null, t: v.t };
+    }
   } catch (e) { /* localStorage 無効でも継続 */ }
   return null;
 }
-function dlCacheSet(url, n) {
-  try { localStorage.setItem('dl:' + url, JSON.stringify({ n, t: Date.now() })); }
+function dlCacheSet(url, stats) {
+  const value = typeof stats === 'number' ? { count: stats } : stats;
+  try {
+    localStorage.setItem('dl:' + url, JSON.stringify({
+      n: value.count,
+      ...(typeof value.installs === 'number' ? { i: value.installs } : {}),
+      t: Date.now(),
+    }));
+  }
   catch (e) { /* localStorage 無効でも継続 */ }
 }
 
@@ -225,58 +234,111 @@ async function fetchOneDownload(url) {
     if (!id) return null;
     const res = await fetch('https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json;api-version=3.0-preview.1' },
-      body: JSON.stringify({ filters: [{ criteria: [{ filterType: 7, value: id }] }], flags: 256 }),
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json;api-version=7.2-preview.1' },
+      body: JSON.stringify({
+        filters: [{
+          criteria: [{ filterType: 7, value: id }],
+          pageNumber: 1, pageSize: 1, sortBy: 0, sortOrder: 0,
+        }],
+        assetTypes: [],
+        flags: 914,
+      }),
     });
     if (!res.ok) return null;
     const d = await res.json();
     const ext  = d?.results?.[0]?.extensions?.[0];
-    const stat = (ext?.statistics ?? []).find(s => s.statisticName === 'install');
-    return stat ? Math.round(stat.value) : null;
+    const stats = ext?.statistics ?? [];
+    const downloads = stats.find(s => s.statisticName === 'downloadCount');
+    const installs = stats.find(s => s.statisticName === 'install');
+    if (!downloads && !installs) return null;
+    return {
+      count: downloads ? Math.round(downloads.value) : Math.round(installs.value),
+      ...(installs ? { installs: Math.round(installs.value) } : {}),
+    };
   }
   return null; // 未対応プラットフォーム（Planet Minecraft 等）
 }
 
-// キャッシュ込みで1リンクのダウンロード数を返す
-async function getDownloadCount(url) {
+function normalizeDownloadStats(value) {
+  if (typeof value === 'number') return { count: value };
+  if (value && typeof value.count === 'number') {
+    return {
+      count: value.count,
+      ...(typeof value.installs === 'number' ? { installs: value.installs } : {}),
+    };
+  }
+  return null;
+}
+
+function newestDownloadStats(...values) {
+  const valid = values.map(normalizeDownloadStats).filter(Boolean);
+  if (!valid.length) return null;
+  const installs = valid.map(v => v.installs).filter(n => typeof n === 'number');
+  return {
+    count: Math.max(...valid.map(v => v.count)),
+    ...(installs.length ? { installs: Math.max(...installs) } : {}),
+  };
+}
+
+// キャッシュ込みで1リンクのダウンロード数・インストール数を返す
+async function getDownloadStats(url) {
   const cached = dlCacheGet(url);
   const generated = await GENERATED_DOWNLOADS;
-  const fallback = generated?.[url]?.count;
-  const known = [
-    cached?.n,
-    typeof fallback === 'number' ? fallback : null,
-  ].filter(n => typeof n === 'number');
-  if (known.length) {
-    const current = Math.max(...known);
-    // 取得済みの値を即表示し、期限切れなら裏側で更新する
-    if (!cached || Date.now() - cached.t >= DL_CACHE_TTL) {
-      fetchOneDownload(url).then(n => {
-        if (typeof n === 'number') dlCacheSet(url, Math.max(current, n));
-      }).catch(() => {});
-    }
+  const fallback = generated?.[url];
+  const current = newestDownloadStats(cached, fallback);
+  if (current) {
+    // 1分以内のライブ取得値があれば即表示する。
+    if (cached && Date.now() - cached.t < DL_CACHE_TTL) return current;
+    // キャッシュが古い場合は最新値を待ち、開いている画面にも反映する。
+    try {
+      const newest = newestDownloadStats(current, await fetchOneDownload(url));
+      if (newest) {
+        dlCacheSet(url, newest);
+        return newest;
+      }
+    } catch (e) { /* 生成済みの値へフォールバック */ }
     return current;
   }
   try {
-    const n = await fetchOneDownload(url);
-    if (typeof n === 'number') {
-      dlCacheSet(url, n);
-      return n;
+    const live = normalizeDownloadStats(await fetchOneDownload(url));
+    if (live) {
+      dlCacheSet(url, live);
+      return live;
     }
   } catch (e) { /* 取得失敗 */ }
   return null;
 }
 
-// Works カードにダウンロード数バッジを表示する
+// Works カードにダウンロード数と、取得できる場合はインストール数を表示する
 async function showDownloadCount(cardEl, links) {
-  const results = await Promise.all(links.map(getDownloadCount));
-  const nums = results.filter(n => typeof n === 'number');
-  if (!nums.length) return;
-  const count = nums.reduce((a, b) => a + b, 0).toLocaleString('en-US');
   const badge = document.createElement('div');
   badge.className = 'work-dl';
-  badge.title = `ダウンロード数 合計 ${count}`;
-  badge.innerHTML = `<span class="work-dl-label">ダウンロード：</span><span class="work-dl-count">${count}</span>`;
   cardEl.appendChild(badge);
+
+  async function refreshBadge() {
+    const results = (await Promise.all(links.map(getDownloadStats))).filter(Boolean);
+    if (!results.length) {
+      badge.hidden = true;
+      return;
+    }
+    badge.hidden = false;
+    const count = results.reduce((sum, stats) => sum + stats.count, 0).toLocaleString('en-US');
+    const installs = results.map(stats => stats.installs).filter(n => typeof n === 'number');
+    if (installs.length) {
+      const installCount = installs.reduce((a, b) => a + b, 0).toLocaleString('en-US');
+      badge.title = `ダウンロード数 ${count} / インストール数 ${installCount}`;
+      badge.innerHTML =
+        `<span class="work-dl-label">ダウンロード：</span><span class="work-dl-count">${count}</span>` +
+        `<span class="work-dl-label">インストール：</span><span class="work-dl-count">${installCount}</span>`;
+    } else {
+      badge.title = `ダウンロード数 合計 ${count}`;
+      badge.innerHTML =
+        `<span class="work-dl-label">ダウンロード：</span><span class="work-dl-count">${count}</span>`;
+    }
+  }
+
+  await refreshBadge();
+  setInterval(refreshBadge, DL_CACHE_TTL);
 }
 
 // URLだけでDL数を取得できる配布プラットフォームか判定する
