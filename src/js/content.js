@@ -309,7 +309,7 @@ async function getDownloadStats(url) {
   return null;
 }
 
-// Works カードにダウンロード数と、取得できる場合はインストール数を表示する
+// Works カードに配布数を表示する。Marketplaceはインストール数だけを表示する。
 async function showDownloadCount(cardEl, links) {
   const badge = document.createElement('div');
   badge.className = 'work-dl';
@@ -326,9 +326,8 @@ async function showDownloadCount(cardEl, links) {
     const installs = results.map(stats => stats.installs).filter(n => typeof n === 'number');
     if (installs.length) {
       const installCount = installs.reduce((a, b) => a + b, 0).toLocaleString('en-US');
-      badge.title = `ダウンロード数 ${count} / インストール数 ${installCount}`;
+      badge.title = `インストール数 ${installCount}`;
       badge.innerHTML =
-        `<span class="work-dl-label">ダウンロード：</span><span class="work-dl-count">${count}</span>` +
         `<span class="work-dl-label">インストール：</span><span class="work-dl-count">${installCount}</span>`;
     } else {
       badge.title = `ダウンロード数 合計 ${count}`;
