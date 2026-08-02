@@ -29,6 +29,8 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
+    outputs:
+      charts_changed: ${{ steps.commit.outputs.changed }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -92,13 +94,27 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit charts if changed
+        id: commit
         run: |
           git add charts
           if git diff --cached --quiet; then
             echo "チャートに変化なし — コミットしません。"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             git config user.name  "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git commit -m "chore: update chart SVGs [skip ci]"
             git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
+
+  # charts/ が更新されたら Pages を再デプロイする。
+  # bot の push では push トリガーが発火しないため、ここから明示的に呼ぶ。
+  deploy:
+    needs: update
+    if: needs.update.outputs.charts_changed == 'true'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/deploy-pages.yml

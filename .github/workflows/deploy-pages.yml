@@ -1,7 +1,13 @@
 name: Deploy to GitHub Pages
 
 # GitHub Pages のデプロイをカスタムワークフロー化。
-# charts/ の更新では再ビルドしない（自動チャート更新が Pages を巻き込まないように）。
+# charts/ の更新では push トリガーで再ビルドしない（更新のたびに巻き込まないように）。
+# ただしそれだけだとサイトが配信する charts/downloads.json が永久に古いままになるため、
+# チャートに変化があったときは update-charts.yml から workflow_call で明示的に呼ぶ。
+#
+# 補足: bot の push は GITHUB_TOKEN で行われるため、そもそも push トリガーでは
+# ワークフローが起動しない（再帰防止の仕様）。paths-ignore の有無に関係なく、
+# charts 更新後のデプロイは呼び出し側から明示的に行う必要がある。
 
 on:
   push:
@@ -9,6 +15,7 @@ on:
     paths-ignore:
       - 'charts/**'
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
