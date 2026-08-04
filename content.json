@@ -34,7 +34,7 @@
           "https://planetminecraft.com/data-pack/rpgish-hpdisplay/",
           "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack",
           "https://planetminecraft.com/mod/rpgish-hpdisplay-mod/",
-          "https://www.curseforge.com/minecraft/mc-mods/rpgish-hpdisplay-mod/"
+          "https://curseforge.com/minecraft/mc-mods/rpgish-hpdisplay-mod/"
         ]
       },
       {
@@ -73,7 +73,7 @@
         "tags": ["Minecraft", "Mod", "Java"],
         "links": [
           "https://github.com/hrmcngs/Backpack-Arsenal",
-          "https://www.curseforge.com/minecraft/mc-mods/arsenal-backpack"
+          "https://curseforge.com/minecraft/mc-mods/arsenal-backpack"
         ]
       },
       {
@@ -83,7 +83,7 @@
         "tags": ["Minecraft", "Mod", "Java"],
         "links": [
           "https://github.com/hrmcngs/gun_and_weapon",
-          "https://www.curseforge.com/minecraft/mc-mods/gun-and-weapons"
+          "https://curseforge.com/minecraft/mc-mods/gun-and-weapons"
         ]
       }
     ],
@@ -321,7 +321,7 @@
       "icon": "https://raw.githubusercontent.com/hrmcngs/Backpack-Arsenal/main/src/main/resources/assets/backpack_arsenal/textures/icon.png",
       "title": "Backpack-Arsenal",
       "desc": "Minecraft mod — バックパック型の装備拡張",
-      "url": "https://www.curseforge.com/minecraft/mc-mods/arsenal-backpack",
+      "url": "https://curseforge.com/minecraft/mc-mods/arsenal-backpack",
       "color": "#d6ff33",
       "tags": ["Minecraft", "Mod", "Java"]
     },
@@ -329,7 +329,7 @@
       "icon": "https://raw.githubusercontent.com/hrmcngs/gun_and_weapon/main/src/main/resources/logo.png",
       "title": "gun_and_weapon",
       "desc": "Minecraft mod",
-      "url": "https://www.curseforge.com/minecraft/mc-mods/gun-and-weapons",
+      "url": "https://curseforge.com/minecraft/mc-mods/gun-and-weapons",
       "color": "#00004d",
       "tags": ["Minecraft", "Mod", "Java"]
     }
@@ -368,14 +368,14 @@
       "title": "Backpack-Arsenal",
       "color": "#d6ff33",
       "links": [
-        "https://www.curseforge.com/minecraft/mc-mods/arsenal-backpack"
+        "https://curseforge.com/minecraft/mc-mods/arsenal-backpack"
       ]
     },
     {
       "title": "gun_and_weapon",
       "color": "#00004d",
       "links": [
-        "https://www.curseforge.com/minecraft/mc-mods/gun-and-weapons"
+        "https://curseforge.com/minecraft/mc-mods/gun-and-weapons"
       ]
     }
 
