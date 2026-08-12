@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-12T13:03:40.534Z",
+  "generated": "2026-08-12T13:40:14.353Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 48,
@@ -14,7 +14,7 @@
       "source": "cfwidget"
     },
     "https://curseforge.com/minecraft/mc-mods/extra-video-settings": {
-      "count": 878,
+      "count": 879,
       "source": "curseforge-html"
     },
     "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility": {
@@ -27,7 +27,7 @@
       "source": "curseforge-html"
     },
     "https://curseforge.com/minecraft/mc-mods/gun-and-weapons": {
-      "count": 515,
+      "count": 517,
       "source": "curseforge-html"
     }
   }
