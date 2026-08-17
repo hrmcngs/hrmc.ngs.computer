@@ -1,7 +1,16 @@
 (() => {
   'use strict';
 
-  const endpoint = 'https://api.counterapi.dev/v1/hrmc-ngs-computer/home/up';
+  // カウンターは Abacus を使う（無登録・APIキー不要・CORS対応）。
+  // 以前使っていた CounterAPI v1 は廃止され HTTP 410 を返すようになった。v2 は
+  // サインアップと APIキーが必須で、クライアントサイドJSに置くと公開されてしまう
+  // ため採用していない。
+  //   GET /hit/:namespace/:key → {"value": N}（1リクエストで +1）
+  //   docs: https://v2.jasoncameron.dev/abacus
+  // 移行時に旧カウンターの値 19 を initializer で引き継いでいる。
+  const NAMESPACE = 'hrmc-ngs-computer';
+  const COUNTER   = 'home';
+  const endpoint = `https://abacus.jasoncameron.dev/hit/${NAMESPACE}/${COUNTER}`;
   const cacheKey = 'page-access-count';
   const detailsCacheKey = 'page-access-details';
   const historyCacheKey = 'page-access-history';
@@ -21,15 +30,17 @@
     window.pageAccessCount = details.count;
     window.pageAccessDetails = details;
     console.group(`[Access Count] ${details.count.toLocaleString('ja-JP')} views${cached ? ' (前回値)' : ''}`);
-    console.table({
+    // Abacus は値以外のメタ情報を返さないため、取れなかった項目は行ごと省く。
+    const rows = {
       'アクセス数': details.count,
       '今回の取得日時': formatDate(details.fetchedAt),
-      'API上の更新日時': formatDate(details.updatedAt),
-      'カウンター作成日時': formatDate(details.createdAt),
-      '対象ページ': details.page,
-      'カウンター名': details.counter,
-      '取得元': cached ? 'ブラウザキャッシュ' : details.source,
-    });
+    };
+    if (details.updatedAt) rows['API上の更新日時'] = formatDate(details.updatedAt);
+    if (details.createdAt) rows['カウンター作成日時'] = formatDate(details.createdAt);
+    rows['対象ページ'] = details.page;
+    rows['カウンター名'] = details.counter;
+    rows['取得元'] = cached ? 'ブラウザキャッシュ' : details.source;
+    console.table(rows);
     console.groupEnd();
     showGraph(loadHistory());
   }
@@ -90,8 +101,8 @@
           updatedAt: null,
           createdAt: null,
           page: location.pathname,
-          counter: 'hrmc-ngs-computer / home',
-          source: 'CounterAPI',
+          counter: `${NAMESPACE} / ${COUNTER}`,
+          source: 'Abacus',
         }, true);
       }
     }
@@ -107,19 +118,21 @@
       }
 
       const data = await response.json();
-      const count = Number(data.count ?? data.value);
+      const count = Number(data.value ?? data.count);
       if (!Number.isFinite(count)) {
         throw new Error('カウンターAPIから不正な値が返されました');
       }
 
+      const fetchedAt = new Date().toISOString();
       const details = {
         count,
-        fetchedAt: new Date().toISOString(),
-        updatedAt: data.updated_at ?? null,
-        createdAt: data.created_at ?? null,
+        fetchedAt,
+        // /hit はこのリクエスト自体がカウンターを更新するので更新日時＝取得日時。
+        updatedAt: fetchedAt,
+        createdAt: null,
         page: location.pathname,
-        counter: `${data.namespace?.name ?? 'hrmc-ngs-computer'} / ${data.name ?? 'home'}`,
-        source: 'CounterAPI (live)',
+        counter: `${NAMESPACE} / ${COUNTER}`,
+        source: 'Abacus (live)',
       };
 
       try {
