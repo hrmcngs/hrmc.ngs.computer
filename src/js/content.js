@@ -48,6 +48,46 @@ function githubRawFallbacks(url) {
   ];
 }
 
+function githubRawApiUrl(url) {
+  let u;
+  try { u = new URL(url); } catch (e) { return null; }
+  if (u.hostname !== 'raw.githubusercontent.com') return null;
+  const [owner, repo, ref, ...path] = u.pathname.split('/').filter(Boolean);
+  if (!owner || !repo || !ref || !path.length) return null;
+  return `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}` +
+    `/contents/${path.map(encodeURIComponent).join('/')}?ref=${encodeURIComponent(ref)}`;
+}
+
+async function loadGithubRawViaApi(img, sourceUrl) {
+  const apiUrl = githubRawApiUrl(sourceUrl);
+  if (!apiUrl) return false;
+  try {
+    const res = await fetch(apiUrl, {
+      headers: { Accept: 'application/vnd.github.raw+json' },
+    });
+    if (!res.ok) return false;
+    const contentType = res.headers.get('content-type') || '';
+    let blob;
+    if (!contentType.includes('json')) {
+      blob = await res.blob();
+    } else {
+      const data = await res.json();
+      if (data?.encoding !== 'base64' || typeof data.content !== 'string') return false;
+      const binary = atob(data.content.replace(/\s/g, ''));
+      const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+      const extension = sourceUrl.split('.').pop()?.toLowerCase();
+      const type = extension === 'svg' ? 'image/svg+xml' : `image/${extension || 'png'}`;
+      blob = new Blob([bytes], { type });
+    }
+    const objectUrl = URL.createObjectURL(blob);
+    img.addEventListener('load', () => URL.revokeObjectURL(objectUrl), { once: true });
+    img.src = objectUrl;
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 
 // ── color フィールドをCSSに変換 ──────────────────────
 // 単色:     "#7c6af7"
@@ -528,9 +568,15 @@ fetch('/content.json', { cache: 'no-store' })
       worksEl.querySelectorAll('.work-icon img[data-icon-url]').forEach(img => {
         const fallbacks = githubRawFallbacks(img.dataset.iconUrl);
         let fallbackIndex = 0;
-        img.addEventListener('error', () => {
+        let apiAttempted = false;
+        img.addEventListener('error', async () => {
           if (fallbackIndex < fallbacks.length) {
             img.src = fallbacks[fallbackIndex++];
+          } else if (!apiAttempted) {
+            apiAttempted = true;
+            if (!await loadGithubRawViaApi(img, img.dataset.iconUrl)) {
+              img.closest('.work-icon')?.remove();
+            }
           } else {
             img.closest('.work-icon')?.remove();
           }
