@@ -32,6 +32,22 @@ function safeUrl(s) {
   return s;
 }
 
+// GitHub Raw がレート制限された場合に、同じファイルを別CDNから試す。
+// content.json には元の画像URLを1件書くだけでよい。
+function githubRawFallbacks(url) {
+  let u;
+  try { u = new URL(url); } catch (e) { return []; }
+  if (u.hostname !== 'raw.githubusercontent.com') return [];
+  const [owner, repo, ref, ...path] = u.pathname.split('/').filter(Boolean);
+  if (!owner || !repo || !ref || !path.length) return [];
+  const filePath = path.join('/');
+  return [
+    `https://cdn.jsdelivr.net/gh/${owner}/${repo}@${ref}/${filePath}`,
+    `https://raw.githack.com/${owner}/${repo}/${ref}/${filePath}`,
+    `https://images.weserv.nl/?url=${encodeURIComponent(url)}`,
+  ];
+}
+
 
 // ── color フィールドをCSSに変換 ──────────────────────
 // 単色:     "#7c6af7"
@@ -160,11 +176,11 @@ function applyColor(el, color, varName = '--link-color') {
   } catch(e) { console.warn('applyColor gradient rule failed', e); }
 }
 
-// ── ダウンロード数を live 取得（ブラウザから直接APIを叩く・Actions 不要） ──
+// ── ダウンロード数を取得 ────────────────────────────────
 // CurseForge → URL の game/category/slug から cfwidget API
-// Modrinth → 公式API / VS Code Marketplace → extensionquery API
-// いずれも CORS 対応なのでブラウザから直接呼べる。
-// 15秒ごとに最新値を取得し、失敗時だけ保存済みの値へフォールバックする。
+// Modrinth → 公式API
+// VS Code Marketplace → Actionsで生成した downloads.json（ブラウザPOSTは403になるため）
+// live取得は15秒キャッシュし、失敗時は保存済みの値へフォールバックする。
 const DL_CACHE_TTL = 15 * 1000;
 const GENERATED_DOWNLOADS = fetch('/charts/downloads.json', { cache: 'no-store' })
   .then(r => r.ok ? r.json() : null)
@@ -228,42 +244,10 @@ async function fetchOneDownload(url) {
     const d = await res.json();
     return typeof d.downloads === 'number' ? d.downloads : null;
   }
-  // VS Code Marketplace → extensionquery API
+  // VS Code Marketplace のAPIはブラウザからのPOSTを拒否するため、
+  // scripts/gen-downloads.js が生成した charts/downloads.json の値を使う。
   if (host === 'marketplace.visualstudio.com') {
-    const id = u.searchParams.get('itemName');
-    if (!id) return null;
-    const endpoint =
-      `https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery` +
-      `?api-version=7.2-preview.1&nocache=${Date.now()}`;
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json;api-version=7.2-preview.1',
-        'Cache-Control': 'no-cache, no-store, max-age=0',
-        'Pragma': 'no-cache',
-      },
-      body: JSON.stringify({
-        filters: [{
-          criteria: [{ filterType: 7, value: id }],
-          pageNumber: 1, pageSize: 1, sortBy: 0, sortOrder: 0,
-        }],
-        assetTypes: [],
-        flags: 914,
-      }),
-    });
-    if (!res.ok) return null;
-    const d = await res.json();
-    const ext  = d?.results?.[0]?.extensions?.[0];
-    const stats = ext?.statistics ?? [];
-    const downloads = stats.find(s => s.statisticName === 'downloadCount');
-    const installs = stats.find(s => s.statisticName === 'install');
-    if (!downloads && !installs) return null;
-    return {
-      count: downloads ? Math.round(downloads.value) : Math.round(installs.value),
-      ...(installs ? { installs: Math.round(installs.value) } : {}),
-    };
+    return null;
   }
   return null; // 未対応プラットフォーム（Planet Minecraft 等）
 }
@@ -529,7 +513,7 @@ fetch('/content.json', { cache: 'no-store' })
     if (worksEl && works) {
       worksEl.innerHTML = works.map(w => {
         const icon = w.icon.startsWith('http')
-          ? `<img src="${safeUrl(w.icon)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:contain;">`
+          ? `<img src="${safeUrl(w.icon)}" data-icon-url="${escHtml(w.icon)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:contain;">`
           : w.icon;
         const tags = (w.tags ?? []).map(t => `<span class="work-tag">${escHtml(t)}</span>`).join('');
         return `
@@ -541,6 +525,17 @@ fetch('/content.json', { cache: 'no-store' })
           </a>
         `;
       }).join('');
+      worksEl.querySelectorAll('.work-icon img[data-icon-url]').forEach(img => {
+        const fallbacks = githubRawFallbacks(img.dataset.iconUrl);
+        let fallbackIndex = 0;
+        img.addEventListener('error', () => {
+          if (fallbackIndex < fallbacks.length) {
+            img.src = fallbacks[fallbackIndex++];
+          } else {
+            img.closest('.work-icon')?.remove();
+          }
+        });
+      });
       // カラーを適用（グラデーション・ノイズ対応）
       worksEl.querySelectorAll('.work-card').forEach((el, i) => {
         const w = works[i];
