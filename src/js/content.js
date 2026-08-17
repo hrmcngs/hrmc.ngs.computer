@@ -32,7 +32,7 @@ function safeUrl(s) {
   return s;
 }
 
-// GitHub Raw がレート制限された場合に、同じファイルを別CDNから試す。
+// GitHub Raw がレート制限された場合に、同じファイルをCDNから読む。
 // content.json には元の画像URLを1件書くだけでよい。
 function githubRawFallbacks(url) {
   let u;
@@ -43,8 +43,6 @@ function githubRawFallbacks(url) {
   const filePath = path.join('/');
   return [
     `https://cdn.jsdelivr.net/gh/${owner}/${repo}@${ref}/${filePath}`,
-    `https://raw.githack.com/${owner}/${repo}/${ref}/${filePath}`,
-    `https://images.weserv.nl/?url=${encodeURIComponent(url)}`,
   ];
 }
 
@@ -61,9 +59,12 @@ function githubRawApiUrl(url) {
 async function loadGithubRawViaApi(img, sourceUrl) {
   const apiUrl = githubRawApiUrl(sourceUrl);
   if (!apiUrl) return false;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 4000);
   try {
     const res = await fetch(apiUrl, {
       headers: { Accept: 'application/vnd.github.raw+json' },
+      signal: controller.signal,
     });
     if (!res.ok) return false;
     const contentType = res.headers.get('content-type') || '';
@@ -85,6 +86,8 @@ async function loadGithubRawViaApi(img, sourceUrl) {
     return true;
   } catch (e) {
     return false;
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
@@ -552,8 +555,10 @@ fetch('/content.json', { cache: 'no-store' })
     const worksEl = document.getElementById('works-grid');
     if (worksEl && works) {
       worksEl.innerHTML = works.map(w => {
+        const iconFallbacks = githubRawFallbacks(w.icon);
+        const iconSrc = iconFallbacks[0] || w.icon;
         const icon = w.icon.startsWith('http')
-          ? `<img src="${safeUrl(w.icon)}" data-icon-url="${escHtml(w.icon)}" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:contain;">`
+          ? `<img src="${safeUrl(iconSrc)}" data-icon-url="${escHtml(w.icon)}" loading="lazy" decoding="async" fetchpriority="low" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:contain;">`
           : w.icon;
         const tags = (w.tags ?? []).map(t => `<span class="work-tag">${escHtml(t)}</span>`).join('');
         return `
@@ -566,13 +571,9 @@ fetch('/content.json', { cache: 'no-store' })
         `;
       }).join('');
       worksEl.querySelectorAll('.work-icon img[data-icon-url]').forEach(img => {
-        const fallbacks = githubRawFallbacks(img.dataset.iconUrl);
-        let fallbackIndex = 0;
         let apiAttempted = false;
         img.addEventListener('error', async () => {
-          if (fallbackIndex < fallbacks.length) {
-            img.src = fallbacks[fallbackIndex++];
-          } else if (!apiAttempted) {
+          if (!apiAttempted) {
             apiAttempted = true;
             if (!await loadGithubRawViaApi(img, img.dataset.iconUrl)) {
               img.closest('.work-icon')?.remove();
