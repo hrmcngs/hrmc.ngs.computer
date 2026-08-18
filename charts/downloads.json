@@ -1,12 +1,12 @@
 {
-  "generated": "2026-08-18T15:47:48.924Z",
+  "generated": "2026-08-18T17:43:14.980Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 50,
       "source": "curseforge-html"
     },
     "https://curseforge.com/minecraft/mc-mods/rpgish-hpdisplay-mod": {
-      "count": 99,
+      "count": 100,
       "source": "curseforge-html"
     },
     "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons": {
@@ -27,7 +27,7 @@
       "source": "curseforge-html"
     },
     "https://curseforge.com/minecraft/mc-mods/gun-and-weapons": {
-      "count": 648,
+      "count": 649,
       "source": "curseforge-html"
     }
   }
