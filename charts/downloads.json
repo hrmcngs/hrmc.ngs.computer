@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-18T21:38:02.928Z",
+  "generated": "2026-08-18T21:57:55.975Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 50,
@@ -27,7 +27,7 @@
       "source": "curseforge-html"
     },
     "https://curseforge.com/minecraft/mc-mods/gun-and-weapons": {
-      "count": 653,
+      "count": 657,
       "source": "curseforge-html"
     }
   }
