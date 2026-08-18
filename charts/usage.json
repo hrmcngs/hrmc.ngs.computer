@@ -1,13 +1,21 @@
 {
   "schemaVersion": 1,
-  "total": 0,
-  "template": 0,
+  "total": 4,
+  "template": 4,
   "bootstrap": 0,
   "breakdown": {
     "forks": 0,
     "usedBy": 0,
     "codeRefs": 0,
-    "rawRefs": 0
+    "rawRefs": 0,
+    "publishedUsage": 1,
+    "knownRepos": 4
   },
-  "generatedAt": "2026-08-17T16:24:12.913Z"
+  "verifiedRepos": [
+    "aya526dev/aya526dev",
+    "hrmcngs/hrmc.ngs.computer",
+    "hrmcngs/hrmcngs",
+    "yuqiuwuu/yuqiuwuu"
+  ],
+  "generatedAt": "2026-08-18T02:51:37.107Z"
 }

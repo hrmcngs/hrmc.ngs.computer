@@ -23,6 +23,17 @@ const path = require('path');
 const TEMPLATE_REPO = 'hrmcngs/github-stats-charts';
 const BOOTSTRAP_URL = 'raw.githubusercontent.com/hrmcngs/hrmcngs/main/bootstrap.sh';
 const SELF_EXCLUDE = ['hrmcngs/hrmcngs', 'hrmcngs/hrmc.ngs.computer'];
+const KNOWN_REPOS = [
+  'aya526dev/aya526dev',
+  'hrmcngs/hrmc.ngs.computer',
+  'hrmcngs/hrmcngs',
+  'yuqiuwuu/yuqiuwuu',
+];
+const MARKER_FILES = [
+  'scripts/gen-charts.js',
+  'src/js/charts.js',
+  '.github/workflows/update-charts.yml',
+];
 
 // 注意: /search/code は Actions の GITHUB_TOKEN では cross-repo 検索ができず
 // 429 で失敗する。USAGE_TOKEN（repo スコープの PAT）をリポジトリ secret に
@@ -78,6 +89,42 @@ async function scrapeUsedBy(repo) {
   }
 }
 
+// テンプレート本体で重複排除・手動検証まで行った公開カウンターを取得する。
+// GitHub の "Use this template" には公式の集計APIがないため、この値を正とする。
+async function fetchPublishedUsage() {
+  try {
+    const d = await api(`/repos/${TEMPLATE_REPO}/contents/.usage.json?ref=main`);
+    if (d?.encoding !== 'base64' || typeof d.content !== 'string') return 0;
+    const usage = JSON.parse(Buffer.from(d.content, 'base64').toString('utf8'));
+    const count = Number.parseInt(usage.message, 10);
+    return Number.isFinite(count) && count >= 0 ? count : 0;
+  } catch (e) {
+    console.warn('published usage failed:', e.message);
+    return 0;
+  }
+}
+
+// コード検索に出ない導入先は、配布ファイルの実在を確認してから数える。
+async function verifyKnownRepos() {
+  const verified = [];
+  for (const repo of KNOWN_REPOS) {
+    try {
+      const info = await api(`/repos/${repo}`);
+      if (info.private) continue;
+      for (const file of MARKER_FILES) {
+        try {
+          await api(`/repos/${repo}/contents/${file}`);
+          verified.push(info.full_name);
+          break;
+        } catch (e) { /* 次のマーカーファイルを確認 */ }
+      }
+    } catch (e) {
+      console.warn(`known repo failed (${repo}):`, e.message);
+    }
+  }
+  return verified;
+}
+
 (async () => {
   // ── テンプレート（"Use this template"）利用数 ─────────────
   let forks = 0;
@@ -86,20 +133,29 @@ async function scrapeUsedBy(repo) {
   const usedBy = await scrapeUsedBy(TEMPLATE_REPO);
   const codeRefs = await searchCount(`"${TEMPLATE_REPO}" -repo:${TEMPLATE_REPO}`);
   const rawRefs  = await searchCount(`"raw.githubusercontent.com/${TEMPLATE_REPO}" -repo:${TEMPLATE_REPO}`);
+  const publishedUsage = await fetchPublishedUsage();
+  const knownRepos = await verifyKnownRepos();
   // raw URL ヒットは概ね codeRefs に含まれるため max で重複除去
-  const template = forks + Math.max(codeRefs, rawRefs) + usedBy;
+  const discoveredTemplate = forks + Math.max(codeRefs, rawRefs) + usedBy;
 
   // ── bootstrap.sh 利用数 ─────────────────────────────────
   const excludeArgs = SELF_EXCLUDE.map(r => `-repo:${r}`).join(' ');
   const bootstrap = await searchCount(`"${BOOTSTRAP_URL}" ${excludeArgs}`);
 
-  const total = template + bootstrap;
+  // 公開カウンターには bootstrap 経由の導入も含まれるため、単純加算せず
+  // このサイト独自集計との大きい方を採用して二重計上を避ける。
+  const total = Math.max(publishedUsage, knownRepos.length, discoveredTemplate + bootstrap);
+  const template = Math.max(discoveredTemplate, knownRepos.length, publishedUsage - bootstrap);
   const out = {
     schemaVersion: 1,
     total,
     template,
     bootstrap,
-    breakdown: { forks, usedBy, codeRefs, rawRefs },
+    breakdown: {
+      forks, usedBy, codeRefs, rawRefs, publishedUsage,
+      knownRepos: knownRepos.length,
+    },
+    verifiedRepos: knownRepos,
     generatedAt: new Date().toISOString(),
   };
   console.log(JSON.stringify(out, null, 2));
