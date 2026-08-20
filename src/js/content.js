@@ -215,7 +215,6 @@ function applyColor(el, color, varName = '--link-color') {
   const sheet = getColorStyleSheet();
   try {
     sheet.insertRule(`.${uid}::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:${accentVal}; border-radius:14px 0 0 14px; }`, sheet.cssRules.length);
-    sheet.insertRule(`.${uid}:hover::after { content:''; position:absolute; inset:0; border-radius:inherit; background:${accentVal}; opacity:0.07; pointer-events:none; }`, sheet.cssRules.length);
   } catch(e) { console.warn('applyColor gradient rule failed', e); }
 }
 

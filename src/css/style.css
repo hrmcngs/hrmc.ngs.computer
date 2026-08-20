@@ -313,12 +313,11 @@ body {
   max-width: 300px;
   aspect-ratio: 1;
   box-shadow: 0 0 60px rgba(124,106,247,0.08);
-  transition: box-shadow 0.4s, transform 0.4s;
+  transition: border-color 0.3s;
 }
 
 .katana-card:hover {
-  box-shadow: 0 0 80px rgba(124,106,247,0.2);
-  transform: translateY(-4px);
+  border-color: var(--accent);
 }
 
 .katana-card img {
@@ -403,7 +402,7 @@ body {
   text-decoration: none;
   color: var(--text-muted);
   font-family: var(--font-en);
-  transition: border-color 0.25s, color 0.25s, transform 0.25s, box-shadow 0.25s, background 0.25s;
+  transition: border-color 0.25s;
   min-width: 220px;
   position: relative;
   overflow: hidden;
@@ -456,24 +455,13 @@ body {
   transition: opacity 0.25s, transform 0.25s;
 }
 
-.link-card:hover {
-  transform: translateY(-3px);
-  border-color: color-mix(in srgb, var(--link-color, #ffffff) 30%, transparent);
-  box-shadow: 0 8px 32px color-mix(in srgb, var(--link-color, #000000) 10%, transparent);
-}
-
-.link-card:hover .link-arrow {
-  opacity: 0.6;
-  transform: translate(0, 0);
-}
-
-.link-card:hover .link-platform {
-  opacity: 1;
-}
-
-.link-card:hover .link-icon {
-  background: color-mix(in srgb, var(--link-color, #ffffff) 15%, transparent);
-  color: var(--link-color, inherit);
+.link-card:hover,
+.link-card:focus-visible {
+  border-color: var(--link-color, var(--accent));
+  box-shadow: none !important;
+  filter: none;
+  transform: none;
+  outline: none;
 }
 
 /* ===== Works ===== */
@@ -492,13 +480,16 @@ body {
   border-radius: 16px;
   text-decoration: none;
   color: var(--text);
-  transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  transition: border-color 0.3s;
 }
 
-.work-card:hover {
+.work-card:hover,
+.work-card:focus-visible {
   border-color: color-mix(in srgb, var(--work-color, var(--accent2)) 60%, transparent);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 30px color-mix(in srgb, var(--work-color, var(--accent2)) 12%, transparent);
+  box-shadow: none !important;
+  filter: none;
+  transform: none;
+  outline: none;
 }
 
 .work-icon {
@@ -626,13 +617,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  transition: border-color 0.3s;
 }
 
 .katana-item:hover {
   border-color: var(--accent);
-  transform: translateY(-6px) rotate(1deg);
-  box-shadow: 0 12px 40px rgba(124,106,247,0.2);
 }
 
 .katana-item img {

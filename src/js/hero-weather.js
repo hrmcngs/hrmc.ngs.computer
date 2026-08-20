@@ -187,39 +187,150 @@
     }
   }
 
-  // ── 8月：花火の火花 ───────────────────────────────
-  class FireworkSpark {
-    constructor(initial) { this.init(initial); }
+  // ── 7〜8月：花火の火花 ────────────────────────────
+  class FireworkBurst {
+    constructor(initial, depth) { this.depth=depth; this.init(initial); }
     init(initial=false) {
-      this.z     = Math.random();
-      this.x     = Math.random() * canvas.width;
-      this.y     = initial ? Math.random() * canvas.height : -10;
-      this.len   = (3 + Math.random() * 6) * (0.5 + this.z * 0.7);
-      this.vx    = (Math.random() - 0.5) * (0.15 + this.z * 0.35);
-      this.vy    = 0.12 + this.z * 0.35;
-      this.alpha = 0.18 + this.z * 0.42;
       const colors = cfg.firework?.colors ?? ['#ffcb6b','#ff8f70','#8be9fd','#c7a0ff'];
       this.color = colors[Math.floor(Math.random() * colors.length)];
-      this.twinkle = Math.random() * Math.PI * 2;
+      this.secondColor = colors[Math.floor(Math.random() * colors.length)];
+      this.z = this.depth ?? Math.random(); // 0=遠景、1=近景
+      this.scale = 0.48 + this.z * 1.05;
+      this.brightness = 0.55 + this.z * 0.55;
+      const types = ['ring','chrysanthemum','double','willow','multicolor'];
+      this.type = types[Math.floor(Math.random() * types.length)];
+      this.x = canvas.width * (0.1 + Math.random() * 0.8);
+      this.y = canvas.height * (0.06 + Math.random() * (0.5 - this.z * 0.12));
+      this.rocketX = this.x + (Math.random() - 0.5) * 100;
+      this.rocketY = canvas.height + 12;
+      this.launchStartX = this.rocketX;
+      this.launchStartY = this.rocketY;
+      this.rocketPX = this.rocketX;
+      this.rocketPY = this.rocketY;
+      this.launchLife = 0;
+      this.maxLaunchLife = 42 + Math.floor(Math.random() * 24);
+      this.phase = 'launch';
+      this.life = 0;
+      this.maxLife = (this.type==='willow' ? 125 : 82) + Math.floor(Math.random() * 30);
+      this.delay = initial ? Math.floor(Math.random() * 160) : 50 + Math.floor(Math.random() * 180);
+      const count = 18 + Math.floor(this.z * 14) + Math.floor(Math.random() * 6);
+      const offset = Math.random() * Math.PI * 2;
+      const tilt = 0.3 + Math.random() * 0.75;
+      const makeSpark = (i, ringScale=1) => {
+        const angle = offset + (Math.PI * 2 * i / count) + (Math.random() - 0.5) * 0.12;
+        let speed = (this.type==='ring' ? 2.45+Math.random()*0.22 : 1.55+Math.random()*1.75) * this.scale * ringScale;
+        if (this.type==='willow') speed=(1.7+Math.random()*1.05)*this.scale;
+        let dx=Math.cos(angle), dy=Math.sin(angle), dz=0;
+        if(this.type==='ring' || this.type==='double'){
+          dz=dy*Math.sin(tilt);
+          dy*=Math.cos(tilt);
+        } else {
+          dz=(Math.random()*2-1)*0.82;
+          const flat=Math.sqrt(1-dz*dz);
+          dx*=flat; dy*=flat;
+        }
+        return {
+          x:0, y:0, z:0,
+          vx:dx*speed, vy:dy*speed, vz:dz*speed,
+          drag:this.type==='willow'?0.988:0.982,
+          gravity:(this.type==='willow'?0.032:0.018)*this.scale,
+          color:this.type==='multicolor' ? colors[i%colors.length] : (ringScale<1?this.secondColor:this.color),
+          history:[], twinkle:Math.random()*Math.PI*2,
+          twinkleSpeed:0.18+Math.random()*0.22
+        };
+      };
+      this.sparks=Array.from({length:count},(_,i)=>makeSpark(i));
+      if(this.type==='double') this.sparks.push(...Array.from({length:count},(_,i)=>makeSpark(i,0.56)));
     }
     update() {
-      this.twinkle += 0.035;
-      this.x += this.vx;
-      this.y += this.vy;
-      if (this.y > canvas.height + this.len) this.init();
+      if (this.delay > 0) { this.delay--; return; }
+      if (this.phase === 'launch') {
+        this.rocketPX=this.rocketX; this.rocketPY=this.rocketY;
+        this.launchLife++;
+        const t=Math.min(1,this.launchLife/this.maxLaunchLife);
+        const eased=1-Math.pow(1-t,2.4);
+        this.rocketX=this.launchStartX+(this.x-this.launchStartX)*t;
+        this.rocketY=this.launchStartY+(this.y-this.launchStartY)*eased;
+        if (this.launchLife >= this.maxLaunchLife) {
+          this.rocketX=this.x; this.rocketY=this.y;
+          this.phase='burst';
+        }
+        return;
+      }
+      this.life++;
+      this.sparks.forEach(s => {
+        s.history.unshift({x:s.x,y:s.y,z:s.z});
+        s.history.length=Math.min(s.history.length,this.type==='willow'?9:6);
+        s.x+=s.vx; s.y+=s.vy; s.z+=s.vz;
+        s.vx*=s.drag; s.vy=s.vy*s.drag+s.gravity; s.vz*=s.drag;
+        s.twinkle+=s.twinkleSpeed;
+      });
+      if (this.life > this.maxLife) this.init();
     }
     draw() {
-      const a = this.alpha * (0.65 + Math.sin(this.twinkle) * 0.35);
+      if (this.delay > 0) return;
+      if (this.phase === 'launch') {
+        ctx.save();
+        ctx.strokeStyle=this.color;
+        ctx.fillStyle='#fff';
+        ctx.shadowColor=this.color;
+        ctx.shadowBlur=7+this.z*5;
+        ctx.globalAlpha=Math.min(1,this.brightness);
+        ctx.lineWidth=0.9+this.z*0.9;
+        ctx.beginPath();
+        ctx.moveTo(this.rocketX,this.rocketY);
+        ctx.lineTo(this.rocketPX,this.rocketPY+10);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(this.rocketX,this.rocketY,1+this.z,0,Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+        return;
+      }
+      const progress = this.life / this.maxLife;
+      const alpha = Math.min(1,Math.pow(1-progress, this.type==='willow'?0.85:1.25) * this.brightness);
       ctx.save();
-      ctx.globalAlpha = a;
-      ctx.strokeStyle = this.color;
-      ctx.lineWidth = 0.6 + this.z;
-      ctx.shadowColor = this.color;
-      ctx.shadowBlur = 3 + this.z * 4;
-      ctx.beginPath();
-      ctx.moveTo(this.x, this.y);
-      ctx.lineTo(this.x - this.vx * 5, this.y - this.len);
-      ctx.stroke();
+      if (this.life < 7) {
+        const flash = 1 - this.life / 7;
+        const flashRadius=12+this.scale*15;
+        const glow = ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,flashRadius);
+        glow.addColorStop(0,`rgba(255,255,255,${flash * 0.9})`);
+        glow.addColorStop(0.25,this.color);
+        glow.addColorStop(1,'transparent');
+        ctx.globalAlpha=flash;
+        ctx.fillStyle=glow;
+        ctx.beginPath();
+        ctx.arc(this.x,this.y,flashRadius,0,Math.PI*2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = alpha;
+      ctx.shadowBlur = 0;
+      ctx.lineWidth = 0.75+this.z*1.15;
+      const project=p=>{
+        const perspective=260/(260+p.z);
+        return {x:this.x+p.x*perspective,y:this.y+p.y*perspective,k:perspective};
+      };
+      this.sparks.forEach(s => {
+        const head=project(s);
+        ctx.strokeStyle=s.color;
+        const trail=[s,...s.history];
+        if(trail.length>1){
+          ctx.globalAlpha=alpha*0.62*Math.min(1.15,Math.max(0.35,head.k));
+          ctx.lineWidth=(0.55+this.z)*Math.min(1.4,Math.max(0.55,head.k));
+          ctx.beginPath(); ctx.moveTo(head.x,head.y);
+          for(let i=1;i<trail.length;i++){
+            const p=project(trail[i]);
+            ctx.lineTo(p.x,p.y);
+          }
+          ctx.stroke();
+        }
+        ctx.globalAlpha=alpha*(0.72+Math.sin(s.twinkle)*0.28)*Math.min(1.2,Math.max(0.4,head.k));
+        if(this.z>0.55 || this.type==='willow'){
+          ctx.fillStyle=s.color;
+          const dot=(1.1+this.z*0.8)*Math.min(1.5,Math.max(0.55,head.k));
+          ctx.fillRect(head.x-dot/2,head.y-dot/2,dot,dot);
+        }
+      });
       ctx.restore();
     }
   }
@@ -397,9 +508,9 @@
     const s=state.season;
     if      (s==='spring'){const n=count(8000); particles=Array.from({length:n},(_,i)=>new Petal(i<n*0.7));}
     else if (s==='summer'){
-      const isAugust = new Date().getMonth() === 7;
-      const n=count(isAugust ? 15000 : 12000);
-      particles=Array.from({length:n},(_,i)=>isAugust ? new FireworkSpark(i<n*0.7) : new Firefly(i<n*0.7));
+      const isFireworkSeason = new Date().getMonth() >= 6;
+      const n=isFireworkSeason ? Math.max(3,Math.min(Math.floor(canvas.width*canvas.height/240000),5)) : count(12000);
+      particles=Array.from({length:n},(_,i)=>isFireworkSeason ? new FireworkBurst(true,i/(n-1)) : new Firefly(i<n*0.7));
     }
     else if (s==='autumn'){const n=count(9000); particles=Array.from({length:n},(_,i)=>new Leaf(i<n*0.7));}
     else                  { particles=[]; } // 冬は天気=雪の時だけ降る
