@@ -26,6 +26,9 @@
   "firefly": {
     "noiseRate": 0.12             // ノイズスパーク発生確率（0〜1）
   },
+  "firework": {
+    "colors": ["#ffcb6b", "#ff8f70", "#8be9fd", "#c7a0ff"] // 8月の火花の色
+  },
   "cloud": {
     "noiseRate": 0.05             // ノイズ発生確率（0〜1、高いほど頻繁）
   },

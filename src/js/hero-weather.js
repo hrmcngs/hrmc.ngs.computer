@@ -187,6 +187,43 @@
     }
   }
 
+  // ── 8月：花火の火花 ───────────────────────────────
+  class FireworkSpark {
+    constructor(initial) { this.init(initial); }
+    init(initial=false) {
+      this.z     = Math.random();
+      this.x     = Math.random() * canvas.width;
+      this.y     = initial ? Math.random() * canvas.height : -10;
+      this.len   = (3 + Math.random() * 6) * (0.5 + this.z * 0.7);
+      this.vx    = (Math.random() - 0.5) * (0.15 + this.z * 0.35);
+      this.vy    = 0.12 + this.z * 0.35;
+      this.alpha = 0.18 + this.z * 0.42;
+      const colors = cfg.firework?.colors ?? ['#ffcb6b','#ff8f70','#8be9fd','#c7a0ff'];
+      this.color = colors[Math.floor(Math.random() * colors.length)];
+      this.twinkle = Math.random() * Math.PI * 2;
+    }
+    update() {
+      this.twinkle += 0.035;
+      this.x += this.vx;
+      this.y += this.vy;
+      if (this.y > canvas.height + this.len) this.init();
+    }
+    draw() {
+      const a = this.alpha * (0.65 + Math.sin(this.twinkle) * 0.35);
+      ctx.save();
+      ctx.globalAlpha = a;
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth = 0.6 + this.z;
+      ctx.shadowColor = this.color;
+      ctx.shadowBlur = 3 + this.z * 4;
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y);
+      ctx.lineTo(this.x - this.vx * 5, this.y - this.len);
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
   // ── 秋：落ち葉 ────────────────────────────────────
   class Leaf {
     constructor(initial){this.init(initial);}
@@ -359,7 +396,11 @@
   function buildParticles(){
     const s=state.season;
     if      (s==='spring'){const n=count(8000); particles=Array.from({length:n},(_,i)=>new Petal(i<n*0.7));}
-    else if (s==='summer'){const n=count(12000);particles=Array.from({length:n},(_,i)=>new Firefly(i<n*0.7));}
+    else if (s==='summer'){
+      const isAugust = new Date().getMonth() === 7;
+      const n=count(isAugust ? 15000 : 12000);
+      particles=Array.from({length:n},(_,i)=>isAugust ? new FireworkSpark(i<n*0.7) : new Firefly(i<n*0.7));
+    }
     else if (s==='autumn'){const n=count(9000); particles=Array.from({length:n},(_,i)=>new Leaf(i<n*0.7));}
     else                  { particles=[]; } // 冬は天気=雪の時だけ降る
   }
