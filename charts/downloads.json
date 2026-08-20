@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-20T17:13:27.005Z",
+  "generated": "2026-08-20T17:47:58.409Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 50,
@@ -19,7 +19,7 @@
     },
     "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility": {
       "count": 468,
-      "installs": 418,
+      "installs": 419,
       "source": "vscode-marketplace"
     },
     "https://curseforge.com/minecraft/mc-mods/arsenal-backpack": {
@@ -27,7 +27,7 @@
       "source": "curseforge-html"
     },
     "https://curseforge.com/minecraft/mc-mods/gun-and-weapons": {
-      "count": 680,
+      "count": 682,
       "source": "curseforge-html"
     }
   }
