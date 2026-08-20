@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-20T12:10:47.383Z",
+  "generated": "2026-08-20T14:36:48.760Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 50,
@@ -18,7 +18,7 @@
       "source": "curseforge-html"
     },
     "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility": {
-      "count": 467,
+      "count": 468,
       "installs": 418,
       "source": "vscode-marketplace"
     },
