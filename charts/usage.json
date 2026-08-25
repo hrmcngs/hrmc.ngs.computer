@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "total": 5,
-  "template": 5,
+  "total": 4,
+  "template": 4,
   "bootstrap": 0,
   "breakdown": {
     "forks": 0,
     "usedBy": 0,
-    "codeRefs": 5,
+    "codeRefs": 3,
     "rawRefs": 1,
     "publishedUsage": 1,
     "knownRepos": 4
@@ -17,5 +17,5 @@
     "hrmcngs/hrmcngs",
     "yuqiuwuu/yuqiuwuu"
   ],
-  "generatedAt": "2026-08-24T10:10:49.351Z"
+  "generatedAt": "2026-08-25T06:41:36.615Z"
 }
