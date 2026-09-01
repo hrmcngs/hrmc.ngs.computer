@@ -351,10 +351,6 @@
         appendLines([{type:'error',message:'matrix: モジュールを読み込めませんでした。'}],body);
         return;
       }
-      if(!window.isSecureContext){
-        appendLines([{type:'error',message:'matrix: カメラ利用には HTTPS または localhost が必要です。'}],body);
-        return;
-      }
       savedBodyContent=body.innerHTML;
       body.innerHTML='';
       activeViewer=true;

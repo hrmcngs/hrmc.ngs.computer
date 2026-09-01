@@ -21,6 +21,9 @@
     ...'日月火水木金土山川田人本一二三四五六七八九十空風雷電光闇',
   ];
   const pickChar = () => CHARS[(Math.random() * CHARS.length) | 0];
+  // QRセル用。細すぎる字を避け、セルの面積を確保しやすい文字に限定する。
+  const QR_CHARS = ['0', '1'];
+  const pickQrChar = () => QR_CHARS[(Math.random() * QR_CHARS.length) | 0];
 
   function mount(container, opts = {}) {
     container.innerHTML = '';
@@ -42,6 +45,24 @@
     ].join(';');
     container.appendChild(root);
 
+    function applySourceLayout() {
+      if (fakeFull || document.fullscreenElement === root) return;
+      if (sourceMode === 'image' && image.naturalWidth && image.naturalHeight) {
+        // アップロード画像はカメラ用の固定高で切り取らず、元画像と同じ比率で表示する
+        const ratio = image.naturalWidth / image.naturalHeight;
+        // 縦長・正方形画像も全体が画面内に入り、QRの四隅が常に見えるようにする
+        root.style.width = `min(100%, ${70 * ratio}vh)`;
+        root.style.height = 'auto';
+        root.style.aspectRatio = `${image.naturalWidth} / ${image.naturalHeight}`;
+        root.style.marginInline = 'auto';
+      } else {
+        root.style.width = '100%';
+        root.style.height = 'min(70vh, 560px)';
+        root.style.aspectRatio = 'auto';
+        root.style.marginInline = '0';
+      }
+    }
+
     const canvas = document.createElement('canvas');
     canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;';
     root.appendChild(canvas);
@@ -52,13 +73,38 @@
     video.autoplay = true; video.playsInline = true; video.muted = true;
     root.appendChild(video);
 
+    const image = document.createElement('img');
+    image.style.display = 'none';
+    image.alt = '';
+    root.appendChild(image);
+
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.style.display = 'none';
+    root.appendChild(fileInput);
+
     const off = document.createElement('canvas');
     const offCtx = off.getContext('2d', { willReadFrequently: true });
+    const qrCanvas = document.createElement('canvas');
+    const qrCtx = qrCanvas.getContext('2d', { willReadFrequently: true });
 
     const status = document.createElement('div');
     status.style.cssText = 'position:absolute;top:0.6rem;left:0.8rem;color:#0f0;font-family:monospace;font-size:0.78rem;opacity:0.75;text-shadow:0 0 4px #000;pointer-events:none;';
     status.textContent = 'カメラを起動中...';
     root.appendChild(status);
+
+    const emptyState = document.createElement('button');
+    emptyState.type = 'button';
+    emptyState.style.cssText = [
+      'position:absolute', 'left:50%', 'top:50%', 'transform:translate(-50%,-50%)',
+      'display:none', 'padding:0.85rem 1.1rem', 'border-radius:9px',
+      'border:1px solid rgba(0,255,0,0.55)', 'background:rgba(0,0,0,0.75)',
+      'color:#0f0', 'font:600 0.9rem/1.4 ui-monospace,monospace',
+      'cursor:pointer', 'z-index:2', 'white-space:nowrap',
+    ].join(';');
+    emptyState.textContent = '▣  画像をアップロード';
+    root.appendChild(emptyState);
 
     // ── 右上アイコンバー（常時表示）─────────────────
     const topBar = document.createElement('div');
@@ -77,6 +123,10 @@
     shotBtn.style.cssText = iconBtnCss + ';color:#f55;border-color:rgba(255,80,80,0.5);font-size:20px;';
     shotBtn.title = '撮影 (PNG 保存)'; shotBtn.textContent = '●';
 
+    const uploadBtn = document.createElement('button');
+    uploadBtn.type = 'button'; uploadBtn.style.cssText = iconBtnCss;
+    uploadBtn.title = '画像をアップロード'; uploadBtn.textContent = '▣';
+
     const swapBtn = document.createElement('button');
     swapBtn.type = 'button'; swapBtn.style.cssText = iconBtnCss;
     swapBtn.title = '前後カメラ切替'; swapBtn.textContent = '⇄';
@@ -89,7 +139,7 @@
     xBtn.type = 'button'; xBtn.style.cssText = iconBtnCss;
     xBtn.title = '閉じる'; xBtn.textContent = '✕';
 
-    topBar.append(shotBtn, swapBtn, gearBtn, xBtn);
+    topBar.append(uploadBtn, shotBtn, swapBtn, gearBtn, xBtn);
 
     // ── 撮影フラッシュ用オーバーレイ ─────────────────
     const flash = document.createElement('div');
@@ -147,7 +197,15 @@
     resetBtn.type = 'button';
     resetBtn.style.cssText = btnCssPanel + ';grid-column:1 / -1;';
     resetBtn.textContent = '↺  Reset';
-    presetRow.append(moonBtn, nightBtn, resetBtn);
+    const qrBtn = document.createElement('button');
+    qrBtn.type = 'button';
+    qrBtn.style.cssText = btnCssPanel + ';grid-column:1 / -1;';
+    qrBtn.textContent = '▦  QR Safe Mode';
+    const qrBgBtn = document.createElement('button');
+    qrBgBtn.type = 'button';
+    qrBgBtn.style.cssText = btnCssPanel + ';grid-column:1 / -1;';
+    qrBgBtn.textContent = 'QR Background: White';
+    presetRow.append(moonBtn, nightBtn, qrBtn, qrBgBtn, resetBtn);
 
     panel.append(tileRow.root, fadeRow.root, motionRow.root, detailRow.root, presetRow, fsBtn);
     root.appendChild(panel);
@@ -169,6 +227,11 @@
     let bgFloor  = 30;  // 暗いセルの下限緑値（デフォルト=飛び防止 / Moon=0）
     let rafId    = 0;
     let stream   = null;
+    let imageUrl = null;
+    let sourceMode = 'camera';
+    let sourceRevision = 0;
+    let qrSafe = false;
+    let qrBackground = 'white';
     let running  = false;
     let mirror   = true;
     let currentFacing = 'environment'; // 'environment' = 外カメ / 'user' = 内カメ
@@ -204,6 +267,7 @@
       fakeFull = false;
       root.setAttribute('style', savedRootStyle);
       document.documentElement.style.overflow = '';
+      applySourceLayout();
       requestAnimationFrame(resizeCanvas);
     };
     const toggleFullscreen = async () => {
@@ -235,11 +299,82 @@
     }
     shotBtn.addEventListener('click', capture);
 
+    uploadBtn.addEventListener('click', () => fileInput.click());
+    emptyState.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files?.[0];
+      if (!file) return;
+      if (file.type && !file.type.startsWith('image/')) {
+        status.textContent = '画像ファイルを選択してください';
+        return;
+      }
+      // 起動中の getUserMedia が後から完了して画像を上書きしないよう無効化する
+      sourceRevision++;
+      const nextUrl = URL.createObjectURL(file);
+      image.onload = () => {
+        if (imageUrl) URL.revokeObjectURL(imageUrl);
+        imageUrl = nextUrl;
+        sourceMode = 'image';
+        qrSafe = false;
+        qrBackground = 'white';
+        qrBgBtn.textContent = 'QR Background: White';
+        updateQrButton();
+        emptyState.style.display = 'none';
+        running = false;
+        cancelAnimationFrame(rafId);
+        stream?.getTracks().forEach(t => t.stop());
+        stream = null;
+        mirror = false;
+        prevPx = null;
+        status.textContent = file.name;
+        swapBtn.title = 'カメラに戻る';
+        swapBtn.textContent = '◉';
+        applySourceLayout();
+        resizeCanvas();
+        running = true;
+        draw();
+      };
+      image.onerror = () => {
+        URL.revokeObjectURL(nextUrl);
+        status.textContent = '画像を読み込めませんでした';
+      };
+      image.src = nextUrl;
+      fileInput.value = '';
+    });
+
     // ── プリセット ──────────────────────────────────
     function setSlider(row, val) {
       row.input.value = String(val);
       row.input.dispatchEvent(new Event('input'));
     }
+    function updateQrButton() {
+      qrBtn.style.color = qrSafe ? '#000' : '#0f0';
+      qrBtn.style.background = qrSafe ? '#0f0' : 'transparent';
+      qrBtn.textContent = qrSafe ? '▦  QR Safe Mode: ON' : '▦  QR Safe Mode';
+    }
+    qrBtn.addEventListener('click', () => {
+      if (sourceMode !== 'image') {
+        status.textContent = '先にQRコード画像をアップロードしてください';
+        return;
+      }
+      qrSafe = !qrSafe;
+      prevPx = null;
+      updateQrButton();
+      status.textContent = qrSafe
+        ? `QR読み取り優先モード（${qrBackground === 'white' ? '白背景' : '黒背景・反転'}）`
+        : '';
+      if (running && !rafId) draw();
+      if (qrSafe) setTimeout(() => togglePanel(false), 180);
+    });
+    qrBgBtn.addEventListener('click', () => {
+      qrBackground = qrBackground === 'white' ? 'black' : 'white';
+      qrBgBtn.textContent = `QR Background: ${qrBackground === 'white' ? 'White' : 'Black'}`;
+      status.textContent = qrBackground === 'white'
+        ? '白背景：読み取り推奨'
+        : '黒背景：反転QR対応リーダー専用';
+      if (running && qrSafe && !rafId) draw();
+      if (qrSafe) setTimeout(() => togglePanel(false), 180);
+    });
     async function applyCameraConstraints(mode) {
       const track = stream?.getVideoTracks()?.[0];
       if (!track?.applyConstraints) return;
@@ -317,12 +452,17 @@
       canvas.height = Math.floor(rect.height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       cellChars = []; cellAge = [];
+      if (running && qrSafe && !rafId) requestAnimationFrame(draw);
     }
 
     function draw() {
       if (!running) return;
       rafId = requestAnimationFrame(draw);
-      if (video.readyState < 2 || !video.videoWidth) return;
+      const source = sourceMode === 'image' ? image : video;
+      const sourceWidth = sourceMode === 'image' ? image.naturalWidth : video.videoWidth;
+      const sourceHeight = sourceMode === 'image' ? image.naturalHeight : video.videoHeight;
+      if (sourceMode === 'camera' && video.readyState < 2) return;
+      if (!sourceWidth || !sourceHeight) return;
 
       const w = canvas.clientWidth, h = canvas.clientHeight;
       ctx.fillStyle = `rgba(0,0,0,${1 - fade})`;
@@ -337,15 +477,99 @@
         off.width = subCols; off.height = subRows;
       }
 
-      const vw = video.videoWidth, vh = video.videoHeight;
-      const tAspect = cols / rows, vAspect = vw / vh;
+      const vw = sourceWidth, vh = sourceHeight;
+      const tAspect = w / h, vAspect = vw / vh;
       let sx = 0, sy = 0, sw = vw, sh = vh;
       if (vAspect > tAspect) { sw = vh * tAspect; sx = (vw - sw) / 2; }
       else                   { sh = vw / tAspect; sy = (vh - sh) / 2; }
 
+      // QRは文字へ置換するとセルが崩れるため、輪郭と余白を保った2値画像として描画する。
+      // 黒セル＋明るい緑背景の標準極性にして、一般的なQRリーダーで認識しやすくする。
+      if (qrSafe && sourceMode === 'image') {
+        const qw = Math.max(1, Math.round(w));
+        const qh = Math.max(1, Math.round(h));
+        if (qrCanvas.width !== qw || qrCanvas.height !== qh) {
+          qrCanvas.width = qw;
+          qrCanvas.height = qh;
+        }
+        qrCtx.imageSmoothingEnabled = false;
+        // 元画像に余白がない場合でも読めるよう、QRの外側に約4モジュール相当の静かな領域を確保する。
+        const quiet = Math.max(8, Math.round(Math.min(qw, qh) * 0.055));
+        qrCtx.fillStyle = '#fff';
+        qrCtx.fillRect(0, 0, qw, qh);
+        qrCtx.drawImage(source, sx, sy, sw, sh, quiet, quiet, qw - quiet * 2, qh - quiet * 2);
+        const qrImage = qrCtx.getImageData(0, 0, qw, qh);
+        const data = qrImage.data;
+        // Otsu法で画像ごとに最適なしきい値を求める。粗い・暗い・薄いQRにも追従する。
+        const histogram = new Uint32Array(256);
+        let lumSum = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          const lum = Math.round(data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114);
+          histogram[lum]++;
+          lumSum += lum;
+        }
+        const pixelCount = data.length / 4;
+        let darkCount = 0, darkSum = 0, bestVariance = -1, threshold = 128;
+        for (let level = 0; level < 256; level++) {
+          darkCount += histogram[level];
+          if (!darkCount) continue;
+          const lightCount = pixelCount - darkCount;
+          if (!lightCount) break;
+          darkSum += level * histogram[level];
+          const darkMean = darkSum / darkCount;
+          const lightMean = (lumSum - darkSum) / lightCount;
+          const variance = darkCount * lightCount * (darkMean - lightMean) ** 2;
+          if (variance > bestVariance) {
+            bestVariance = variance;
+            threshold = level;
+          }
+        }
+        for (let i = 0; i < data.length; i += 4) {
+          const lum = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+          if (lum <= threshold) {
+            data[i] = 0; data[i + 1] = 0; data[i + 2] = 0;
+          } else {
+            data[i] = 0; data[i + 1] = 255; data[i + 2] = 65;
+          }
+          data[i + 3] = 255;
+        }
+        // QRセルをベタ塗りせず、文字だけで構成する。
+        // 白背景では濃い文字（標準極性）、黒背景では明るい文字（反転極性）になる。
+        ctx.fillStyle = qrBackground === 'white' ? '#fff' : '#000';
+        ctx.fillRect(0, 0, w, h);
+        const charSize = Math.max(3, Math.min(6, Math.round(Math.min(w, h) / 165)));
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = qrBackground === 'white' ? '#001b0b' : '#00ff41';
+        ctx.strokeStyle = ctx.fillStyle;
+        ctx.lineJoin = 'round';
+        for (let y = 0; y < h; y += charSize) {
+          // 1文字ずつ描画せず、行単位でまとめることで細かいQRでも軽くする。
+          const variedSize = charSize * (0.98 + Math.random() * 0.04);
+          ctx.font = `900 ${variedSize}px Monocraft, ui-monospace, monospace`;
+          const advance = Math.max(1, ctx.measureText('0').width);
+          const jitterX = (Math.random() - 0.5) * advance * 0.08;
+          const jitterY = (Math.random() - 0.5) * charSize * 0.06;
+          let line = '';
+          for (let x = 0; x < w + advance; x += advance) {
+            const sampleX = Math.min(qw - 1, Math.max(0, Math.floor((x + jitterX + advance / 2) / w * qw)));
+            const sampleY = Math.min(qh - 1, Math.floor((y + charSize / 2) / h * qh));
+            const sample = (sampleY * qw + sampleX) * 4;
+            const isDark = data[sample + 1] < 128;
+            line += isDark ? pickQrChar() : ' ';
+          }
+          // 0/1の形は空白率が高いため、文字の輪郭を太らせてQRセルとして認識可能な密度にする。
+          ctx.lineWidth = Math.max(0.8, variedSize * 0.32);
+          ctx.strokeText(line, jitterX, y + jitterY);
+          ctx.fillText(line, jitterX, y + jitterY);
+        }
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+        return;
+      }
+
       offCtx.save();
       if (mirror) { offCtx.translate(subCols, 0); offCtx.scale(-1, 1); }
-      offCtx.drawImage(video, sx, sy, sw, sh, 0, 0, subCols, subRows);
+      offCtx.drawImage(source, sx, sy, sw, sh, 0, 0, subCols, subRows);
       offCtx.restore();
 
       const px = offCtx.getImageData(0, 0, subCols, subRows).data;
@@ -397,6 +621,7 @@
     }
 
     async function startCamera(facing) {
+      const requestRevision = ++sourceRevision;
       // 既存ストリームを止める
       running = false;
       cancelAnimationFrame(rafId);
@@ -409,14 +634,27 @@
           video: { facingMode: { ideal: facing } }
         });
       } catch (_) {
+        if (requestRevision !== sourceRevision) return;
         try {
           chosen = await navigator.mediaDevices.getUserMedia({ video: true });
         } catch (err) {
-          status.textContent = 'カメラを開けませんでした: ' + (err?.message ?? err);
+          if (requestRevision === sourceRevision) {
+            status.textContent = 'カメラを開けませんでした。画像変換は利用できます。';
+            emptyState.style.display = 'block';
+          }
           return;
         }
       }
+      // 画像選択など、より新しい操作が行われていたらこのカメラ要求は破棄する
+      if (requestRevision !== sourceRevision) {
+        chosen.getTracks().forEach(t => t.stop());
+        return;
+      }
       stream = chosen;
+      sourceMode = 'camera';
+      qrSafe = false;
+      updateQrButton();
+      applySourceLayout();
       const t = stream.getVideoTracks()[0];
       const actualFacing = t?.getSettings?.().facingMode ?? facing ?? 'user';
       currentFacing = actualFacing;
@@ -424,6 +662,7 @@
       swapBtn.title = actualFacing === 'environment'
         ? '前後カメラ切替（現在: 外カメ）'
         : '前後カメラ切替（現在: 内カメ）';
+      swapBtn.textContent = '⇄';
 
       video.srcObject = stream;
       try { await video.play(); } catch {}
@@ -435,7 +674,10 @@
 
     async function start() {
       if (!navigator.mediaDevices?.getUserMedia) {
-        status.textContent = 'このブラウザは getUserMedia に未対応です';
+        status.textContent = window.isSecureContext
+          ? 'カメラは利用できません。画像変換は利用できます。'
+          : 'HTTPではカメラを利用できません。画像変換は利用できます。';
+        emptyState.style.display = 'block';
         return;
       }
       await startCamera('environment');
@@ -444,7 +686,9 @@
     async function switchCamera() {
       if (switching) return;
       switching = true;
-      const next = currentFacing === 'environment' ? 'user' : 'environment';
+      const next = sourceMode === 'image'
+        ? currentFacing
+        : (currentFacing === 'environment' ? 'user' : 'environment');
       status.textContent = '切替中...';
       try { await startCamera(next); }
       finally { switching = false; }
@@ -462,6 +706,8 @@
       cancelAnimationFrame(rafId);
       stream?.getTracks().forEach(t => t.stop());
       stream = null;
+      if (imageUrl) URL.revokeObjectURL(imageUrl);
+      imageUrl = null;
       window.removeEventListener('resize', onResize);
       document.removeEventListener('fullscreenchange', onResize);
       if (document.fullscreenElement === root) document.exitFullscreen?.();
