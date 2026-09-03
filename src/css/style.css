@@ -479,7 +479,7 @@ body {
 .work-card {
   display: flex;
   flex-direction: column;
-  padding: 2rem 1.5rem;
+  padding: 1.35rem 1.15rem;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -860,9 +860,9 @@ body {
 .work-card.is-nixie-clock::after {
   content: '';
   position: absolute;
-  inset: 7px;
+  inset: 5px;
   border: 1px solid rgba(206,222,248,0.09);
-  border-radius: 11px;
+  border-radius: 12px;
   pointer-events: none;
   /* 内板を一段落とし、その四隅を太いボルトで留めている */
   box-shadow:
@@ -871,8 +871,8 @@ body {
   background-repeat: no-repeat;
   background-size: 6px 6px;
   background-position:
-    8px 8px, calc(100% - 8px) 8px,
-    8px calc(100% - 8px), calc(100% - 8px) calc(100% - 8px);
+    7px 7px, calc(100% - 7px) 7px,
+    7px calc(100% - 7px), calc(100% - 7px) calc(100% - 7px);
   background-image:
     radial-gradient(circle 3px at 50% 50%, rgba(232,244,255,0.92) 0%, rgba(158,172,196,0.85) 38%, rgba(84,94,112,0.9) 66%, rgba(10,12,16,0.95) 88%, transparent 100%),
     radial-gradient(circle 3px at 50% 50%, rgba(232,244,255,0.92) 0%, rgba(158,172,196,0.85) 38%, rgba(84,94,112,0.9) 66%, rgba(10,12,16,0.95) 88%, transparent 100%),
@@ -895,9 +895,9 @@ body {
 .work-card.is-nixie-clock .work-dl {
   position: relative;
   /* 上の margin を auto にして、天板をカードの下端へ押し付ける */
-  margin: auto -1.5rem -2rem;
-  padding-top: 0.75rem;
-  padding: 0.75rem 1.5rem 0.8rem;
+  margin: auto -1.15rem -1.35rem;
+  padding-top: 0.7rem;
+  padding: 0.7rem 1.15rem 0.75rem;
   border-top: 1px solid rgba(206,222,248,0.09);
   border-radius: 0 0 15px 15px;
   background:
@@ -1322,12 +1322,12 @@ body {
   }
 
   .work-card {
-    padding: 1.2rem 1rem;
+    padding: 1rem 0.85rem;
   }
 
   .work-card.is-nixie-clock .work-dl {
-    margin: auto -1rem -1.2rem;
-    padding: 0.55rem 1rem 0.6rem;
+    margin: auto -0.85rem -1rem;
+    padding: 0.55rem 0.85rem 0.6rem;
   }
 
   .work-card h3 {

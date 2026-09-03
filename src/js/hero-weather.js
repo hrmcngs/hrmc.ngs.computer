@@ -353,20 +353,64 @@
       this.alpha= 0.2 + this.z * 0.7;
       const cs=['#c8501a','#e07830','#b83010','#f09040','#a02808'];
       this.color=cs[Math.floor(Math.random()*cs.length)];
+      this.glitchT=0;
     }
-    update(){this.swing+=this.dswing;this.x+=this.vx+Math.sin(this.swing)*(0.3+this.z*0.6);this.y+=this.vy;this.rot+=this.drot;if(this.y>canvas.height+20)this.init();}
+    _path(sz){ctx.ellipse(0,0,sz*0.45,sz,0,0,Math.PI*2);}
+    update(){
+      this.swing+=this.dswing;
+      this.x+=this.vx+Math.sin(this.swing)*(0.3+this.z*0.6);
+      this.y+=this.vy;
+      this.rot+=this.drot;
+      // 花びらと同じく、発動したら数フレーム持続させる
+      if(Math.random()<(cfg.leaf?.glitchRate??0.05)){
+        const [d0,d1]=cfg.leaf?.glitchDuration??[2,5];
+        this.glitchT=d0+Math.floor(Math.random()*(d1-d0));
+      }
+      if(this.glitchT>0)this.glitchT--;
+      if(this.y>canvas.height+20)this.init();
+    }
     draw(){
       ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rot);
-      // グリッチ
-      if(Math.random()<0.004){
-        const dx=(Math.random()-0.5)*this.sz*0.6*this.z;
-        const dy=(Math.random()-0.5)*this.sz*0.6*this.z;
-        ctx.globalAlpha=this.alpha*this.z*0.7;
-        ctx.translate(dx,dy);ctx.beginPath();ctx.ellipse(0,0,this.sz*0.45,this.sz,0,0,Math.PI*2);ctx.fillStyle='rgba(0,255,200,0.7)';ctx.fill();
-        ctx.translate(-dx*2,-dy*2);ctx.beginPath();ctx.ellipse(0,0,this.sz*0.45,this.sz,0,0,Math.PI*2);ctx.fillStyle='rgba(255,0,80,0.7)';ctx.fill();
+      // グリッチ：RGBずれ + 水平スライス（花びらと同じ）
+      if(this.glitchT>0){
+        ctx.save(); // グリッチの状態変化を閉じ込める
+        const sz=this.sz;
+        const range=cfg.leaf?.glitchRange??0.35;
+        const gs=cfg.leaf?.glitchShift??[0.5,2.5];
+        const shift=Array.isArray(gs)?gs[0]+Math.random()*(gs[1]-gs[0]):gs;
+        const angle=Math.random()*Math.PI*2;
+        const dist=sz*shift*range;
+        const dx=Math.cos(angle)*dist*(0.5+Math.random()*0.5);
+        const dy=Math.sin(angle)*dist*(0.5+Math.random()*0.5);
+
+        ctx.globalAlpha=(cfg.leaf?.glitchOpacity??0.8)*this.z;
         ctx.translate(dx,dy);
+        ctx.beginPath();this._path(sz*1.1);
+        ctx.fillStyle='rgba(0,255,200,0.80)';ctx.fill();
+        ctx.translate(-dx*2,-dy*2);
+        ctx.beginPath();this._path(sz*1.1);
+        ctx.fillStyle='rgba(255,0,80,0.80)';ctx.fill();
+        ctx.translate(dx,dy);
+
+        const spread=sz*range;
+        const [slMin,slMax]=cfg.leaf?.sliceCount??[3,6];
+        const slices=slMin+Math.floor(Math.random()*(slMax-slMin));
+        for(let i=0;i<slices;i++){
+          const sa=Math.random()*Math.PI*2;
+          const sl=spread*(1.0+Math.random()*1.0);
+          const sx=(Math.random()-0.5)*spread;
+          const sy=(Math.random()-0.5)*spread*1.5;
+          ctx.globalAlpha=(0.5+Math.random()*0.5)*this.z;
+          ctx.fillStyle=Math.random()<0.5?'#fff':'#ffb050';
+          ctx.save();
+          ctx.translate(sx,sy);
+          ctx.rotate(sa);
+          ctx.fillRect(-sl/2,0,sl,1.2+Math.random()*1.8);
+          ctx.restore();
+        }
+        ctx.restore(); // グリッチ終わり
       }
-      ctx.globalAlpha=this.alpha;ctx.beginPath();ctx.ellipse(0,0,this.sz*0.45,this.sz,0,0,Math.PI*2);ctx.fillStyle=this.color;ctx.fill();
+      ctx.globalAlpha=this.alpha;ctx.beginPath();this._path(this.sz);ctx.fillStyle=this.color;ctx.fill();
       // ノイズ粒
       const lCount=cfg.leaf?.noiseCount??3;
       for(let i=0;i<lCount;i++){
@@ -669,6 +713,10 @@
       glitchRate:0.08, glitchDuration:[2,5], glitchShift:[0.5,2.5],
       glitchRange:0.1, glitchOpacity:0.8, sliceCount:[3,6]
     }, cfg.petal ?? {});
+    cfg.leaf   = Object.assign({
+      noiseCount:3, glitchRate:0.05, glitchDuration:[2,5], glitchShift:[0.5,2.5],
+      glitchRange:0.35, glitchOpacity:0.8, sliceCount:[3,6]
+    }, cfg.leaf ?? {});
     cfg.rain   = Object.assign({ density:6 },   cfg.rain   ?? {});
     cfg.glitch = Object.assign({ rate:180 },     cfg.glitch ?? {});
 
