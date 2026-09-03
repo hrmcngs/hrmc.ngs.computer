@@ -404,19 +404,20 @@ async function showDownloadCount(cardEl, links) {
       return;
     }
     badge.hidden = false;
-    const count = results.reduce((sum, stats) => sum + stats.count, 0).toLocaleString('en-US');
+    const count = results.reduce((sum, stats) => sum + stats.count, 0);
     const installs = results.map(stats => stats.installs).filter(n => typeof n === 'number');
+    // 管には桁区切りを入れず数字だけを並べる。読み上げ・ツールチップ側はカンマ付きで読みやすくする。
     if (installs.length) {
-      const installCount = installs.reduce((a, b) => a + b, 0).toLocaleString('en-US');
-      badge.title = `インストール数 ${installCount}`;
-      badge.setAttribute('aria-label', `インストール数 ${installCount}`);
+      const installCount = installs.reduce((a, b) => a + b, 0);
+      badge.title = `インストール数 ${installCount.toLocaleString('en-US')}`;
+      badge.setAttribute('aria-label', `インストール数 ${installCount.toLocaleString('en-US')}`);
       labelEl.textContent = 'インストール：';
-      renderNixieCount(countEl, installCount);
+      renderNixieCount(countEl, String(installCount));
     } else {
-      badge.title = `ダウンロード数 合計 ${count}`;
-      badge.setAttribute('aria-label', `ダウンロード数 合計 ${count}`);
+      badge.title = `ダウンロード数 合計 ${count.toLocaleString('en-US')}`;
+      badge.setAttribute('aria-label', `ダウンロード数 合計 ${count.toLocaleString('en-US')}`);
       labelEl.textContent = 'ダウンロード：';
-      renderNixieCount(countEl, count);
+      renderNixieCount(countEl, String(count));
     }
   }
 
