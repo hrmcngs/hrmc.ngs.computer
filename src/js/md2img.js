@@ -813,7 +813,7 @@
 
     samp.querySelectorAll('button').forEach(b => {
       b.addEventListener('click', async () => {
-        setStatus('取得中… ' + b.dataset.file);
+        setStatus('取得中… ' + esc(b.dataset.file));
         try {
           const r = await fetch(b.dataset.file);
           if (!r.ok) throw new Error(String(r.status));
