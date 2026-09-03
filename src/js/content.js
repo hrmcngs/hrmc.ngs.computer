@@ -542,6 +542,17 @@ fetch('/content.json', { cache: 'no-store' })
       setText('hero-tag', hero.tag);
       setText('hero-title', hero.title);
       setText('hero-sub', hero.sub);
+      // bg: ヒーローの背景写真（任意）。指定が無ければ従来どおり背景なし。
+      const heroBg = document.querySelector('.hero-bg');
+      if (heroBg && hero.bg) {
+        const img = document.createElement('img');
+        img.className = 'hero-bg-img';
+        img.alt = '';
+        img.decoding = 'async';
+        img.addEventListener('error', () => img.remove());
+        img.src = safeUrl(hero.bg);
+        heroBg.prepend(img);
+      }
     }
 
     // ---- Links ----
@@ -684,15 +695,26 @@ fetch('/content.json', { cache: 'no-store' })
       worksEl.innerHTML = works.map(w => {
         const iconFallbacks = githubRawFallbacks(w.icon);
         const iconSrc = iconFallbacks[0] || w.icon;
+        // iconOffset: 元画像の中で絵が寄っている場合の補正 [横%, 縦%]。
+        // 例: 上に余白が多く絵が下寄りの画像は [0, -13] で中央に見せる。
+        const off = Array.isArray(w.iconOffset) ? w.iconOffset : null;
+        const offStyle = off ? `transform:translate(${Number(off[0]) || 0}%,${Number(off[1]) || 0}%);` : '';
         const icon = w.icon.startsWith('http')
-          ? `<img src="${safeUrl(iconSrc)}" data-icon-url="${escHtml(w.icon)}" loading="lazy" decoding="async" fetchpriority="low" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:contain;">`
+          ? `<img src="${safeUrl(iconSrc)}" data-icon-url="${escHtml(w.icon)}" loading="lazy" decoding="async" fetchpriority="low" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:contain;${offStyle}">`
           : w.icon;
         const tags = (w.tags ?? []).map(t => `<span class="work-tag">${escHtml(t)}</span>`).join('');
+        // shot: 作品のスクリーンショット（任意）。読めなかった枠ごと消す。
+        const shot = w.shot
+          ? `<div class="work-shot"><img src="${safeUrl(w.shot)}" loading="lazy" decoding="async"
+               alt="${escHtml(w.title)} のスクリーンショット"
+               onerror="this.closest('.work-shot')?.remove()"></div>`
+          : '';
         return `
           <a class="work-card" href="${safeUrl(w.url)}" target="_blank" rel="noopener noreferrer">
             <div class="work-icon">${icon}</div>
             <h3>${escHtml(w.title)}</h3>
             <p>${escHtml(w.desc)}</p>
+            ${shot}
             ${tags ? `<div class="work-tags">${tags}</div>` : ''}
           </a>
         `;

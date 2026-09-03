@@ -73,6 +73,33 @@
   --font-mono: 'Monocraft', 'MisakiGothic', 'Noto Sans JP', ui-monospace, Menlo, Consolas, monospace;
   /* ニキシー管の数字用。実機の陰極の字形に寄せた Nixie One を使う。 */
   --font-nixie: 'Nixie One', 'Monocraft', ui-monospace, Menlo, Consolas, monospace;
+
+  /* ── 作品カードの筐体と管（theme.jsonc の cardThemes で差し替える）──
+     ここに書いてあるのが既定テーマ "safe"（分厚い鋼板の金庫）。
+     JSON を読めなかった場合もこの見た目になる。 */
+  --site-image: none;                       /* サイト背景の写真（テーマが指定） */
+  --heat: 255,120,30;                       /* 管が放つ熱の色（R,G,B） */
+  --nixie-on: #ffbe7d;                      /* 点灯した数字 */
+  --nixie-bloom: #ff9a3c;                   /* 数字のにじみ */
+  --case-face: linear-gradient(165deg, #2c3242 0%, #232834 46%, #13161d 100%);
+  --case-texture:
+    linear-gradient(180deg, rgba(214,230,252,0.09) 0 2px, transparent 2px 22px),
+    repeating-linear-gradient(0deg,
+      transparent 0, rgba(255,255,255,0.018) 1px, transparent 3px),
+    repeating-linear-gradient(97deg,
+      transparent 0, rgba(0,0,0,0.09) 23px, transparent 44px,
+      rgba(200,220,250,0.02) 61px, transparent 88px);
+  --case-edge: rgba(154,172,200,0.32);      /* 外周のふち */
+  --case-edge-hover: rgba(198,216,244,0.55);
+  --case-hi: rgba(220,234,255,0.13);        /* 上端の面取り */
+  --case-hi-soft: rgba(220,234,255,0.06);
+  --case-line: rgba(206,222,248,0.09);      /* 内板の枠・天板の境界線 */
+  --case-plate: linear-gradient(180deg, #333b4e, #191d26);  /* アイコンの銘板 */
+  --case-plate-hi: rgba(226,238,255,0.24);
+  --case-plate-ring: rgba(206,222,248,0.13);
+  --case-bolt: radial-gradient(circle 3px at 50% 50%,
+    rgba(232,244,255,0.92) 0%, rgba(158,172,196,0.85) 38%,
+    rgba(84,94,112,0.9) 66%, rgba(10,12,16,0.95) 88%, transparent 100%);
 }
 
 html {
@@ -81,6 +108,11 @@ html {
 
 body {
   background-color: var(--bg);
+  /* テーマが写真を指定したときだけ敷かれる（既定は none） */
+  background-image: var(--site-image, none);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   color: var(--text);
   font-family: var(--font-jp);
   line-height: 1.7;
@@ -673,11 +705,11 @@ body {
 
 .nixie-digit {
   position: relative;
-  color: #ffbe7d;
+  color: var(--nixie-on);
   text-shadow:
-    0 0 4px rgba(255,150,55,0.5),
-    0 0 12px rgba(255,110,15,0.32),
-    0 0 22px rgba(255,90,0,0.2);
+    0 0 4px rgba(var(--heat),0.5),
+    0 0 12px rgba(var(--heat),0.32),
+    0 0 22px rgba(var(--heat),0.2);
   animation: nixie-idle var(--nixie-dur, 6s) ease-in-out var(--nixie-delay, 0s) infinite;
 }
 
@@ -686,7 +718,7 @@ body {
   content: attr(data-d);
   position: absolute;
   inset: 0;
-  color: #ff9a3c;
+  color: var(--nixie-bloom);
   filter: blur(2.5px);
   opacity: 0.8;
   pointer-events: none;
@@ -794,42 +826,31 @@ body {
 /* ===== ダウンロード数のある作品カードは、ニキシー時計の筐体に見立てる ===== */
 .work-card.is-nixie-clock {
   position: relative;
-  border-color: rgba(154,172,200,0.32);
-  /* 分厚い鋼板の金庫。上端の面取り → 鋼のヘアライン → 圧延のむら →
-     管の熱 → 鋼の地色、の順に重ねている。 */
+  border-color: var(--case-edge);
+  /* 筐体の質感（--case-texture）→ 管の熱 → 地色（--case-face）の順に重ねる */
   background:
-    linear-gradient(180deg, rgba(214,230,252,0.09) 0 2px, transparent 2px 22px),
-    repeating-linear-gradient(0deg,
-      transparent 0,
-      rgba(255,255,255,0.018) 1px,
-      transparent 3px),
-    repeating-linear-gradient(97deg,
-      transparent 0,
-      rgba(0,0,0,0.09) 23px,
-      transparent 44px,
-      rgba(200,220,250,0.02) 61px,
-      transparent 88px),
-    radial-gradient(130% 52% at 50% 114%, rgba(255,120,30,0.07), transparent 66%),
-    linear-gradient(165deg, #2c3242 0%, #232834 46%, #13161d 100%);
+    var(--case-texture),
+    radial-gradient(130% 52% at 50% 114%, rgba(var(--heat),0.07), transparent 66%),
+    var(--case-face);
   box-shadow:
-    inset 0 1px 0 rgba(220,234,255,0.13),
-    inset 1px 0 0 rgba(220,234,255,0.05),
+    inset 0 1px 0 var(--case-hi),
+    inset 1px 0 0 var(--case-hi-soft),
     inset -1px 0 0 rgba(0,0,0,0.45),
     inset 0 -2px 0 rgba(0,0,0,0.6),
     0 12px 24px -16px rgba(0,0,0,0.9),
-    0 10px 22px -18px rgba(255,120,30,0.4);
+    0 10px 22px -18px rgba(var(--heat),0.4);
 }
 
 .work-card.is-nixie-clock:hover,
 .work-card.is-nixie-clock:focus-visible {
-  border-color: rgba(198,216,244,0.55);
+  border-color: var(--case-edge-hover);
   box-shadow:
-    inset 0 1px 0 rgba(220,234,255,0.18),
-    inset 1px 0 0 rgba(220,234,255,0.07),
+    inset 0 1px 0 var(--case-hi),
+    inset 1px 0 0 var(--case-hi-soft),
     inset -1px 0 0 rgba(0,0,0,0.45),
     inset 0 -2px 0 rgba(0,0,0,0.6),
     0 12px 26px -14px rgba(0,0,0,0.9),
-    0 12px 26px -16px rgba(255,120,30,0.5);
+    0 12px 26px -16px rgba(var(--heat),0.5);
 }
 
 /* アイコンは扉に留められた四角い銘板。中央に作品のアイコンが入る。 */
@@ -839,15 +860,15 @@ body {
   padding: 9px;
   border-radius: 7px;
   background:
-    linear-gradient(158deg, rgba(226,238,255,0.14), transparent 52%),
-    radial-gradient(circle at 50% 118%, rgba(255,120,30,0.1), transparent 62%),
-    linear-gradient(180deg, #333b4e, #191d26);
+    linear-gradient(158deg, var(--case-hi), transparent 52%),
+    radial-gradient(circle at 50% 118%, rgba(var(--heat),0.1), transparent 62%),
+    var(--case-plate);
   /* 上下の面取り → 外周の暗いふち → 磨かれたリング → プレートの影 */
   box-shadow:
-    inset 0 1px 0 rgba(226,238,255,0.24),
+    inset 0 1px 0 var(--case-plate-hi),
     inset 0 -1px 0 rgba(0,0,0,0.65),
     0 0 0 1px rgba(0,0,0,0.6),
-    0 0 0 2px rgba(206,222,248,0.13),
+    0 0 0 2px var(--case-plate-ring),
     0 2px 5px rgba(0,0,0,0.55);
 }
 
@@ -861,23 +882,154 @@ body {
   content: '';
   position: absolute;
   inset: 5px;
-  border: 1px solid rgba(206,222,248,0.09);
+  border: 1px solid var(--case-line);
   border-radius: 12px;
   pointer-events: none;
   /* 内板を一段落とし、その四隅を太いボルトで留めている */
   box-shadow:
     inset 0 1px 1px rgba(0,0,0,0.5),
-    0 1px 0 rgba(220,234,255,0.05);
+    0 1px 0 var(--case-hi-soft);
   background-repeat: no-repeat;
   background-size: 6px 6px;
   background-position:
     7px 7px, calc(100% - 7px) 7px,
     7px calc(100% - 7px), calc(100% - 7px) calc(100% - 7px);
   background-image:
-    radial-gradient(circle 3px at 50% 50%, rgba(232,244,255,0.92) 0%, rgba(158,172,196,0.85) 38%, rgba(84,94,112,0.9) 66%, rgba(10,12,16,0.95) 88%, transparent 100%),
-    radial-gradient(circle 3px at 50% 50%, rgba(232,244,255,0.92) 0%, rgba(158,172,196,0.85) 38%, rgba(84,94,112,0.9) 66%, rgba(10,12,16,0.95) 88%, transparent 100%),
-    radial-gradient(circle 3px at 50% 50%, rgba(232,244,255,0.92) 0%, rgba(158,172,196,0.85) 38%, rgba(84,94,112,0.9) 66%, rgba(10,12,16,0.95) 88%, transparent 100%),
-    radial-gradient(circle 3px at 50% 50%, rgba(232,244,255,0.92) 0%, rgba(158,172,196,0.85) 38%, rgba(84,94,112,0.9) 66%, rgba(10,12,16,0.95) 88%, transparent 100%);
+    var(--case-bolt),
+    var(--case-bolt),
+    var(--case-bolt),
+    var(--case-bolt);
+}
+
+/* 筐体なしのテーマでは内板とボルトを出さない */
+:root[data-card-theme="plain"] .work-card.is-nixie-clock::after {
+  display: none;
+}
+
+/* ===== cardThemes: "retro" =====
+   最初に作ったニキシー表示に戻すテーマ。
+   金庫の筐体・銘板・溝・にじみ層はどれも後から足したものなので全部外し、
+   Monocraft のドット数字が小さな黒い台に載っているだけの状態にする。 */
+:root[data-card-theme="retro"] .work-card.is-nixie-clock::after {
+  display: none;                       /* 内板とボルト */
+}
+
+:root[data-card-theme="retro"] .work-card.is-nixie-clock .work-icon {
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;                    /* 銘板をやめて素のアイコンに戻す */
+}
+
+:root[data-card-theme="retro"] .work-card.is-nixie-clock .work-icon img {
+  border-radius: 8px;
+}
+
+/* 天板の帯をやめて、カード内の普通の1行に戻す */
+:root[data-card-theme="retro"] .work-card.is-nixie-clock .work-dl {
+  margin: auto 0 0;
+  padding: 0.6rem 0 0;
+  border-top: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+/* 管そのものを出さない。台も枠も無く、数字だけが並ぶデジタル表示。 */
+:root[data-card-theme="retro"] .work-card.is-nixie-clock .nixie {
+  gap: 0.06em;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+:root[data-card-theme="retro"] .work-card.is-nixie-clock .nixie::before,
+:root[data-card-theme="retro"] .work-card.is-nixie-clock .nixie::after {
+  content: none;
+}
+
+/* 1桁ぶんの箱。ガラス管の表現（背景・金網・もや・ソケット）は全部外す */
+:root[data-card-theme="retro"] .nixie-tube {
+  min-width: 0.62em;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+:root[data-card-theme="retro"] .nixie-tube::before,
+:root[data-card-theme="retro"] .nixie-tube::after,
+:root[data-card-theme="retro"] .nixie-ghost {
+  content: none;
+  display: none;
+}
+
+/* 発光もさせない。にじみ・明滅・点灯し直しのフラッシュを全部止めて、
+   ただ色の付いた数字が並ぶだけにする（桁が回る動きだけ残る）。 */
+:root[data-card-theme="retro"] .nixie-digit,
+:root[data-card-theme="retro"] .nixie-tube.is-settled .nixie-digit,
+:root[data-card-theme="retro"] .work-card.is-nixie-clock:hover .nixie-tube .nixie-digit,
+:root[data-card-theme="retro"] .work-card.is-nixie-clock:focus-visible .nixie-tube .nixie-digit {
+  text-shadow: none;
+  filter: none;
+  opacity: 1;
+  animation: none;
+}
+
+:root[data-card-theme="retro"] .nixie-digit::before {
+  content: none;                       /* 字形をぼかして重ねる層も無し */
+}
+
+/* 回っている最中だけ、少しだけ薄くする */
+:root[data-card-theme="retro"] .nixie-tube.is-spinning .nixie-digit {
+  opacity: 0.6;
+}
+
+:root[data-card-theme="retro"] .nixie-sep {
+  align-self: center;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0 0.04em;
+  color: rgba(var(--heat),0.5);
+}
+
+/* 作品のスクリーンショット。筐体にはめ込まれた窓に見立てる。 */
+.work-shot {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin-top: 0.75rem;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #0b0d11;
+}
+
+.work-shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ガラスの映り込みと、はめ込みのふち */
+.work-shot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(104deg, rgba(255,255,255,0.07) 0 22%, transparent 46%);
+  box-shadow:
+    inset 0 0 0 1px var(--case-line),
+    inset 0 2px 4px -2px rgba(0,0,0,0.9);
 }
 
 /* 高さを揃えた結果 margin-top:auto が 0 になっても、
@@ -898,12 +1050,12 @@ body {
   margin: auto -1.15rem -1.35rem;
   padding-top: 0.7rem;
   padding: 0.7rem 1.15rem 0.75rem;
-  border-top: 1px solid rgba(206,222,248,0.09);
+  border-top: 1px solid var(--case-line);
   border-radius: 0 0 15px 15px;
   background:
-    radial-gradient(90% 130% at 50% 100%, rgba(255,120,30,0.07), transparent 72%),
-    linear-gradient(180deg, rgba(214,230,252,0.05), rgba(0,0,0,0.4));
-  box-shadow: inset 0 1px 0 rgba(220,234,255,0.06);
+    radial-gradient(90% 130% at 50% 100%, rgba(var(--heat),0.07), transparent 72%),
+    linear-gradient(180deg, var(--case-hi-soft), rgba(0,0,0,0.4));
+  box-shadow: inset 0 1px 0 var(--case-hi-soft);
 }
 
 /* 天板に彫られた溝。ここに管が挿さっている。 */
@@ -913,7 +1065,7 @@ body {
   gap: 2px;
   padding: 3px 6px 4px;
   background:
-    radial-gradient(80% 60% at 50% 108%, rgba(255,120,30,0.16), transparent 70%),
+    radial-gradient(80% 60% at 50% 108%, rgba(var(--heat),0.16), transparent 70%),
     linear-gradient(180deg, rgba(0,0,0,0.82), rgba(0,0,0,0.62));
   /* 上のふちが落とす影と、掘り込みの側面。外側の1本は溝のふちが光を拾った線。 */
   box-shadow:
@@ -921,7 +1073,7 @@ body {
     inset 3px 0 4px -3px rgba(0,0,0,0.9),
     inset -3px 0 4px -3px rgba(0,0,0,0.9),
     inset 0 -3px 4px -3px rgba(0,0,0,0.85),
-    0 1px 0 rgba(220,234,255,0.1);
+    0 1px 0 var(--case-hi);
 }
 
 /* 溝の中なので、板の映り込みと台座は出さない */

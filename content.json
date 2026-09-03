@@ -295,6 +295,7 @@
     },
     {
       "icon": "https://raw.githubusercontent.com/hrmcngs/MC-Mod-Utility/0d379a556a6b5f88a01b8060ea27ddb30859a306/icon.png",
+      "iconOffset": [0, -13],
       "title": "MC-Mod-Utility",
       "desc": "VSCode plugin / JavaScript",
       "url": "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility",

@@ -1,0 +1,227 @@
+{
+  // ------------------------------------------------------------------
+  // 使うテーマを名前で1つ選ぶ。presets はサイトの配色とカードの見た目を
+  // セットにしたもので、これを書くと両方まとめて切り替わる。
+  //
+  //   theme.setPreset('digital')   コンソールから試す
+  //   theme.list()                 使える名前の一覧
+  //
+  // preset を消して site / card を個別に指定することもできる（下の2行）。
+  // ------------------------------------------------------------------
+  "preset": "digital",
+
+  // "site": "midnight",   // preset を使わないときだけ有効
+  // "card": "safe",
+
+  // ------------------------------------------------------------------
+  // サイトの配色 × カードの見た目 の組み合わせ
+  // ------------------------------------------------------------------
+  "presets": {
+    // 最初に作ったドット数字のDL表示 × 今のサイト配色
+    "digital": { "site": "midnight", "card": "retro" },
+
+    // ニキシー管の時計を金庫にはめ込んだ、今の見た目
+    "vault":   { "site": "midnight", "card": "safe" },
+
+    // 木箱の時計。サイトの配色も鉄と錆に寄せる
+    "workshop": { "site": "rust", "card": "wood" },
+
+    // 緑のターミナル調でまとめる
+    "terminal": { "site": "phosphor", "card": "green" },
+
+    // 装飾を落として数字だけ光らせる
+    "quiet":   { "site": "indigo", "card": "plain" },
+
+    // 夜桜
+    "sakura":  { "site": "sakura", "card": "safe" },
+
+    // レトロ・スチームパンク。真鍮の筐体に収まった真空管時計
+    "steampunk": { "site": "steampunk", "card": "brass" }
+  },
+
+  // ------------------------------------------------------------------
+  // サイト全体の配色。中身は CSS カスタムプロパティ。
+  //
+  //   --bg / --bg2   背景と一段明るい背景
+  //   --surface      カードなどの面
+  //   --border       境界線
+  //   --accent       主役の色（リンクの下線・強調）
+  //   --accent2      副の色（ターミナルの緑など）
+  //   --text         本文 / --text-muted 補助テキスト
+  //
+  // 写真を敷きたいときは siteImage を足す（siteImageDim は上に重ねる黒の濃さ 0〜1）。
+  //   "siteImage": "/image/bg/concrete.jpg",
+  //   "siteImageDim": 0.75
+  // ------------------------------------------------------------------
+  "siteThemes": {
+    // 既定。style.css の :root と同じ値
+    "midnight": {
+      "--bg": "#0d0d0f",
+      "--bg2": "#111115",
+      "--surface": "#1a1a22",
+      "--border": "rgba(255,255,255,0.08)",
+      "--accent": "#7c6af7",
+      "--accent2": "#3ecfcf",
+      "--text": "#e8e8f0",
+      "--text-muted": "#888896"
+    },
+    // 青みを抜いた黒に琥珀。ニキシー管と一番馴染む
+    "carbon": {
+      "--bg": "#0a0a0a",
+      "--bg2": "#0f0f0f",
+      "--surface": "#171717",
+      "--border": "rgba(255,255,255,0.07)",
+      "--accent": "#e0a34a",
+      "--accent2": "#7fbf9a",
+      "--text": "#ececec",
+      "--text-muted": "#8a8a8a"
+    },
+    // 緑のターミナル調
+    "phosphor": {
+      "--bg": "#07100c",
+      "--bg2": "#0a1712",
+      "--surface": "#0f2019",
+      "--border": "rgba(120,255,190,0.10)",
+      "--accent": "#3ecf8e",
+      "--accent2": "#8affc8",
+      "--text": "#d8f5e6",
+      "--text-muted": "#6f9585"
+    },
+    // 深い藍。青系でまとめた静かな配色
+    "indigo": {
+      "--bg": "#080b14",
+      "--bg2": "#0c1120",
+      "--surface": "#141b2e",
+      "--border": "rgba(150,180,255,0.10)",
+      "--accent": "#5b8cff",
+      "--accent2": "#57d6f0",
+      "--text": "#e2e8f5",
+      "--text-muted": "#7f8ba6"
+    },
+    // 夜桜。暗い紫地に桜色
+    "sakura": {
+      "--bg": "#0f0a10",
+      "--bg2": "#150e17",
+      "--surface": "#1e1523",
+      "--border": "rgba(255,190,220,0.10)",
+      "--accent": "#f087b6",
+      "--accent2": "#c9a6ff",
+      "--text": "#f2e6ee",
+      "--text-muted": "#9a8797"
+    },
+    // レトロ・スチームパンク。煤けた革と真鍮、差し色に緑青
+    "steampunk": {
+      "--bg": "#100d09",
+      "--bg2": "#15110b",
+      "--surface": "#1f1810",
+      "--border": "rgba(214,170,92,0.16)",
+      "--accent": "#c9963f",
+      "--accent2": "#6fae9b",
+      "--text": "#ece0cc",
+      "--text-muted": "#9a8a72"
+    },
+    // 鉄と錆。カードの金庫と合わせた無彩色寄り
+    "rust": {
+      "--bg": "#0c0b0a",
+      "--bg2": "#12100e",
+      "--surface": "#1b1815",
+      "--border": "rgba(255,220,190,0.09)",
+      "--accent": "#d1743c",
+      "--accent2": "#8fa3ad",
+      "--text": "#ece7e1",
+      "--text-muted": "#8e8781"
+    }
+  },
+
+  // ------------------------------------------------------------------
+  // 作品カードの筐体。書かなかった変数は style.css の :root の既定値になる。
+  //
+  //   --heat        管が放つ熱の色（R,G,B の3値。rgba() に渡すので数値のみ）
+  //   --nixie-on    点灯した数字 / --nixie-bloom そのにじみ
+  //   --case-face   筐体の地色 / --case-texture 表面の質感（背景レイヤー）
+  //   --case-edge   外周のふち / --case-line 内板の枠と天板の境界線
+  //   --case-plate  アイコンの銘板 / --case-bolt 四隅のボルト
+  //
+  // 写真を質感に使うときは caseImage を足す。--case-texture を組み立てるので、
+  // 手で --case-texture を書く必要はない（両方書くと caseImage が優先）。
+  //   "caseImage": "/image/themes/walnut.jpg",
+  //   "caseImageDim": 0.45      // 写真の上に重ねる黒の濃さ 0〜1（暗いほど文字が読める）
+  // ------------------------------------------------------------------
+  "cardThemes": {
+    // 既定。分厚い鋼板の金庫
+    "safe": {},
+
+    // ウォールナットの木箱（CSSで木目を描いたもの）
+    "wood": {
+      "--case-face": "linear-gradient(168deg, #2e2018 0%, #241812 45%, #170f0a 100%)",
+      "--case-texture": "linear-gradient(180deg, rgba(255,232,198,0.06) 0 2px, transparent 2px 26px), repeating-linear-gradient(92deg, transparent 0, rgba(0,0,0,0.09) 3px, transparent 5px, rgba(255,214,170,0.02) 9px, transparent 12px, rgba(0,0,0,0.05) 15px, transparent 19px, rgba(0,0,0,0.11) 20px, transparent 22px, rgba(255,214,170,0.014) 27px, transparent 31px), repeating-linear-gradient(88deg, transparent 0, rgba(0,0,0,0.07) 20px, transparent 31px, rgba(255,206,158,0.018) 50px, transparent 79px)",
+      "--case-edge": "rgba(196,150,96,0.3)",
+      "--case-edge-hover": "rgba(226,178,118,0.55)",
+      "--case-hi": "rgba(255,228,190,0.1)",
+      "--case-hi-soft": "rgba(255,228,190,0.05)",
+      "--case-line": "rgba(196,150,96,0.22)",
+      "--case-plate": "linear-gradient(180deg, #3a2a1e, #1d1410)",
+      "--case-plate-hi": "rgba(255,228,190,0.22)",
+      "--case-plate-ring": "rgba(196,150,96,0.28)",
+      "--case-bolt": "radial-gradient(circle 3px at 50% 50%, rgba(246,220,168,0.92) 0%, rgba(196,150,96,0.85) 38%, rgba(104,72,36,0.9) 66%, rgba(14,10,6,0.95) 88%, transparent 100%)"
+    },
+
+    // レトロ・スチームパンク用。真鍮の筐体に収まった真空管時計。
+    // 構造は safe（金庫）と同じで、金属の色だけ鋼から真鍮に置き換えている。
+    "brass": {
+      "--case-face": "linear-gradient(165deg, #4b3a22 0%, #372a17 46%, #1b140b 100%)",
+      "--case-texture": "linear-gradient(180deg, rgba(255,226,170,0.1) 0 2px, transparent 2px 22px), repeating-linear-gradient(0deg, transparent 0, rgba(255,235,200,0.022) 1px, transparent 3px), repeating-linear-gradient(97deg, transparent 0, rgba(0,0,0,0.1) 23px, transparent 44px, rgba(255,220,160,0.025) 61px, transparent 88px)",
+      "--case-edge": "rgba(214,170,92,0.42)",
+      "--case-edge-hover": "rgba(240,205,140,0.7)",
+      "--case-hi": "rgba(255,226,170,0.16)",
+      "--case-hi-soft": "rgba(255,226,170,0.07)",
+      "--case-line": "rgba(214,170,92,0.24)",
+      "--case-plate": "linear-gradient(180deg, #6a5230, #2a2013)",
+      "--case-plate-hi": "rgba(255,232,180,0.3)",
+      "--case-plate-ring": "rgba(214,170,92,0.38)",
+      "--case-bolt": "radial-gradient(circle 3px at 50% 50%, rgba(255,236,186,0.95) 0%, rgba(206,160,86,0.9) 38%, rgba(120,84,36,0.92) 66%, rgba(16,11,6,0.95) 88%, transparent 100%)"
+    },
+
+    // 写真を質感に使う例。画像を置いてから card を "photo" にする。
+    // （画像が無いうちは地色だけが見える）
+    "photo": {
+      "caseImage": "/image/themes/case.jpg",
+      "caseImageDim": 0.5,
+      "--case-face": "linear-gradient(180deg, #1c1c22, #101014)",
+      "--case-edge": "rgba(255,255,255,0.16)",
+      "--case-line": "rgba(255,255,255,0.10)"
+    },
+
+    // 一番最初に作った表示。Monocraft のドット数字が小さな黒い台に載るだけの、
+    // 金庫の筐体も溝もにじみも無い状態（構造の違いは style.css 側で戻している）
+    "retro": {
+      "--case-face": "linear-gradient(180deg, #1a1a22, #1a1a22)",
+      "--case-texture": "none",
+      "--case-edge": "rgba(255,255,255,0.08)",
+      "--case-edge-hover": "rgba(255,255,255,0.2)",
+      "--case-hi": "rgba(255,255,255,0.04)",
+      "--case-hi-soft": "rgba(255,255,255,0.02)",
+      "--case-line": "rgba(255,255,255,0.07)",
+      "--nixie-on": "#ffb972",
+      "--nixie-bloom": "#ff9a3c"
+    },
+
+    // 筐体なし。管だけがカードに載っている状態
+    "plain": {
+      "--case-face": "linear-gradient(180deg, #1a1a22, #15151c)",
+      "--case-texture": "none",
+      "--case-edge": "rgba(255,255,255,0.08)",
+      "--case-edge-hover": "rgba(255,255,255,0.2)",
+      "--case-hi": "rgba(255,255,255,0.05)",
+      "--case-hi-soft": "rgba(255,255,255,0.03)",
+      "--case-line": "rgba(255,255,255,0.07)"
+    },
+
+    // 管を緑（IV-11 などの緑発光管）にした例
+    "green": {
+      "--heat": "80,255,170",
+      "--nixie-on": "#b6ffdc",
+      "--nixie-bloom": "#4fe6a8"
+    }
+  }
+}
