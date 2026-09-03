@@ -363,6 +363,7 @@ function createNixieCell(ch) {
   const digit = document.createElement('span');
   digit.className = 'nixie-digit';
   digit.textContent = ch;
+  digit.dataset.d = ch; // 同じ字形をぼかして重ねる（もやっとした発光）ために使う
   cell.append(ghost, digit);
   return cell;
 }

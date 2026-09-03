@@ -587,7 +587,6 @@ body {
   font-weight: 300;
   line-height: 1;
   border-radius: 2px 2px 3px 3px;
-  overflow: hidden;
   /* 左上のガラスの映り込み＋管の底に溜まるオレンジの輝き */
   background:
     linear-gradient(108deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 42%),
@@ -595,14 +594,26 @@ body {
   box-shadow: inset 0 -6px 9px -7px rgba(255,140,45,0.4);
 }
 
-/* 管の中の金網（アノードメッシュ） */
+/* 管の中の金網（アノードメッシュ）。発光をはみ出させたいので管側は clip しない */
 .nixie-tube::before {
   content: '';
   position: absolute;
   inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
   background-image:
     repeating-linear-gradient(90deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 4px),
     repeating-linear-gradient(0deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 4px);
+  pointer-events: none;
+}
+
+/* 管全体に薄くかかるオレンジのもや */
+.nixie-tube::after {
+  content: '';
+  position: absolute;
+  inset: -30%;
+  background: radial-gradient(50% 42% at 50% 50%, rgba(255,130,30,0.18), transparent 70%);
+  filter: blur(3px);
   pointer-events: none;
 }
 
@@ -615,11 +626,23 @@ body {
 
 .nixie-digit {
   position: relative;
-  color: #ffb972;
+  color: #ffbe7d;
   text-shadow:
-    0 0 3px rgba(255,150,55,0.55),
-    0 0 9px rgba(255,110,15,0.35);
+    0 0 4px rgba(255,150,55,0.5),
+    0 0 12px rgba(255,110,15,0.32),
+    0 0 22px rgba(255,90,0,0.2);
   animation: nixie-idle 7s ease-in-out infinite;
+}
+
+/* 同じ字形をぼかして重ね、輪郭のまわりに滲みを作る */
+.nixie-digit::before {
+  content: attr(data-d);
+  position: absolute;
+  inset: 0;
+  color: #ff9a3c;
+  filter: blur(2.5px);
+  opacity: 0.8;
+  pointer-events: none;
 }
 
 /* 桁が変わったときだけ、放電が落ち着くまでの点灯を再現する */
