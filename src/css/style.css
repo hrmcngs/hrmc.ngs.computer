@@ -470,12 +470,15 @@ body {
 .works-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  /* 行が違ってもカードの高さを揃える */
+  grid-auto-rows: 1fr;
   gap: 1.2rem;
   margin-bottom: 3rem;
 }
 
 .work-card {
-  display: block;
+  display: flex;
+  flex-direction: column;
   padding: 2rem 1.5rem;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -769,45 +772,42 @@ body {
 /* ===== ダウンロード数のある作品カードは、ニキシー時計の筐体に見立てる ===== */
 .work-card.is-nixie-clock {
   position: relative;
-  border-color: rgba(196,150,96,0.3);
-  /* ウォールナットの筐体。上端のベゼル → 細い木目 → うねりの太い木目 →
-     管の足元にたまる熱 → 木地の色、の順に重ねている。
-     木目は周期の違う縞を重ねて、繰り返しが目立たないようにしている。 */
+  border-color: rgba(154,172,200,0.32);
+  /* 分厚い鋼板の金庫。上端の面取り → 鋼のヘアライン → 圧延のむら →
+     管の熱 → 鋼の地色、の順に重ねている。 */
   background:
-    linear-gradient(180deg, rgba(255,232,198,0.06) 0 2px, transparent 2px 26px),
-    repeating-linear-gradient(92deg,
+    linear-gradient(180deg, rgba(214,230,252,0.09) 0 2px, transparent 2px 22px),
+    repeating-linear-gradient(0deg,
       transparent 0,
-      rgba(0,0,0,0.09) 3px,
-      transparent 5px,
-      rgba(255,214,170,0.02) 9px,
-      transparent 12px,
-      rgba(0,0,0,0.05) 15px,
-      transparent 19px,
-      rgba(0,0,0,0.11) 20px,
-      transparent 22px,
-      rgba(255,214,170,0.014) 27px,
-      transparent 31px),
-    repeating-linear-gradient(88deg,
+      rgba(255,255,255,0.018) 1px,
+      transparent 3px),
+    repeating-linear-gradient(97deg,
       transparent 0,
-      rgba(0,0,0,0.07) 20px,
-      transparent 31px,
-      rgba(255,206,158,0.018) 50px,
-      transparent 79px),
-    radial-gradient(130% 52% at 50% 114%, rgba(255,120,30,0.1), transparent 66%),
-    linear-gradient(168deg, #2e2018 0%, #241812 45%, #170f0a 100%);
+      rgba(0,0,0,0.09) 23px,
+      transparent 44px,
+      rgba(200,220,250,0.02) 61px,
+      transparent 88px),
+    radial-gradient(130% 52% at 50% 114%, rgba(255,120,30,0.07), transparent 66%),
+    linear-gradient(165deg, #2c3242 0%, #232834 46%, #13161d 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255,228,190,0.09),
-    inset 0 -1px 0 rgba(0,0,0,0.55),
-    0 10px 22px -16px rgba(255,120,30,0.5);
+    inset 0 1px 0 rgba(220,234,255,0.13),
+    inset 1px 0 0 rgba(220,234,255,0.05),
+    inset -1px 0 0 rgba(0,0,0,0.45),
+    inset 0 -2px 0 rgba(0,0,0,0.6),
+    0 12px 24px -16px rgba(0,0,0,0.9),
+    0 10px 22px -18px rgba(255,120,30,0.4);
 }
 
 .work-card.is-nixie-clock:hover,
 .work-card.is-nixie-clock:focus-visible {
-  border-color: rgba(226,178,118,0.55);
+  border-color: rgba(198,216,244,0.55);
   box-shadow:
-    inset 0 1px 0 rgba(255,228,190,0.09),
-    inset 0 -1px 0 rgba(0,0,0,0.5),
-    0 12px 26px -14px rgba(255,120,30,0.6);
+    inset 0 1px 0 rgba(220,234,255,0.18),
+    inset 1px 0 0 rgba(220,234,255,0.07),
+    inset -1px 0 0 rgba(0,0,0,0.45),
+    inset 0 -2px 0 rgba(0,0,0,0.6),
+    0 12px 26px -14px rgba(0,0,0,0.9),
+    0 12px 26px -16px rgba(255,120,30,0.5);
 }
 
 /* 内側のパネル枠と、それを留めている四隅のネジ。
@@ -816,32 +816,38 @@ body {
   content: '';
   position: absolute;
   inset: 7px;
-  border: 1px solid rgba(196,150,96,0.14);
+  border: 1px solid rgba(206,222,248,0.09);
   border-radius: 11px;
   pointer-events: none;
+  /* 内板を一段落とし、その四隅を太いボルトで留めている */
+  box-shadow:
+    inset 0 1px 1px rgba(0,0,0,0.5),
+    0 1px 0 rgba(220,234,255,0.05);
   background-repeat: no-repeat;
-  background-size: 4px 4px;
+  background-size: 6px 6px;
   background-position:
-    4px 4px, calc(100% - 4px) 4px,
-    4px calc(100% - 4px), calc(100% - 4px) calc(100% - 4px);
+    5px 5px, calc(100% - 5px) 5px,
+    5px calc(100% - 5px), calc(100% - 5px) calc(100% - 5px);
   background-image:
-    radial-gradient(circle at 40% 35%, rgba(232,198,150,0.9), rgba(88,60,30,0.8) 58%, transparent 70%),
-    radial-gradient(circle at 40% 35%, rgba(232,198,150,0.9), rgba(88,60,30,0.8) 58%, transparent 70%),
-    radial-gradient(circle at 40% 35%, rgba(232,198,150,0.9), rgba(88,60,30,0.8) 58%, transparent 70%),
-    radial-gradient(circle at 40% 35%, rgba(232,198,150,0.9), rgba(88,60,30,0.8) 58%, transparent 70%);
+    radial-gradient(circle at 36% 32%, rgba(226,238,255,0.85), rgba(126,140,164,0.7) 45%, rgba(10,12,16,0.85) 72%, transparent 78%),
+    radial-gradient(circle at 36% 32%, rgba(226,238,255,0.85), rgba(126,140,164,0.7) 45%, rgba(10,12,16,0.85) 72%, transparent 78%),
+    radial-gradient(circle at 36% 32%, rgba(226,238,255,0.85), rgba(126,140,164,0.7) 45%, rgba(10,12,16,0.85) 72%, transparent 78%),
+    radial-gradient(circle at 36% 32%, rgba(226,238,255,0.85), rgba(126,140,164,0.7) 45%, rgba(10,12,16,0.85) 72%, transparent 78%);
 }
 
 /* 管が立つのは箱の天板。カード下端いっぱいの帯にして、木の一枚板に見せる。 */
 .work-card.is-nixie-clock .work-dl {
   position: relative;
-  margin: 0.9rem -1.5rem -2rem;
+  /* 上の margin を auto にして、天板をカードの下端へ押し付ける */
+  margin: auto -1.5rem -2rem;
+  padding-top: 0.75rem;
   padding: 0.75rem 1.5rem 0.8rem;
-  border-top: 1px solid rgba(255,225,190,0.07);
+  border-top: 1px solid rgba(206,222,248,0.09);
   border-radius: 0 0 15px 15px;
   background:
-    radial-gradient(90% 130% at 50% 100%, rgba(255,120,30,0.08), transparent 72%),
-    linear-gradient(180deg, rgba(255,235,205,0.045), rgba(0,0,0,0.35));
-  box-shadow: inset 0 1px 0 rgba(255,230,195,0.05);
+    radial-gradient(90% 130% at 50% 100%, rgba(255,120,30,0.07), transparent 72%),
+    linear-gradient(180deg, rgba(214,230,252,0.05), rgba(0,0,0,0.4));
+  box-shadow: inset 0 1px 0 rgba(220,234,255,0.06);
 }
 
 /* 天板に彫られた溝。ここに管が挿さっている。 */
@@ -859,7 +865,7 @@ body {
     inset 3px 0 4px -3px rgba(0,0,0,0.9),
     inset -3px 0 4px -3px rgba(0,0,0,0.9),
     inset 0 -3px 4px -3px rgba(0,0,0,0.85),
-    0 1px 0 rgba(255,228,190,0.08);
+    0 1px 0 rgba(220,234,255,0.1);
 }
 
 /* 溝の中なので、板の映り込みと台座は出さない */
@@ -1264,7 +1270,7 @@ body {
   }
 
   .work-card.is-nixie-clock .work-dl {
-    margin: 0.75rem -1rem -1.2rem;
+    margin: auto -1rem -1.2rem;
     padding: 0.55rem 1rem 0.6rem;
   }
 
