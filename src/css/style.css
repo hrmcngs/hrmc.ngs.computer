@@ -567,14 +567,46 @@ body {
 }
 
 /* ===== ニキシー管風カウンタ ===== */
-/* 数字1桁 = ガラス管1本。管を並べた土台がこの .nixie。 */
+/* 数字1桁 = ガラス管1本。管を並べた筐体がこの .nixie。 */
 .nixie {
+  position: relative;
   display: inline-flex;
   align-items: stretch;
   gap: 1px;
-  padding: 1px 2px;
-  border-radius: 4px;
-  background: rgba(0,0,0,0.28);
+  padding: 3px 5px 4px;
+  border-radius: 4px 4px 5px 5px;
+  /* 真鍮の細いふちと、管の足元にたまる熱 */
+  border: 1px solid rgba(196,150,96,0.3);
+  background:
+    linear-gradient(180deg, rgba(255,235,205,0.05), transparent 45%),
+    radial-gradient(120% 70% at 50% 125%, rgba(255,120,30,0.12), transparent 72%),
+    linear-gradient(180deg, #15151b, #0a0a0e);
+  box-shadow:
+    inset 0 1px 0 rgba(255,225,180,0.09),
+    0 1px 2px rgba(0,0,0,0.55);
+}
+
+/* 前面のガラスの映り込み */
+.nixie::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(100deg, rgba(255,255,255,0.055) 0 26%, transparent 52%);
+  pointer-events: none;
+}
+
+/* 管を挿してある台座 */
+.nixie::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  bottom: 1px;
+  height: 2px;
+  border-radius: 1px;
+  background: linear-gradient(180deg, rgba(196,150,96,0.28), rgba(0,0,0,0.5));
+  pointer-events: none;
 }
 
 .nixie-tube {
@@ -617,6 +649,7 @@ body {
   background: radial-gradient(50% 42% at 50% 50%, rgba(255,130,30,0.18), transparent 70%);
   filter: blur(3px);
   pointer-events: none;
+  animation: nixie-haze var(--nixie-dur2, 9s) ease-in-out var(--nixie-delay2, 0s) infinite;
 }
 
 /* 点灯していない陰極が奥に重なって見える質感 */
@@ -633,7 +666,7 @@ body {
     0 0 4px rgba(255,150,55,0.5),
     0 0 12px rgba(255,110,15,0.32),
     0 0 22px rgba(255,90,0,0.2);
-  animation: nixie-idle 7s ease-in-out infinite;
+  animation: nixie-idle var(--nixie-dur, 6s) ease-in-out var(--nixie-delay, 0s) infinite;
 }
 
 /* 同じ字形をぼかして重ね、輪郭のまわりに滲みを作る */
@@ -661,7 +694,9 @@ body {
 
 /* 止まった瞬間だけ、放電が落ち着くまでの点灯を再現する */
 .nixie-tube.is-settled .nixie-digit {
-  animation: nixie-strike 0.45s ease-out, nixie-idle 7s ease-in-out 0.45s infinite;
+  animation:
+    nixie-strike 0.45s ease-out,
+    nixie-idle var(--nixie-dur, 6s) ease-in-out 0.45s infinite;
 }
 
 /* カンマは管に入れず、土台の上に置く */
@@ -675,12 +710,36 @@ body {
   color: rgba(255,150,60,0.4);
 }
 
-/* 実物のように、明るさがごくわずかに揺れる */
+/* 実物のように、明るさが不規則に揺れる。
+   キーフレームの間隔と揺れ幅をわざと不揃いにし、さらに管ごとに
+   周期(--nixie-dur)と位相(--nixie-delay)をずらすことで、
+   全体としては繰り返しの見えない明滅になる。 */
 @keyframes nixie-idle {
-  0%, 92%, 100% { opacity: 1; }
-  94%           { opacity: 0.86; }
-  96%           { opacity: 1; }
-  98%           { opacity: 0.92; }
+  0%   { filter: brightness(1);    opacity: 1; }
+  7%   { filter: brightness(0.88); opacity: var(--nixie-dim, 0.9); }
+  9%   { filter: brightness(1.06); opacity: 1; }
+  23%  { filter: brightness(0.96); opacity: 1; }
+  31%  { filter: brightness(1.1);  opacity: 1; }
+  32%  { filter: brightness(0.82); opacity: var(--nixie-dim, 0.9); }
+  34%  { filter: brightness(1);    opacity: 1; }
+  58%  { filter: brightness(1.08); opacity: 1; }
+  67%  { filter: brightness(0.93); opacity: 1; }
+  68%  { filter: brightness(1.03); opacity: 1; }
+  81%  { filter: brightness(0.86); opacity: var(--nixie-dim, 0.9); }
+  83%  { filter: brightness(1.05); opacity: 1; }
+  94%  { filter: brightness(0.97); opacity: 1; }
+  100% { filter: brightness(1);    opacity: 1; }
+}
+
+/* もやのほうは数字より長い周期でゆっくり濃淡が変わる */
+@keyframes nixie-haze {
+  0%   { opacity: 1; }
+  19%  { opacity: 0.72; }
+  38%  { opacity: 1; }
+  55%  { opacity: 0.84; }
+  56%  { opacity: 1.05; }
+  74%  { opacity: 0.78; }
+  100% { opacity: 1; }
 }
 
 @keyframes nixie-strike {
@@ -692,9 +751,69 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .nixie-digit,
+  .nixie-tube::after,
   .nixie-tube.is-settled .nixie-digit {
     animation: none;
   }
+}
+
+/* ===== ダウンロード数のある作品カードは、ニキシー時計の筐体に見立てる ===== */
+.work-card.is-nixie-clock {
+  position: relative;
+  border-color: rgba(196,150,96,0.26);
+  background:
+    radial-gradient(130% 55% at 50% 116%, rgba(255,120,30,0.08), transparent 68%),
+    linear-gradient(180deg, #1c1c24, #131318);
+  box-shadow:
+    inset 0 1px 0 rgba(255,228,190,0.06),
+    inset 0 -1px 0 rgba(0,0,0,0.5),
+    0 10px 22px -16px rgba(255,120,30,0.5);
+}
+
+.work-card.is-nixie-clock:hover,
+.work-card.is-nixie-clock:focus-visible {
+  border-color: rgba(226,178,118,0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255,228,190,0.09),
+    inset 0 -1px 0 rgba(0,0,0,0.5),
+    0 12px 26px -14px rgba(255,120,30,0.6);
+}
+
+/* 筐体を留めている四隅のネジ */
+.work-card.is-nixie-clock::before {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  border-radius: 10px;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-size: 4px 4px;
+  background-position: left top, right top, left bottom, right bottom;
+  background-image:
+    radial-gradient(circle at 40% 35%, rgba(228,192,142,0.85), rgba(90,62,32,0.75) 60%, transparent 72%),
+    radial-gradient(circle at 40% 35%, rgba(228,192,142,0.85), rgba(90,62,32,0.75) 60%, transparent 72%),
+    radial-gradient(circle at 40% 35%, rgba(228,192,142,0.85), rgba(90,62,32,0.75) 60%, transparent 72%),
+    radial-gradient(circle at 40% 35%, rgba(228,192,142,0.85), rgba(90,62,32,0.75) 60%, transparent 72%);
+}
+
+/* 管の列の下に敷く、筐体の底板 */
+.work-card.is-nixie-clock .work-dl {
+  position: relative;
+  padding-top: 0.55rem;
+}
+
+.work-card.is-nixie-clock .work-dl::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(196,150,96,0.28) 18%,
+    rgba(196,150,96,0.28) 82%,
+    transparent);
 }
 
 .omake-section {

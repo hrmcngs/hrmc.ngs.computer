@@ -363,6 +363,13 @@ function createNixieCell(ch) {
   const digit = document.createElement('span');
   digit.className = 'nixie-digit';
   cell.append(ghost, digit);
+  // 管ごとに明滅の周期・位相・落ち込む深さをばらつかせ、全部が揃って点滅しないようにする
+  const rand = (min, max) => (min + Math.random() * (max - min)).toFixed(2);
+  cell.style.setProperty('--nixie-dur',    `${rand(4.2, 9.5)}s`);
+  cell.style.setProperty('--nixie-delay',  `-${rand(0, 9.5)}s`);
+  cell.style.setProperty('--nixie-dur2',   `${rand(7, 16)}s`);
+  cell.style.setProperty('--nixie-delay2', `-${rand(0, 16)}s`);
+  cell.style.setProperty('--nixie-dim',    rand(0.7, 0.93));
   setNixieDigit(cell, ch);
   return cell;
 }
@@ -456,9 +463,12 @@ async function showDownloadCount(cardEl, links) {
     const results = (await Promise.all(links.map(getDownloadStats))).filter(Boolean);
     if (!results.length) {
       badge.hidden = true;
+      cardEl.classList.remove('is-nixie-clock');
       return;
     }
     badge.hidden = false;
+    // 管が載るカードだけ、時計の筐体として見せる
+    cardEl.classList.add('is-nixie-clock');
     const count = results.reduce((sum, stats) => sum + stats.count, 0);
     const installs = results.map(stats => stats.installs).filter(n => typeof n === 'number');
     // 管には桁区切りを入れず数字だけを並べる。読み上げ・ツールチップ側はカンマ付きで読みやすくする。
