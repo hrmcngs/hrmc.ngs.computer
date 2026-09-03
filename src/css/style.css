@@ -541,9 +541,10 @@ body {
 
 .work-dl {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   flex-wrap: wrap;
-  column-gap: 0.2rem;
+  column-gap: 0.35rem;
+  row-gap: 0.25rem;
   margin-top: 0.6rem;
   font-size: 0.72rem;
 }
@@ -561,6 +562,108 @@ body {
 
 .work-dl-count + .work-dl-label {
   margin-left: 0.45rem;
+}
+
+/* ===== ニキシー管風カウンタ ===== */
+/* 数字1桁 = ガラス管1本。管を並べた土台がこの .nixie。 */
+.nixie {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 2px;
+  padding: 2px 3px;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #131319, #08080b);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    0 1px 3px rgba(0,0,0,0.5);
+}
+
+.nixie-tube {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0.95em;
+  padding: 0.2em 0.12em;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: 3px 3px 5px 5px;
+  overflow: hidden;
+  /* 左上のガラスの映り込み＋管の底に溜まるオレンジの輝き */
+  background:
+    linear-gradient(108deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 40%),
+    radial-gradient(120% 85% at 50% 118%, rgba(255,140,45,0.20), transparent 72%),
+    linear-gradient(180deg, #17171f, #0b0b10);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.05),
+    inset 0 -7px 11px -7px rgba(255,140,45,0.55);
+}
+
+/* 管の中の金網（アノードメッシュ） */
+.nixie-tube::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 4px);
+  pointer-events: none;
+}
+
+/* 点灯していない陰極が奥に重なって見える質感 */
+.nixie-ghost {
+  position: absolute;
+  color: rgba(255,190,140,0.08);
+  transform: translate(0.5px, 0.5px);
+}
+
+.nixie-digit {
+  position: relative;
+  color: #ffb45e;
+  text-shadow:
+    0 0 2px rgba(255,160,60,0.95),
+    0 0 6px rgba(255,120,20,0.7),
+    0 0 15px rgba(255,85,0,0.45);
+  animation: nixie-idle 7s ease-in-out infinite;
+}
+
+/* 桁が変わったときだけ、放電が落ち着くまでの点灯を再現する */
+.nixie-tube.is-changed .nixie-digit {
+  animation: nixie-strike 0.5s ease-out, nixie-idle 7s ease-in-out 0.5s infinite;
+}
+
+/* カンマは管に入れず、土台の上に置く */
+.nixie-sep {
+  align-self: flex-end;
+  padding: 0 0.05em 0.36em;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  line-height: 1;
+  color: rgba(255,140,45,0.5);
+}
+
+/* 実物のように、明るさがごくわずかに揺れる */
+@keyframes nixie-idle {
+  0%, 92%, 100% { opacity: 1; }
+  94%           { opacity: 0.86; }
+  96%           { opacity: 1; }
+  98%           { opacity: 0.92; }
+}
+
+@keyframes nixie-strike {
+  0%   { opacity: 0;    filter: brightness(2.2); }
+  35%  { opacity: 1;    filter: brightness(1.9); }
+  55%  { opacity: 0.55; filter: brightness(1.2); }
+  100% { opacity: 1;    filter: brightness(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nixie-digit,
+  .nixie-tube.is-changed .nixie-digit {
+    animation: none;
+  }
 }
 
 .omake-section {

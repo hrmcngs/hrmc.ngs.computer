@@ -346,10 +346,55 @@ async function getDownloadStats(url) {
   return null;
 }
 
+// ニキシー管1本ぶん（数字）またはカンマなどの区切りを作る
+function createNixieCell(ch) {
+  const cell = document.createElement('span');
+  cell.dataset.char = ch;
+  if (!/[0-9]/.test(ch)) {
+    cell.className = 'nixie-sep';
+    cell.textContent = ch;
+    return cell;
+  }
+  cell.className = 'nixie-tube';
+  // 実物のニキシー管と同じく、点灯していない陰極がうっすら奥に重なって見える
+  const ghost = document.createElement('span');
+  ghost.className = 'nixie-ghost';
+  ghost.textContent = '8';
+  const digit = document.createElement('span');
+  digit.className = 'nixie-digit';
+  digit.textContent = ch;
+  cell.append(ghost, digit);
+  return cell;
+}
+
+// 数値をニキシー管の並びとして描画する。
+// 15秒ごとの再取得で全桁が点灯し直さないよう、変わった桁だけ差し替える。
+function renderNixieCount(el, text) {
+  const chars = [...text];
+  if (el.childElementCount !== chars.length) {
+    el.replaceChildren(...chars.map(createNixieCell));
+    return;
+  }
+  chars.forEach((ch, i) => {
+    const cell = el.children[i];
+    if (cell.dataset.char === ch) return;
+    const fresh = createNixieCell(ch);
+    fresh.classList.add('is-changed'); // 差し替え時に点灯アニメーションが走る
+    el.replaceChild(fresh, cell);
+  });
+}
+
 // Works カードに配布数を表示する。Marketplaceはインストール数だけを表示する。
 async function showDownloadCount(cardEl, links) {
   const badge = document.createElement('div');
   badge.className = 'work-dl';
+  const labelEl = document.createElement('span');
+  labelEl.className = 'work-dl-label';
+  const countEl = document.createElement('span');
+  countEl.className = 'work-dl-count nixie';
+  // 数字は装飾された桁の集まりなので、読み上げは badge の aria-label に任せる
+  countEl.setAttribute('aria-hidden', 'true');
+  badge.append(labelEl, countEl);
   cardEl.appendChild(badge);
 
   async function refreshBadge() {
@@ -364,12 +409,14 @@ async function showDownloadCount(cardEl, links) {
     if (installs.length) {
       const installCount = installs.reduce((a, b) => a + b, 0).toLocaleString('en-US');
       badge.title = `インストール数 ${installCount}`;
-      badge.innerHTML =
-        `<span class="work-dl-label">インストール：</span><span class="work-dl-count">${installCount}</span>`;
+      badge.setAttribute('aria-label', `インストール数 ${installCount}`);
+      labelEl.textContent = 'インストール：';
+      renderNixieCount(countEl, installCount);
     } else {
       badge.title = `ダウンロード数 合計 ${count}`;
-      badge.innerHTML =
-        `<span class="work-dl-label">ダウンロード：</span><span class="work-dl-count">${count}</span>`;
+      badge.setAttribute('aria-label', `ダウンロード数 合計 ${count}`);
+      labelEl.textContent = 'ダウンロード：';
+      renderNixieCount(countEl, count);
     }
   }
 
