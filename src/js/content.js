@@ -362,26 +362,80 @@ function createNixieCell(ch) {
   ghost.textContent = '8';
   const digit = document.createElement('span');
   digit.className = 'nixie-digit';
-  digit.textContent = ch;
-  digit.dataset.d = ch; // 同じ字形をぼかして重ねる（もやっとした発光）ために使う
   cell.append(ghost, digit);
+  setNixieDigit(cell, ch);
   return cell;
 }
 
+function setNixieDigit(cell, ch) {
+  const digit = cell.querySelector('.nixie-digit');
+  digit.textContent = ch;
+  digit.dataset.d = ch; // 同じ字形をぼかして重ねる（もやっとした発光）ために使う
+  cell.dataset.char = ch;
+}
+
+function nixieMotionOff() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function stopNixieSpin(cell) {
+  clearTimeout(cell.nixieTimer);
+  cell.nixieTimer = null;
+}
+
+// ニキシー時計のように、0〜9を1周ぶん巡ってから減速して目的の数字で止まる
+function spinNixieTube(cell, target, delay = 0) {
+  stopNixieSpin(cell);
+  if (nixieMotionOff()) {
+    setNixieDigit(cell, target);
+    return;
+  }
+  const from  = Number(cell.dataset.char);
+  const to    = Number(target);
+  const steps = 10 + ((to - from + 10) % 10); // 必ず1周してから目的の桁へ入る
+  let i = 0;
+
+  const step = () => {
+    i += 1;
+    setNixieDigit(cell, String((from + i) % 10));
+    if (i >= steps) {
+      cell.classList.remove('is-spinning');
+      cell.classList.add('is-settled');
+      cell.nixieTimer = setTimeout(() => cell.classList.remove('is-settled'), 500);
+      return;
+    }
+    // 終わりに近いほど間隔を広げ、回転が止まっていくように見せる
+    const t = i / steps;
+    cell.nixieTimer = setTimeout(step, 25 + 90 * t * t);
+  };
+
+  cell.classList.remove('is-settled');
+  cell.classList.add('is-spinning');
+  cell.nixieTimer = setTimeout(step, delay);
+}
+
 // 数値をニキシー管の並びとして描画する。
-// 15秒ごとの再取得で全桁が点灯し直さないよう、変わった桁だけ差し替える。
+// 15秒ごとの再取得で全桁が回り直さないよう、変わった桁だけ回す。
 function renderNixieCount(el, text) {
   const chars = [...text];
   if (el.childElementCount !== chars.length) {
+    // 桁数が変わったら組み直す。電源投入のように左の桁から順に点灯させる。
+    [...el.children].forEach(stopNixieSpin);
     el.replaceChildren(...chars.map(createNixieCell));
+    [...el.children].forEach((cell, i) => {
+      if (cell.classList.contains('nixie-tube')) spinNixieTube(cell, cell.dataset.char, i * 90);
+    });
     return;
   }
   chars.forEach((ch, i) => {
     const cell = el.children[i];
     if (cell.dataset.char === ch) return;
-    const fresh = createNixieCell(ch);
-    fresh.classList.add('is-changed'); // 差し替え時に点灯アニメーションが走る
-    el.replaceChild(fresh, cell);
+    if (cell.classList.contains('nixie-tube')) {
+      spinNixieTube(cell, ch);
+    } else {
+      cell.textContent = ch;
+      cell.dataset.char = ch;
+    }
   });
 }
 

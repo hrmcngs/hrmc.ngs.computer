@@ -71,6 +71,8 @@
   --font-en:   'Monocraft', 'MisakiGothic', 'Noto Sans JP', ui-monospace, Menlo, Consolas, monospace;
   --font-jp:   'Monocraft', 'MisakiGothic', 'Noto Sans JP', ui-monospace, Menlo, monospace;
   --font-mono: 'Monocraft', 'MisakiGothic', 'Noto Sans JP', ui-monospace, Menlo, Consolas, monospace;
+  /* ニキシー管の数字用。実機の陰極の字形に寄せた Nixie One を使う。 */
+  --font-nixie: 'Nixie One', 'Monocraft', ui-monospace, Menlo, Consolas, monospace;
 }
 
 html {
@@ -580,11 +582,11 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 0.9em;
-  padding: 0.16em 0.1em;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  font-weight: 300;
+  min-width: 0.72em;
+  padding: 0.1em 0.08em;
+  font-family: var(--font-nixie);
+  font-size: 1.15rem;
+  font-weight: 400;
   line-height: 1;
   border-radius: 2px 2px 3px 3px;
   /* 左上のガラスの映り込み＋管の底に溜まるオレンジの輝き */
@@ -645,18 +647,30 @@ body {
   pointer-events: none;
 }
 
-/* 桁が変わったときだけ、放電が落ち着くまでの点灯を再現する */
-.nixie-tube.is-changed .nixie-digit {
-  animation: nixie-strike 0.5s ease-out, nixie-idle 7s ease-in-out 0.5s infinite;
+/* 巡っている最中は放電が安定せず、少し暗くにじむ */
+.nixie-tube.is-spinning .nixie-digit {
+  color: #ffa851;
+  opacity: 0.72;
+  animation: none;
+}
+
+.nixie-tube.is-spinning .nixie-digit::before {
+  opacity: 1;
+  filter: blur(3.5px);
+}
+
+/* 止まった瞬間だけ、放電が落ち着くまでの点灯を再現する */
+.nixie-tube.is-settled .nixie-digit {
+  animation: nixie-strike 0.45s ease-out, nixie-idle 7s ease-in-out 0.45s infinite;
 }
 
 /* カンマは管に入れず、土台の上に置く */
 .nixie-sep {
   align-self: flex-end;
-  padding: 0 0.04em 0.32em;
-  font-family: var(--font-mono);
-  font-weight: 300;
-  font-size: 0.9rem;
+  padding: 0 0.04em 0.26em;
+  font-family: var(--font-nixie);
+  font-weight: 400;
+  font-size: 1.15rem;
   line-height: 1;
   color: rgba(255,150,60,0.4);
 }
@@ -678,7 +692,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .nixie-digit,
-  .nixie-tube.is-changed .nixie-digit {
+  .nixie-tube.is-settled .nixie-digit {
     animation: none;
   }
 }
