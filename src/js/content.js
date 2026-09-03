@@ -421,6 +421,18 @@ function spinNixieTube(cell, target, delay = 0) {
   cell.nixieTimer = setTimeout(step, delay);
 }
 
+// カードにカーソルを合わせたとき、全桁を一度だけ回して同じ数字に戻す
+function enableNixieShuffleOnHover(cardEl, countEl) {
+  if (cardEl.dataset.nixieShuffle) return;
+  cardEl.dataset.nixieShuffle = '1';
+  cardEl.addEventListener('mouseenter', () => {
+    const tubes = [...countEl.querySelectorAll('.nixie-tube')];
+    // 回っている最中に重ねがけしない
+    if (tubes.some(tube => tube.classList.contains('is-spinning'))) return;
+    tubes.forEach((tube, i) => spinNixieTube(tube, tube.dataset.char, i * 45));
+  });
+}
+
 // 数値をニキシー管の並びとして描画する。
 // 15秒ごとの再取得で全桁が回り直さないよう、変わった桁だけ回す。
 function renderNixieCount(el, text) {
@@ -458,6 +470,7 @@ async function showDownloadCount(cardEl, links) {
   countEl.setAttribute('aria-hidden', 'true');
   badge.append(labelEl, countEl);
   cardEl.appendChild(badge);
+  enableNixieShuffleOnHover(cardEl, countEl);
 
   async function refreshBadge() {
     const results = (await Promise.all(links.map(getDownloadStats))).filter(Boolean);
@@ -744,11 +757,21 @@ fetch('/content.json', { cache: 'no-store' })
             badge.className = 'work-dl';
             const tmpl = usage.template || 0;
             const boot = usage.bootstrap || 0;
-            badge.title = `Use this template: ${tmpl} / bootstrap.sh: ${boot}`;
-            badge.innerHTML =
-              `<span class="work-dl-label">使用：</span>` +
-              `<span class="work-dl-count">${usage.total.toLocaleString('en-US')}</span>`;
+            const detail = `Use this template: ${tmpl} / bootstrap.sh: ${boot}`;
+            badge.title = detail;
+            badge.setAttribute('aria-label', `使用 ${usage.total.toLocaleString('en-US')}（${detail}）`);
+            const labelEl = document.createElement('span');
+            labelEl.className = 'work-dl-label';
+            labelEl.textContent = '使用：';
+            const countEl = document.createElement('span');
+            countEl.className = 'work-dl-count nixie';
+            countEl.setAttribute('aria-hidden', 'true');
+            badge.append(labelEl, countEl);
             el.appendChild(badge);
+            // このカードもダウンロード数と同じくニキシー時計として見せる
+            el.classList.add('is-nixie-clock');
+            renderNixieCount(countEl, String(usage.total));
+            enableNixieShuffleOnHover(el, countEl);
           });
         })
         .catch(() => { /* usage.json 未生成でも無視 */ });
