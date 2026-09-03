@@ -743,6 +743,26 @@ body {
   100% { filter: brightness(1);    opacity: 1; }
 }
 
+/* カーソルを乗せている間だけ、接触不良のように不規則に瞬く。
+   1周に3回だけ、しかも1回あたり数十msなので数字は読めるまま。
+   周期(--nixie-hdur)と位相(--nixie-delay)は管ごとに違うので、
+   どの管がいつ瞬くかは揃わない。 */
+.work-card.is-nixie-clock:hover .nixie-tube:not(.is-spinning):not(.is-settled) .nixie-digit,
+.work-card.is-nixie-clock:focus-visible .nixie-tube:not(.is-spinning):not(.is-settled) .nixie-digit {
+  animation: nixie-blink var(--nixie-hdur, 1.6s) steps(1, end) var(--nixie-delay, 0s) infinite;
+}
+
+@keyframes nixie-blink {
+  0%   { opacity: 1;    filter: brightness(1); }
+  27%  { opacity: 0.25; filter: brightness(0.45); }
+  30%  { opacity: 1;    filter: brightness(1.18); }
+  32%  { opacity: 1;    filter: brightness(1); }
+  74%  { opacity: 0.35; filter: brightness(0.55); }
+  76%  { opacity: 1;    filter: brightness(1.1); }
+  78%  { opacity: 1;    filter: brightness(1); }
+  100% { opacity: 1;    filter: brightness(1); }
+}
+
 /* もやのほうは数字より長い周期でゆっくり濃淡が変わる */
 @keyframes nixie-haze {
   0%   { opacity: 1; }
@@ -764,7 +784,9 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .nixie-digit,
   .nixie-tube::after,
-  .nixie-tube.is-settled .nixie-digit {
+  .nixie-tube.is-settled .nixie-digit,
+  .work-card.is-nixie-clock:hover .nixie-tube .nixie-digit,
+  .work-card.is-nixie-clock:focus-visible .nixie-tube .nixie-digit {
     animation: none;
   }
 }
@@ -810,12 +832,12 @@ body {
     0 12px 26px -16px rgba(255,120,30,0.5);
 }
 
-/* アイコンは扉に留められた丸い銘板。中央に作品のアイコンが入る。 */
+/* アイコンは扉に留められた四角い銘板。中央に作品のアイコンが入る。 */
 .work-card.is-nixie-clock .work-icon {
   width: 58px;
   height: 58px;
   padding: 9px;
-  border-radius: 50%;
+  border-radius: 7px;
   background:
     linear-gradient(158deg, rgba(226,238,255,0.14), transparent 52%),
     radial-gradient(circle at 50% 118%, rgba(255,120,30,0.1), transparent 62%),
@@ -856,6 +878,17 @@ body {
     radial-gradient(circle 3px at 50% 50%, rgba(232,244,255,0.92) 0%, rgba(158,172,196,0.85) 38%, rgba(84,94,112,0.9) 66%, rgba(10,12,16,0.95) 88%, transparent 100%),
     radial-gradient(circle 3px at 50% 50%, rgba(232,244,255,0.92) 0%, rgba(158,172,196,0.85) 38%, rgba(84,94,112,0.9) 66%, rgba(10,12,16,0.95) 88%, transparent 100%),
     radial-gradient(circle 3px at 50% 50%, rgba(232,244,255,0.92) 0%, rgba(158,172,196,0.85) 38%, rgba(84,94,112,0.9) 66%, rgba(10,12,16,0.95) 88%, transparent 100%);
+}
+
+/* 高さを揃えた結果 margin-top:auto が 0 になっても、
+   タグが天板の境界線に貼り付かないよう余白を確保する。
+   また、詰まったときに中身が潰れて重ならないよう縮小も止める。 */
+.work-card.is-nixie-clock > * {
+  flex-shrink: 0;
+}
+
+.work-card.is-nixie-clock .work-tags {
+  padding-bottom: 0.55rem;
 }
 
 /* 管が立つのは箱の天板。カード下端いっぱいの帯にして、木の一枚板に見せる。 */

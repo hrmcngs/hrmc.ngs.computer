@@ -370,6 +370,8 @@ function createNixieCell(ch) {
   cell.style.setProperty('--nixie-dur2',   `${rand(7, 16)}s`);
   cell.style.setProperty('--nixie-delay2', `-${rand(0, 16)}s`);
   cell.style.setProperty('--nixie-dim',    rand(0.7, 0.93));
+  // ホバー中の瞬きも管ごとに周期をずらす
+  cell.style.setProperty('--nixie-hdur',   `${rand(1.4, 3.2)}s`);
   setNixieDigit(cell, ch);
   return cell;
 }
