@@ -614,25 +614,34 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 0.72em;
-  padding: 0.1em 0.08em;
+  min-width: 0.86em;
+  /* 上にガラスの天板、下に黒いソケットぶんの余白をとる（実機の縦長の管） */
+  padding: 0.5em 0.1em 0.36em;
   font-family: var(--font-nixie);
   font-size: 1.15rem;
   font-weight: 400;
   line-height: 1;
-  border-radius: 2px 2px 3px 3px;
-  /* 左上のガラスの映り込み＋管の底に溜まるオレンジの輝き */
+  border-radius: 2px 2px 1px 1px;
   background:
-    linear-gradient(108deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 42%),
-    radial-gradient(120% 85% at 50% 120%, rgba(255,140,45,0.10), transparent 74%);
-  box-shadow: inset 0 -6px 9px -7px rgba(255,140,45,0.4);
+    /* ガラスの天板と、根元の黒いソケット */
+    linear-gradient(180deg,
+      rgba(222,232,245,0.34) 0 2px,
+      rgba(214,224,238,0.16) 2px 4px,
+      rgba(255,255,255,0.05) 4px 6px,
+      transparent 6px calc(100% - 5px),
+      rgba(0,0,0,0.55) calc(100% - 5px) calc(100% - 4px),
+      rgba(0,0,0,0.85) calc(100% - 4px) 100%),
+    /* 左上のガラスの映り込み＋管の底に溜まるオレンジの輝き */
+    linear-gradient(108deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 44%),
+    radial-gradient(120% 60% at 50% 88%, rgba(255,140,45,0.12), transparent 72%);
+  box-shadow: inset 0 -9px 11px -9px rgba(255,140,45,0.45);
 }
 
 /* 管の中の金網（アノードメッシュ）。発光をはみ出させたいので管側は clip しない */
 .nixie-tube::before {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: 6px 0 5px;
   border-radius: inherit;
   overflow: hidden;
   background-image:
@@ -761,14 +770,33 @@ body {
 .work-card.is-nixie-clock {
   position: relative;
   border-color: rgba(196,150,96,0.3);
-  /* 上端のベゼル、ヘアライン仕上げの金属、足元にたまる熱 */
+  /* ウォールナットの筐体。上端のベゼル → 細い木目 → うねりの太い木目 →
+     管の足元にたまる熱 → 木地の色、の順に重ねている。
+     木目は周期の違う縞を重ねて、繰り返しが目立たないようにしている。 */
   background:
-    linear-gradient(180deg, rgba(255,232,198,0.055) 0 2px, transparent 2px 26px),
-    repeating-linear-gradient(90deg, rgba(255,255,255,0.014) 0 1px, transparent 1px 3px),
-    radial-gradient(130% 52% at 50% 114%, rgba(255,120,30,0.09), transparent 66%),
-    linear-gradient(180deg, #1e1e26, #121217);
+    linear-gradient(180deg, rgba(255,232,198,0.06) 0 2px, transparent 2px 26px),
+    repeating-linear-gradient(92deg,
+      transparent 0,
+      rgba(0,0,0,0.09) 3px,
+      transparent 5px,
+      rgba(255,214,170,0.02) 9px,
+      transparent 12px,
+      rgba(0,0,0,0.05) 15px,
+      transparent 19px,
+      rgba(0,0,0,0.11) 20px,
+      transparent 22px,
+      rgba(255,214,170,0.014) 27px,
+      transparent 31px),
+    repeating-linear-gradient(88deg,
+      transparent 0,
+      rgba(0,0,0,0.07) 20px,
+      transparent 31px,
+      rgba(255,206,158,0.018) 50px,
+      transparent 79px),
+    radial-gradient(130% 52% at 50% 114%, rgba(255,120,30,0.1), transparent 66%),
+    linear-gradient(168deg, #2e2018 0%, #241812 45%, #170f0a 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255,228,190,0.07),
+    inset 0 1px 0 rgba(255,228,190,0.09),
     inset 0 -1px 0 rgba(0,0,0,0.55),
     0 10px 22px -16px rgba(255,120,30,0.5);
 }
@@ -803,16 +831,41 @@ body {
     radial-gradient(circle at 40% 35%, rgba(232,198,150,0.9), rgba(88,60,30,0.8) 58%, transparent 70%);
 }
 
-/* 管が載る前面パネル。カード下端いっぱいの帯にして時計の土台に見せる。 */
+/* 管が立つのは箱の天板。カード下端いっぱいの帯にして、木の一枚板に見せる。 */
 .work-card.is-nixie-clock .work-dl {
   position: relative;
   margin: 0.9rem -1.5rem -2rem;
-  padding: 0.6rem 1.5rem 0.7rem;
-  border-top: 1px solid rgba(196,150,96,0.22);
+  padding: 0.75rem 1.5rem 0.8rem;
+  border-top: 1px solid rgba(255,225,190,0.07);
   border-radius: 0 0 15px 15px;
   background:
-    radial-gradient(90% 120% at 50% 100%, rgba(255,120,30,0.07), transparent 70%),
-    linear-gradient(180deg, rgba(255,235,205,0.03), rgba(0,0,0,0.32));
+    radial-gradient(90% 130% at 50% 100%, rgba(255,120,30,0.08), transparent 72%),
+    linear-gradient(180deg, rgba(255,235,205,0.045), rgba(0,0,0,0.35));
+  box-shadow: inset 0 1px 0 rgba(255,230,195,0.05);
+}
+
+/* 天板に彫られた溝。ここに管が挿さっている。 */
+.work-card.is-nixie-clock .nixie {
+  border: 0;
+  border-radius: 2px;
+  gap: 2px;
+  padding: 3px 6px 4px;
+  background:
+    radial-gradient(80% 60% at 50% 108%, rgba(255,120,30,0.16), transparent 70%),
+    linear-gradient(180deg, rgba(0,0,0,0.82), rgba(0,0,0,0.62));
+  /* 上のふちが落とす影と、掘り込みの側面。外側の1本は溝のふちが光を拾った線。 */
+  box-shadow:
+    inset 0 4px 5px -3px rgba(0,0,0,0.95),
+    inset 3px 0 4px -3px rgba(0,0,0,0.9),
+    inset -3px 0 4px -3px rgba(0,0,0,0.9),
+    inset 0 -3px 4px -3px rgba(0,0,0,0.85),
+    0 1px 0 rgba(255,228,190,0.08);
+}
+
+/* 溝の中なので、板の映り込みと台座は出さない */
+.work-card.is-nixie-clock .nixie::before,
+.work-card.is-nixie-clock .nixie::after {
+  content: none;
 }
 
 .omake-section {
