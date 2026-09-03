@@ -810,6 +810,29 @@ body {
     0 12px 26px -16px rgba(255,120,30,0.5);
 }
 
+/* アイコンは扉に留められた丸い銘板。中央に作品のアイコンが入る。 */
+.work-card.is-nixie-clock .work-icon {
+  width: 58px;
+  height: 58px;
+  padding: 9px;
+  border-radius: 50%;
+  background:
+    linear-gradient(158deg, rgba(226,238,255,0.14), transparent 52%),
+    radial-gradient(circle at 50% 118%, rgba(255,120,30,0.1), transparent 62%),
+    linear-gradient(180deg, #333b4e, #191d26);
+  /* 上下の面取り → 外周の暗いふち → 磨かれたリング → プレートの影 */
+  box-shadow:
+    inset 0 1px 0 rgba(226,238,255,0.24),
+    inset 0 -1px 0 rgba(0,0,0,0.65),
+    0 0 0 1px rgba(0,0,0,0.6),
+    0 0 0 2px rgba(206,222,248,0.13),
+    0 2px 5px rgba(0,0,0,0.55);
+}
+
+.work-card.is-nixie-clock .work-icon img {
+  border-radius: 4px;
+}
+
 /* 内側のパネル枠と、それを留めている四隅のネジ。
    ::before は applyColor が色帯を挿すことがあるので ::after を使う。 */
 .work-card.is-nixie-clock::after {
@@ -826,13 +849,13 @@ body {
   background-repeat: no-repeat;
   background-size: 6px 6px;
   background-position:
-    5px 5px, calc(100% - 5px) 5px,
-    5px calc(100% - 5px), calc(100% - 5px) calc(100% - 5px);
+    8px 8px, calc(100% - 8px) 8px,
+    8px calc(100% - 8px), calc(100% - 8px) calc(100% - 8px);
   background-image:
-    radial-gradient(circle at 36% 32%, rgba(226,238,255,0.85), rgba(126,140,164,0.7) 45%, rgba(10,12,16,0.85) 72%, transparent 78%),
-    radial-gradient(circle at 36% 32%, rgba(226,238,255,0.85), rgba(126,140,164,0.7) 45%, rgba(10,12,16,0.85) 72%, transparent 78%),
-    radial-gradient(circle at 36% 32%, rgba(226,238,255,0.85), rgba(126,140,164,0.7) 45%, rgba(10,12,16,0.85) 72%, transparent 78%),
-    radial-gradient(circle at 36% 32%, rgba(226,238,255,0.85), rgba(126,140,164,0.7) 45%, rgba(10,12,16,0.85) 72%, transparent 78%);
+    radial-gradient(circle 3px at 50% 50%, rgba(232,244,255,0.92) 0%, rgba(158,172,196,0.85) 38%, rgba(84,94,112,0.9) 66%, rgba(10,12,16,0.95) 88%, transparent 100%),
+    radial-gradient(circle 3px at 50% 50%, rgba(232,244,255,0.92) 0%, rgba(158,172,196,0.85) 38%, rgba(84,94,112,0.9) 66%, rgba(10,12,16,0.95) 88%, transparent 100%),
+    radial-gradient(circle 3px at 50% 50%, rgba(232,244,255,0.92) 0%, rgba(158,172,196,0.85) 38%, rgba(84,94,112,0.9) 66%, rgba(10,12,16,0.95) 88%, transparent 100%),
+    radial-gradient(circle 3px at 50% 50%, rgba(232,244,255,0.92) 0%, rgba(158,172,196,0.85) 38%, rgba(84,94,112,0.9) 66%, rgba(10,12,16,0.95) 88%, transparent 100%);
 }
 
 /* 管が立つのは箱の天板。カード下端いっぱいの帯にして、木の一枚板に見せる。 */
