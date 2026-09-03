@@ -760,60 +760,59 @@ body {
 /* ===== ダウンロード数のある作品カードは、ニキシー時計の筐体に見立てる ===== */
 .work-card.is-nixie-clock {
   position: relative;
-  border-color: rgba(196,150,96,0.26);
+  border-color: rgba(196,150,96,0.3);
+  /* 上端のベゼル、ヘアライン仕上げの金属、足元にたまる熱 */
   background:
-    radial-gradient(130% 55% at 50% 116%, rgba(255,120,30,0.08), transparent 68%),
-    linear-gradient(180deg, #1c1c24, #131318);
+    linear-gradient(180deg, rgba(255,232,198,0.055) 0 2px, transparent 2px 26px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.014) 0 1px, transparent 1px 3px),
+    radial-gradient(130% 52% at 50% 114%, rgba(255,120,30,0.09), transparent 66%),
+    linear-gradient(180deg, #1e1e26, #121217);
   box-shadow:
-    inset 0 1px 0 rgba(255,228,190,0.06),
-    inset 0 -1px 0 rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,228,190,0.07),
+    inset 0 -1px 0 rgba(0,0,0,0.55),
     0 10px 22px -16px rgba(255,120,30,0.5);
 }
 
 .work-card.is-nixie-clock:hover,
 .work-card.is-nixie-clock:focus-visible {
-  border-color: rgba(226,178,118,0.5);
+  border-color: rgba(226,178,118,0.55);
   box-shadow:
     inset 0 1px 0 rgba(255,228,190,0.09),
     inset 0 -1px 0 rgba(0,0,0,0.5),
     0 12px 26px -14px rgba(255,120,30,0.6);
 }
 
-/* 筐体を留めている四隅のネジ */
-.work-card.is-nixie-clock::before {
+/* 内側のパネル枠と、それを留めている四隅のネジ。
+   ::before は applyColor が色帯を挿すことがあるので ::after を使う。 */
+.work-card.is-nixie-clock::after {
   content: '';
   position: absolute;
-  inset: 9px;
-  border-radius: 10px;
+  inset: 7px;
+  border: 1px solid rgba(196,150,96,0.14);
+  border-radius: 11px;
   pointer-events: none;
   background-repeat: no-repeat;
   background-size: 4px 4px;
-  background-position: left top, right top, left bottom, right bottom;
+  background-position:
+    4px 4px, calc(100% - 4px) 4px,
+    4px calc(100% - 4px), calc(100% - 4px) calc(100% - 4px);
   background-image:
-    radial-gradient(circle at 40% 35%, rgba(228,192,142,0.85), rgba(90,62,32,0.75) 60%, transparent 72%),
-    radial-gradient(circle at 40% 35%, rgba(228,192,142,0.85), rgba(90,62,32,0.75) 60%, transparent 72%),
-    radial-gradient(circle at 40% 35%, rgba(228,192,142,0.85), rgba(90,62,32,0.75) 60%, transparent 72%),
-    radial-gradient(circle at 40% 35%, rgba(228,192,142,0.85), rgba(90,62,32,0.75) 60%, transparent 72%);
+    radial-gradient(circle at 40% 35%, rgba(232,198,150,0.9), rgba(88,60,30,0.8) 58%, transparent 70%),
+    radial-gradient(circle at 40% 35%, rgba(232,198,150,0.9), rgba(88,60,30,0.8) 58%, transparent 70%),
+    radial-gradient(circle at 40% 35%, rgba(232,198,150,0.9), rgba(88,60,30,0.8) 58%, transparent 70%),
+    radial-gradient(circle at 40% 35%, rgba(232,198,150,0.9), rgba(88,60,30,0.8) 58%, transparent 70%);
 }
 
-/* 管の列の下に敷く、筐体の底板 */
+/* 管が載る前面パネル。カード下端いっぱいの帯にして時計の土台に見せる。 */
 .work-card.is-nixie-clock .work-dl {
   position: relative;
-  padding-top: 0.55rem;
-}
-
-.work-card.is-nixie-clock .work-dl::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg,
-    transparent,
-    rgba(196,150,96,0.28) 18%,
-    rgba(196,150,96,0.28) 82%,
-    transparent);
+  margin: 0.9rem -1.5rem -2rem;
+  padding: 0.6rem 1.5rem 0.7rem;
+  border-top: 1px solid rgba(196,150,96,0.22);
+  border-radius: 0 0 15px 15px;
+  background:
+    radial-gradient(90% 120% at 50% 100%, rgba(255,120,30,0.07), transparent 70%),
+    linear-gradient(180deg, rgba(255,235,205,0.03), rgba(0,0,0,0.32));
 }
 
 .omake-section {
@@ -1209,6 +1208,11 @@ body {
 
   .work-card {
     padding: 1.2rem 1rem;
+  }
+
+  .work-card.is-nixie-clock .work-dl {
+    margin: 0.75rem -1rem -1.2rem;
+    padding: 0.55rem 1rem 0.6rem;
   }
 
   .work-card h3 {
