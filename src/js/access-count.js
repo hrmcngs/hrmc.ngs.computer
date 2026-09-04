@@ -11,9 +11,22 @@
   const NAMESPACE = 'hrmc-ngs-computer';
   const COUNTER   = 'home';
   const endpoint = `https://abacus.jasoncameron.dev/hit/${NAMESPACE}/${COUNTER}`;
+  const DAILY_COUNTER_PREFIX = `${COUNTER}-daily`;
+  const DAILY_TIME_ZONE = 'Asia/Tokyo';
   const cacheKey = 'page-access-count';
   const detailsCacheKey = 'page-access-details';
   const historyCacheKey = 'page-access-history';
+
+  function getDateKey(value = new Date()) {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: DAILY_TIME_ZONE,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).formatToParts(value);
+    const part = type => parts.find(item => item.type === type)?.value;
+    return `${part('year')}-${part('month')}-${part('day')}`;
+  }
 
   function formatDate(value) {
     if (!value) return '不明';
@@ -28,6 +41,7 @@
 
   function showDetails(details, cached = false) {
     window.pageAccessCount = details.count;
+    window.pageTodayAccessCount = Number.isFinite(details.todayCount) ? details.todayCount : null;
     window.pageAccessDetails = details;
     console.group(`[Access Count] ${details.count.toLocaleString('ja-JP')} views${cached ? ' (前回値)' : ''}`);
     // Abacus は値以外のメタ情報を返さないため、取れなかった項目は行ごと省く。
@@ -35,10 +49,14 @@
       'アクセス数': details.count,
       '今回の取得日時': formatDate(details.fetchedAt),
     };
+    if (Number.isFinite(details.todayCount)) {
+      rows[`今日のアクセス数 (${details.todayDate})`] = details.todayCount;
+    }
     if (details.updatedAt) rows['API上の更新日時'] = formatDate(details.updatedAt);
     if (details.createdAt) rows['カウンター作成日時'] = formatDate(details.createdAt);
     rows['対象ページ'] = details.page;
     rows['カウンター名'] = details.counter;
+    if (details.todayCounter) rows['今日のカウンター名'] = details.todayCounter;
     rows['取得元'] = cached ? 'ブラウザキャッシュ' : details.source;
     console.table(rows);
     console.groupEnd();
@@ -91,6 +109,12 @@
   try {
     const cachedDetails = JSON.parse(localStorage.getItem(detailsCacheKey));
     if (cachedDetails && Number.isFinite(cachedDetails.count)) {
+      // 日付をまたいだ場合、前日の値を「今日」として一瞬表示しない。
+      if (cachedDetails.todayDate !== getDateKey()) {
+        delete cachedDetails.todayCount;
+        delete cachedDetails.todayDate;
+        delete cachedDetails.todayCounter;
+      }
       showDetails(cachedDetails, true);
     } else {
       const cachedCount = Number(localStorage.getItem(cacheKey));
@@ -112,26 +136,35 @@
 
   async function updateAccessCount() {
     try {
-      const response = await fetch(endpoint, { cache: 'no-store' });
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
+      const todayDate = getDateKey();
+      const todayCounterKey = `${DAILY_COUNTER_PREFIX}-${todayDate}`;
+      const todayEndpoint = `https://abacus.jasoncameron.dev/hit/${NAMESPACE}/${todayCounterKey}`;
+      const [response, todayResponse] = await Promise.all([
+        fetch(endpoint, { cache: 'no-store' }),
+        fetch(todayEndpoint, { cache: 'no-store' }),
+      ]);
+      if (!response.ok) throw new Error(`累計カウンター: HTTP ${response.status}`);
+      if (!todayResponse.ok) throw new Error(`日別カウンター: HTTP ${todayResponse.status}`);
 
-      const data = await response.json();
+      const [data, todayData] = await Promise.all([response.json(), todayResponse.json()]);
       const count = Number(data.value ?? data.count);
-      if (!Number.isFinite(count)) {
+      const todayCount = Number(todayData.value ?? todayData.count);
+      if (!Number.isFinite(count) || !Number.isFinite(todayCount)) {
         throw new Error('カウンターAPIから不正な値が返されました');
       }
 
       const fetchedAt = new Date().toISOString();
       const details = {
         count,
+        todayCount,
+        todayDate,
         fetchedAt,
         // /hit はこのリクエスト自体がカウンターを更新するので更新日時＝取得日時。
         updatedAt: fetchedAt,
         createdAt: null,
         page: location.pathname,
         counter: `${NAMESPACE} / ${COUNTER}`,
+        todayCounter: `${NAMESPACE} / ${todayCounterKey}`,
         source: 'Abacus (live)',
       };
 
