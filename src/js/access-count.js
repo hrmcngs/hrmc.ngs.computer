@@ -43,6 +43,14 @@
     window.pageAccessCount = details.count;
     window.pageTodayAccessCount = Number.isFinite(details.todayCount) ? details.todayCount : null;
     window.pageAccessDetails = details;
+    const totalElement = document.getElementById('access-watcher-total');
+    const todayElement = document.getElementById('access-watcher-today');
+    if (totalElement) totalElement.textContent = details.count.toLocaleString('ja-JP');
+    if (todayElement) {
+      todayElement.textContent = Number.isFinite(details.todayCount)
+        ? details.todayCount.toLocaleString('ja-JP')
+        : '---';
+    }
     console.group(`[Access Count] ${details.count.toLocaleString('ja-JP')} views${cached ? ' (前回値)' : ''}`);
     // Abacus は値以外のメタ情報を返さないため、取れなかった項目は行ごと省く。
     const rows = {

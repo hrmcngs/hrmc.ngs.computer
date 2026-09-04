@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 84 60">
+  <style>
+    .outline,.lashes,.iris{transform-box:fill-box;transform-origin:center}
+    .outline{fill:none;stroke:#000;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round;animation:blink 5.2s infinite}
+    .lashes{fill:none;stroke:#000;stroke-width:2;stroke-linecap:round;transform-origin:center bottom;animation:lashes-blink 5.2s infinite}
+    .iris{fill:#777;stroke:#000;stroke-width:1.5;animation:iris-visible 5.2s infinite}
+    .mark{fill:#333;stroke:none}.pupil{fill:#111}.glint{fill:#fff;stroke:none}
+    path,ellipse,circle{vector-effect:non-scaling-stroke}
+    @keyframes blink{0%,43%,47%,76%,80%,100%{transform:scaleY(1)}45%,78%{transform:scaleY(.08)}}
+    @keyframes lashes-blink{0%,43%,47%,76%,80%,100%{transform:translateY(0)}45%,78%{transform:translateY(15px) scaleY(.35)}}
+    @keyframes iris-visible{0%,43%,47%,76%,80%,100%{opacity:1}44%,46%,77%,79%{opacity:0}}
+    @media (prefers-reduced-motion:reduce){.outline,.lashes,.iris{animation:none}}
+  </style>
+  <rect width="84" height="60" rx="18" fill="#fff"/>
+  <g class="outline"><path d="M4 31C17 17 30 12 42 12C56 12 69 19 80 31C68 42 55 48 42 48C29 48 16 42 4 31Z"/></g>
+  <g class="iris">
+    <ellipse cx="42" cy="31" rx="16" ry="11"/>
+    <circle class="mark" cx="34" cy="27" r="1"/><circle class="mark" cx="36" cy="35" r=".8"/>
+    <circle class="mark" cx="48" cy="25" r=".8"/><circle class="mark" cx="50" cy="36" r="1"/>
+    <circle class="pupil" cx="42" cy="31" r="4.5"/><circle class="glint" cx="40" cy="28.5" r="1.6"/>
+  </g>
+  <g class="lashes"><path d="M20 18L15 8M27 15L24 4M35 13L34 2M43 12L43 1M51 14L53 3M59 16L63 5M67 20L73 10"/></g>
+</svg>

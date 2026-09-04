@@ -101,8 +101,9 @@ jobs:
             echo "チャートに変化なし — コミットしません。"
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
-            git config user.name  "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            # このサイト自身のチャート更新は、サイト所有者のコミットとして記録する。
+            git config user.name  "Hiromichi Nagase"
+            git config user.email "78349683+hrmcngs@users.noreply.github.com"
             git commit -m "chore: update chart SVGs [skip ci]"
             git push
             echo "changed=true" >> "$GITHUB_OUTPUT"

@@ -218,6 +218,126 @@ body {
   letter-spacing: 0.05em;
 }
 
+/* ===== Access watcher ===== */
+.access-watcher {
+  position: absolute;
+  right: clamp(1.5rem, 6vw, 6rem);
+  bottom: clamp(2rem, 7vh, 5rem);
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.8rem 1rem 0.8rem 0.8rem;
+  color: var(--text);
+  background: rgba(13, 13, 15, 0.72);
+  border: 1px solid rgba(62, 207, 207, 0.25);
+  border-radius: 18px;
+  box-shadow: 0 14px 45px rgba(0, 0, 0, 0.35), inset 0 0 24px rgba(62, 207, 207, 0.04);
+  backdrop-filter: blur(12px);
+}
+
+.access-watcher-character {
+  position: relative;
+  width: 78px;
+  height: 58px;
+  flex: 0 0 auto;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.access-watcher-eye {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.access-watcher-eye path,
+.access-watcher-eye ellipse,
+.access-watcher-eye circle {
+  vector-effect: non-scaling-stroke;
+}
+
+.access-watcher-eye-outline {
+  fill: none;
+  stroke: #000;
+  stroke-width: 2.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: watcher-blink 5.2s infinite;
+}
+
+.access-watcher-lashes {
+  fill: none;
+  stroke: #000;
+  stroke-width: 2;
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: watcher-lashes-blink 5.2s infinite;
+}
+
+.access-watcher-iris {
+  fill: #777;
+  stroke: #000;
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: watcher-pupil-visibility 5.2s infinite;
+}
+
+.access-watcher-pupil { fill: #111; }
+.access-watcher-iris-mark { fill: #333; stroke: none; }
+.access-watcher-eye-glint { fill: #fff; stroke: none; }
+
+@keyframes watcher-blink {
+  0%, 43%, 47%, 76%, 80%, 100% { transform: scaleY(1); }
+  45%, 78% { transform: scaleY(0.08); }
+}
+
+@keyframes watcher-lashes-blink {
+  0%, 43%, 47%, 76%, 80%, 100% { transform: translateY(0); }
+  45%, 78% { transform: translateY(15px) scaleY(0.35); }
+}
+
+@keyframes watcher-pupil-visibility {
+  0%, 43%, 47%, 76%, 80%, 100% { opacity: 1; }
+  44%, 46%, 77%, 79% { opacity: 0; }
+}
+
+.access-watcher-copy {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.35;
+}
+
+.access-watcher-message {
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+}
+
+.access-watcher-counts {
+  margin-top: 0.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.67rem;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+}
+
+.access-watcher-counts strong {
+  color: var(--accent2);
+  font-size: 0.78rem;
+  font-weight: 400;
+}
+
+.access-watcher-counts i {
+  margin: 0 0.25rem;
+  color: rgba(255, 255, 255, 0.2);
+  font-style: normal;
+}
+
 .scroll-btn {
   display: inline-flex;
   align-items: center;
@@ -1403,6 +1523,23 @@ body {
     font-size: 0.9rem;
   }
 
+  .access-watcher {
+    right: 1rem;
+    bottom: 1rem;
+    gap: 0.65rem;
+    padding: 0.6rem 0.75rem 0.6rem 0.6rem;
+    border-radius: 14px;
+  }
+
+  .access-watcher-character {
+    width: 66px;
+    height: 49px;
+  }
+
+  .access-watcher-message { font-size: 0.72rem; }
+  .access-watcher-counts { font-size: 0.58rem; }
+  .access-watcher-counts strong { font-size: 0.68rem; }
+
   .scroll-btn {
     margin-top: 2rem;
   }
@@ -1555,4 +1692,10 @@ body {
   .footer-copy {
     font-size: 0.72rem;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .access-watcher-eye-outline,
+  .access-watcher-lashes,
+  .access-watcher-iris { animation: none; }
 }
