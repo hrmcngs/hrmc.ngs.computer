@@ -16,6 +16,7 @@
   const cacheKey = 'page-access-count';
   const detailsCacheKey = 'page-access-details';
   const historyCacheKey = 'page-access-history';
+  const dailyHistoryCacheKey = 'page-daily-access-history';
 
   function getDateKey(value = new Date()) {
     const parts = new Intl.DateTimeFormat('en-US', {
@@ -69,6 +70,7 @@
     console.table(rows);
     console.groupEnd();
     showGraph(loadHistory());
+    showDailyHistory(loadDailyHistory());
   }
 
   function loadHistory() {
@@ -100,6 +102,34 @@
     return latest;
   }
 
+  function loadDailyHistory() {
+    try {
+      const history = JSON.parse(localStorage.getItem(dailyHistoryCacheKey));
+      return Array.isArray(history) ? history : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function saveDailyHistory(date, count, fetchedAt) {
+    const history = loadDailyHistory();
+    const entry = { date, count, fetchedAt };
+    const sameDayIndex = history.findIndex(item => item.date === date);
+    if (sameDayIndex >= 0) history[sameDayIndex] = entry;
+    else history.push(entry);
+    const latest = history
+      .filter(item => item && typeof item.date === 'string' && Number.isFinite(item.count))
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(-30);
+    try {
+      localStorage.setItem(dailyHistoryCacheKey, JSON.stringify(latest));
+    } catch (error) {
+      // localStorageが無効でも今回分は表示する。
+    }
+    window.pageDailyAccessHistory = latest;
+    return latest;
+  }
+
   function showGraph(history) {
     if (!history.length) return;
     window.pageAccessHistory = history;
@@ -109,6 +139,23 @@
       const width = Math.max(1, Math.round((item.count / max) * 30));
       const bar = '█'.repeat(width);
       console.log(`${item.date} | ${bar} ${item.count.toLocaleString('ja-JP')}`);
+    });
+    console.groupEnd();
+  }
+
+  function showDailyHistory(history) {
+    if (!history.length) return;
+    window.pageDailyAccessHistory = history;
+    const max = Math.max(...history.map(item => item.count), 1);
+    console.group('[Daily Access Count] 日にちごとのアクセス数（最大30日）');
+    console.table(history.map(item => ({
+      '日付': item.date,
+      'アクセス数': item.count,
+      '最終取得日時': formatDate(item.fetchedAt),
+    })));
+    history.forEach(item => {
+      const width = Math.max(1, Math.round((item.count / max) * 30));
+      console.log(`${item.date} | ${'█'.repeat(width)} ${item.count.toLocaleString('ja-JP')}`);
     });
     console.groupEnd();
   }
@@ -183,6 +230,7 @@
         // localStorageが無効でもConsole表示は続ける。
       }
       saveHistory(count, details.fetchedAt);
+      saveDailyHistory(todayDate, todayCount, details.fetchedAt);
       showDetails(details);
     } catch (error) {
       console.warn('[Access Count] アクセス数を取得できませんでした', error);
