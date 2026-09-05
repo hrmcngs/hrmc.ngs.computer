@@ -1,4 +1,17 @@
 (() => {
+  const modules = new Map();
+  function loadModule(src) {
+    if (!modules.has(src)) {
+      modules.set(src, new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = resolve;
+        script.onerror = () => { modules.delete(src); script.remove(); reject(new Error('load failed')); };
+        document.head.append(script);
+      }));
+    }
+    return modules.get(src);
+  }
   function init(cfg, profile, data_works) {
     if (cfg.colors) {
       const r = document.documentElement;
@@ -335,6 +348,16 @@
 
     let savedBodyContent=null;
     let viewerCleanup=null;
+    let moduleRequest = 0;
+    async function openTool(src, open) {
+      const request = ++moduleRequest;
+      try {
+        await loadModule(src);
+        if (request === moduleRequest && !activeViewer) open();
+      } catch {
+        if (request === moduleRequest) appendLines([{type:'error',message:'ツールを読み込めませんでした。もう一度実行してください。'}],body);
+      }
+    }
     function closeViewer(){if(!activeViewer)return;if(viewerCleanup){try{viewerCleanup();}catch(e){}viewerCleanup=null;}body.innerHTML=savedBodyContent;savedBodyContent=null;activeViewer=null;body.scrollTop=body.scrollHeight;input.focus({ preventScroll: true });}
     function showMd2Img(){
       if(!window.MD2IMG||typeof window.MD2IMG.mount!=='function'){
@@ -387,6 +410,7 @@
       history.unshift(cmd); histIdx = -1;
 
       if (cmd === './stop' || cmd === '0') {
+        moduleRequest++;
         if (activeViewer)   { closeViewer(); return; }
         if (userCountState) { userCountState = null; print(['<span style="opacity:0.45">キャンセルしました。</span>'], cmd); return; }
       }
@@ -396,8 +420,8 @@
         handleUserCountInput(cmd);
         return;
       }
-      if (cmd === './md2img.sh') { showMd2Img(); return; }
-      if (cmd === './matrix.sh') { showMatrixCam(); return; }
+      if (cmd === './md2img.sh') { if (!activeViewer) openTool('/src/js/md2img.js', showMd2Img); return; }
+      if (cmd === './matrix.sh') { if (!activeViewer) openTool('/src/js/matrix-cam.js?v=2026-09-02-1', showMatrixCam); return; }
       if (activeViewer) { print([{ type: 'error', message: `command not found: ${cmd}  (./stop で戻る)` }], cmd); return; }
       if (buildActive && /^\d+$/.test(cmd)) {
         const n = parseInt(cmd, 10);
@@ -431,8 +455,7 @@
     print(COMMANDS.help(), 'help');
   }
 
-  fetch('/content.json')
-    .then(r => r.json())
+  (window.siteContent || fetch('/content.json').then(r => r.json()))
     .then(data => init(data.terminal ?? {}, data.profile ?? {}, data.works ?? []))
     .catch(() => init({}, {}));
 })();

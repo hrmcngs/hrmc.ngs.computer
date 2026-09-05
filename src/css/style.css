@@ -1758,3 +1758,13 @@ body {
   .access-watcher-lashes,
   .access-watcher-iris { animation: none; }
 }
+
+/* 画面外のニキシー管では、ぼかし・点滅アニメーションを停止する。 */
+.work-card:not(.card-visible) *,
+.work-card:not(.card-visible) *::before,
+.work-card:not(.card-visible) *::after,
+.page-hidden .work-card *,
+.page-hidden .work-card *::before,
+.page-hidden .work-card *::after {
+  animation-play-state: paused !important;
+}

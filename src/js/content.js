@@ -224,10 +224,13 @@ function applyColor(el, color, varName = '--link-color') {
 // VS Code Marketplace → Actionsで生成した downloads.json（ブラウザPOSTは403になるため）
 // live取得は15秒キャッシュし、失敗時は保存済みの値へフォールバックする。
 const DL_CACHE_TTL = 15 * 1000;
-const GENERATED_DOWNLOADS = fetch('/charts/downloads.json', { cache: 'no-store' })
-  .then(r => r.ok ? r.json() : null)
-  .then(d => d?.entries ?? {})
-  .catch(() => ({}));
+let generatedDownloads;
+function getGeneratedDownloads() {
+  return generatedDownloads ||= fetch('/charts/downloads.json', { cache: 'no-cache' })
+    .then(r => r.ok ? r.json() : null)
+    .then(d => d?.entries ?? {})
+    .catch(() => ({}));
+}
 
 function dlCacheGet(url) {
   try {
@@ -318,7 +321,7 @@ function newestDownloadStats(...values) {
 // キャッシュ込みで1リンクのダウンロード数・インストール数を返す
 async function getDownloadStats(url) {
   const cached = dlCacheGet(url);
-  const generated = await GENERATED_DOWNLOADS;
+  const generated = await getGeneratedDownloads();
   const fallback = generated?.[url];
   const current = newestDownloadStats(cached, fallback);
   if (current) {
@@ -532,8 +535,9 @@ function uniqueDownloadLinks(links) {
   });
 }
 
-fetch('/content.json', { cache: 'no-store' })
-  .then(r => r.json())
+const siteContent = window.siteContent = fetch('/content.json', { cache: 'no-cache' })
+  .then(r => r.json());
+siteContent
   .then(data => {
     const { hero, footer, terminal, links, about, profile, works } = data;
 
@@ -741,67 +745,78 @@ fetch('/content.json', { cache: 'no-store' })
         if (w?.color) applyColor(el, w.color, '--work-color');
       });
 
-      // Works と terminal.build の全リンクからDL数を自動取得する。
-      // stats は追加リンクを指定する場合だけ使う。
-      const statByTitle = {};
-      const buildByTitle = {};
-      if (Array.isArray(terminal?.build)) {
-        terminal.build.forEach(item => {
-          buildByTitle[String(item.title).toLowerCase()] = item;
-        });
-      }
-      if (Array.isArray(data.stats)) {
-        data.stats.forEach(p => {
-          statByTitle[String(p.title).toLowerCase()] = p;
-        });
-      }
-      worksEl.querySelectorAll('.work-card').forEach((el, i) => {
-        const work = works[i];
-        const titleKey = String(work?.title ?? '').toLowerCase();
-        const conf = statByTitle[titleKey];
-        const build = buildByTitle[titleKey];
-        const configuredLinks = conf && Array.isArray(conf.links) ? conf.links : [];
-        const workLinks = Array.isArray(work?.links) ? work.links : [];
-        const buildLinks = Array.isArray(build?.links) ? build.links : [];
-        const downloadLinks = uniqueDownloadLinks([
-          work?.url,
-          ...workLinks,
-          ...buildLinks,
-          ...configuredLinks,
-        ]);
-        if (downloadLinks.length) showDownloadCount(el, downloadLinks);
-      });
-
-      // github-stats-charts カードに「Use template / bootstrap.sh 利用回数」を表示
-      fetch('/charts/usage.json', { cache: 'no-store' })
-        .then(r => r.ok ? r.json() : null)
-        .then(usage => {
-          if (!usage || typeof usage.total !== 'number') return;
-          worksEl.querySelectorAll('.work-card').forEach((el, i) => {
-            const title = String(works[i]?.title ?? '').toLowerCase();
-            if (title !== 'github-stats-charts') return;
-            const badge = document.createElement('div');
-            badge.className = 'work-dl';
-            const tmpl = usage.template || 0;
-            const boot = usage.bootstrap || 0;
-            const detail = `Use this template: ${tmpl} / bootstrap.sh: ${boot}`;
-            badge.title = detail;
-            badge.setAttribute('aria-label', `使用 ${usage.total.toLocaleString('en-US')}（${detail}）`);
-            const labelEl = document.createElement('span');
-            labelEl.className = 'work-dl-label';
-            labelEl.textContent = '使用：';
-            const countEl = document.createElement('span');
-            countEl.className = 'work-dl-count nixie';
-            countEl.setAttribute('aria-hidden', 'true');
-            badge.append(labelEl, countEl);
-            el.appendChild(badge);
-            // このカードもダウンロード数と同じくニキシー時計として見せる
-            el.classList.add('is-nixie-clock');
-            renderNixieCount(countEl, String(usage.total));
-            enableNixieShuffleOnHover(el, countEl);
+      const loadWorkStats = () => {
+        // Works と terminal.build の全リンクからDL数を自動取得する。
+        // stats は追加リンクを指定する場合だけ使う。
+        const statByTitle = {};
+        const buildByTitle = {};
+        if (Array.isArray(terminal?.build)) {
+          terminal.build.forEach(item => {
+            buildByTitle[String(item.title).toLowerCase()] = item;
           });
-        })
-        .catch(() => { /* usage.json 未生成でも無視 */ });
+        }
+        if (Array.isArray(data.stats)) {
+          data.stats.forEach(p => {
+            statByTitle[String(p.title).toLowerCase()] = p;
+          });
+        }
+        worksEl.querySelectorAll('.work-card').forEach((el, i) => {
+          const work = works[i];
+          const titleKey = String(work?.title ?? '').toLowerCase();
+          const conf = statByTitle[titleKey];
+          const build = buildByTitle[titleKey];
+          const configuredLinks = conf && Array.isArray(conf.links) ? conf.links : [];
+          const workLinks = Array.isArray(work?.links) ? work.links : [];
+          const buildLinks = Array.isArray(build?.links) ? build.links : [];
+          const downloadLinks = uniqueDownloadLinks([
+            work?.url,
+            ...workLinks,
+            ...buildLinks,
+            ...configuredLinks,
+          ]);
+          if (downloadLinks.length) showDownloadCount(el, downloadLinks);
+        });
+
+        // github-stats-charts カードに「Use template / bootstrap.sh 利用回数」を表示
+        fetch('/charts/usage.json', { cache: 'no-store' })
+          .then(r => r.ok ? r.json() : null)
+          .then(usage => {
+            if (!usage || typeof usage.total !== 'number') return;
+            worksEl.querySelectorAll('.work-card').forEach((el, i) => {
+              const title = String(works[i]?.title ?? '').toLowerCase();
+              if (title !== 'github-stats-charts') return;
+              const badge = document.createElement('div');
+              badge.className = 'work-dl';
+              const tmpl = usage.template || 0;
+              const boot = usage.bootstrap || 0;
+              const detail = `Use this template: ${tmpl} / bootstrap.sh: ${boot}`;
+              badge.title = detail;
+              badge.setAttribute('aria-label', `使用 ${usage.total.toLocaleString('en-US')}（${detail}）`);
+              const labelEl = document.createElement('span');
+              labelEl.className = 'work-dl-label';
+              labelEl.textContent = '使用：';
+              const countEl = document.createElement('span');
+              countEl.className = 'work-dl-count nixie';
+              countEl.setAttribute('aria-hidden', 'true');
+              badge.append(labelEl, countEl);
+              el.appendChild(badge);
+              // このカードもダウンロード数と同じくニキシー時計として見せる
+              el.classList.add('is-nixie-clock');
+              renderNixieCount(countEl, String(usage.total));
+              enableNixieShuffleOnHover(el, countEl);
+            });
+          })
+          .catch(() => { /* usage.json 未生成でも無視 */ });
+      };
+      if ('IntersectionObserver' in window) {
+        const statsObserver = new IntersectionObserver(entries => {
+          if (entries.some(entry => entry.isIntersecting)) {
+            statsObserver.disconnect();
+            loadWorkStats();
+          }
+        }, { rootMargin: '300px' });
+        statsObserver.observe(worksEl);
+      } else loadWorkStats();
     }
 
   })

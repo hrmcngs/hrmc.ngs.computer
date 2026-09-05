@@ -11,6 +11,8 @@
     const hero = document.querySelector('.hero');
     canvas.width  = hero ? hero.offsetWidth  : window.innerWidth;
     canvas.height = hero ? hero.offsetHeight : window.innerHeight;
+    // 静止したビネットはCSSで合成し、毎フレームの全画面塗り直しを避ける。
+    canvas.style.backgroundImage = `radial-gradient(circle ${canvas.height * 0.9}px at 50% 50%, rgba(0,0,0,0) 33.333333%, rgba(0,0,0,0.7) 100%)`;
   }
 
   const month = new Date().getMonth() + 1;
@@ -654,12 +656,14 @@
   let animationFrame = null;
   let animationReady = false;
   let heroVisible = true;
+  let lastPaint = -Infinity;
   function syncAnimation() {
     const shouldRun = animationReady && heroVisible && !document.hidden;
     if (shouldRun && animationFrame === null) animationFrame = requestAnimationFrame(animate);
     else if (!shouldRun && animationFrame !== null) {
       cancelAnimationFrame(animationFrame);
       animationFrame = null;
+      lastPaint = -Infinity;
     }
   }
   document.addEventListener('visibilitychange', syncAnimation);
@@ -669,19 +673,15 @@
       syncAnimation();
     }).observe(canvas);
   }
-  function animate(){
+  function animate(timestamp){
     animationFrame = null;
     if (!animationReady || !heroVisible || document.hidden) return;
+    // 高リフレッシュレート画面でも、同じ速度で最大60fpsに揃える。
+    if (timestamp - lastPaint < 1000 / 60 - 1) { syncAnimation(); return; }
+    lastPaint = Number.isFinite(lastPaint) && timestamp - lastPaint < 1000 / 30
+      ? lastPaint + 1000 / 60 : timestamp;
     frame++;
-    const bright=getBright();
     ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    // ビネット（canvasに直接描画）
-    const vg=ctx.createRadialGradient(canvas.width/2,canvas.height/2,canvas.height*0.3,canvas.width/2,canvas.height/2,canvas.height*0.9);
-    vg.addColorStop(0,'rgba(0,0,0,0)');
-    vg.addColorStop(1,'rgba(0,0,0,0.7)');
-    ctx.fillStyle=vg;
-    ctx.fillRect(0,0,canvas.width,canvas.height);
 
     particles.forEach(p=>{p.update();p.draw();});
     if(state.isRaining)rainDrops.forEach(r=>{r.update();r.draw();});
