@@ -307,11 +307,11 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
-  line-height: 1.35;
+  line-height: 1.6;
   min-width: 178px;
   padding: 0.72rem 0.9rem;
   color: #111115;
-  background: rgba(255, 255, 255, 0.94);
+  background: #fff;
   border: 2px solid #111115;
   border-radius: 16px;
   box-shadow: 0 12px 34px rgba(0, 0, 0, 0.3);
@@ -331,27 +331,30 @@ body {
 }
 
 .access-watcher-message {
-  font-size: 0.82rem;
-  letter-spacing: 0.08em;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .access-watcher-counts {
-  margin-top: 0.2rem;
+  margin-top: 0.35rem;
   font-family: var(--font-mono);
-  font-size: 0.67rem;
-  letter-spacing: 0.07em;
-  color: #555;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: #42424a;
 }
 
 .access-watcher-counts strong {
-  color: #5a46e8;
-  font-size: 0.78rem;
-  font-weight: 400;
+  color: #4933c9;
+  font-size: 0.9375rem;
+  font-weight: 700;
 }
 
 .access-watcher-counts i {
   margin: 0 0.25rem;
-  color: rgba(255, 255, 255, 0.2);
+  color: #62626b;
   font-style: normal;
 }
 
@@ -1552,10 +1555,10 @@ body {
     height: 49px;
   }
 
-  .access-watcher-message { font-size: 0.72rem; }
+  .access-watcher-message { font-size: 0.8125rem; }
   .access-watcher-copy { min-width: 158px; padding: 0.6rem 0.72rem; }
-  .access-watcher-counts { font-size: 0.58rem; }
-  .access-watcher-counts strong { font-size: 0.68rem; }
+  .access-watcher-counts { font-size: 0.75rem; }
+  .access-watcher-counts strong { font-size: 0.875rem; }
 
   .scroll-btn {
     margin-top: 2rem;

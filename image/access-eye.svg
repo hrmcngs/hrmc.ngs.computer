@@ -1,23 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 84 60">
   <style>
-    .outline,.lashes,.iris{transform-box:fill-box;transform-origin:center}
-    .outline{fill:none;stroke:#000;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round;animation:blink 5.2s infinite}
-    .lashes{fill:none;stroke:#000;stroke-width:2;stroke-linecap:round;transform-origin:center bottom;animation:lashes-blink 5.2s infinite}
-    .iris{fill:#777;stroke:#000;stroke-width:1.5;animation:iris-visible 5.2s infinite}
-    .mark{fill:#333;stroke:none}.pupil{fill:#111}.glint{fill:#fff;stroke:none}
-    path,ellipse,circle{vector-effect:non-scaling-stroke}
-    @keyframes blink{0%,43%,47%,76%,80%,100%{transform:scaleY(1)}45%,78%{transform:scaleY(.08)}}
-    @keyframes lashes-blink{0%,43%,47%,76%,80%,100%{transform:translateY(0)}45%,78%{transform:translateY(15px) scaleY(.35)}}
-    @keyframes iris-visible{0%,43%,47%,76%,80%,100%{opacity:1}44%,46%,77%,79%{opacity:0}}
-    @media (prefers-reduced-motion:reduce){.outline,.lashes,.iris{animation:none}}
+    .open{animation:eye-open 5.2s step-end infinite}
+    .closed{visibility:hidden;animation:eye-closed 5.2s step-end infinite}
+    @keyframes eye-open{0%,47%,80%{visibility:visible}44%,77%{visibility:hidden}}
+    @keyframes eye-closed{0%,47%,80%{visibility:hidden}44%,77%{visibility:visible}}
+    @media (prefers-reduced-motion:reduce){.open,.closed{animation:none}}
   </style>
   <rect width="84" height="60" rx="18" fill="#fff"/>
-  <g class="outline"><path d="M4 31C17 17 30 12 42 12C56 12 69 19 80 31C68 42 55 48 42 48C29 48 16 42 4 31Z"/></g>
-  <g class="iris">
-    <ellipse cx="42" cy="31" rx="16" ry="11"/>
-    <circle class="mark" cx="34" cy="27" r="1"/><circle class="mark" cx="36" cy="35" r=".8"/>
-    <circle class="mark" cx="48" cy="25" r=".8"/><circle class="mark" cx="50" cy="36" r="1"/>
-    <circle class="pupil" cx="42" cy="31" r="4.5"/><circle class="glint" cx="40" cy="28.5" r="1.6"/>
+  <!-- One pixel is a 3 × 3 unit square; blinking switches whole pixel frames. -->
+  <g transform="scale(3)" shape-rendering="crispEdges">
+    <g class="open">
+      <!-- Stepped lashes and eye outline. -->
+      <path fill="#111" d="M5 3h1v2h1v2H6V5H5ZM8 1h1v3h1v2H9V4H8ZM11 0h1v5h-1ZM14 0h1v5h-1ZM18 1h1v3h-1v2h-1V4h1ZM22 2h1v2h-1v2h-1v1h-1V5h1V4h1ZM25 4h1v2h-1v2h-1v1h-1V7h1V6h1Z"/>
+      <path fill="#111" d="M11 4h6v1h3v1h2v1h2v1h1v1h1v1h1v1h-1v1h-1v1h-1v1h-2v1h-2v1h-3v1h-6v-1H8v-1H6v-1H4v-1H3v-1H2v-1H1v-1h1V9h1V8h1V7h2V6h2V5h3Z"/>
+      <path fill="#fff" d="M11 5h6v1h3v1h2v1h2v1h1v1h1v1h-1v1h-1v1h-2v1h-2v1h-3v1h-6v-1H8v-1H6v-1H4v-1H3v-1H2v-1h1V9h1V8h2V7h2V6h3Z"/>
+      <!-- Gray iris, black pupil, and square highlight. -->
+      <path fill="#111" d="M11 6h6v1h2v2h1v3h-1v2h-2v1h-6v-1H9v-2H8V9h1V7h2Z"/>
+      <path fill="#888" d="M11 7h6v1h1v1h1v3h-1v1h-1v1h-6v-1h-1v-1H9V9h1V8h1Z"/>
+      <path fill="#444" d="M10 9h1v1h-1ZM11 12h1v1h-1ZM17 11h1v1h-1Z"/>
+      <path fill="#111" d="M13 8h2v1h1v3h-1v1h-2v-1h-1V9h1Z"/>
+      <path fill="#fff" d="M12 8h2v2h-2Z"/>
+    </g>
+    <g class="closed" fill="#111">
+      <path d="M2 10h3v1h4v1h10v-1h4v-1h3v1h-2v1h-4v1H8v-1H4v-1H2Z"/>
+      <path d="M5 12h1v2H5ZM9 13h1v2H9ZM14 13h1v3h-1ZM18 13h1v2h-1ZM22 12h1v2h-1Z"/>
+    </g>
   </g>
-  <g class="lashes"><path d="M20 18L15 8M27 15L24 4M35 13L34 2M43 12L43 1M51 14L53 3M59 16L63 5M67 20L73 10"/></g>
 </svg>
