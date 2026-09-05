@@ -10,10 +10,34 @@
     let restoreTimer;
     let blinkTimer;
     let flinch;
+    let effectTimer;
+    function playPixelHit() {
+      window.clearTimeout(effectTimer);
+      eyeButton.querySelector('.eye-hit-effect')?.remove();
+      const effect = document.createElement('span');
+      effect.className = 'eye-hit-effect';
+      effect.setAttribute('aria-hidden', 'true');
+      effect.innerHTML = '<svg class="eye-hit-star" viewBox="0 0 16 16" shape-rendering="crispEdges">'
+        + '<path fill="#111" d="M6 0h4v4h2v2h4v4h-4v2h-2v4H6v-4H4v-2H0V6h4V4h2Z"/>'
+        + '<path fill="#ffd65c" d="M7 2h2v3h2v2h3v2h-3v2H9v3H7v-3H5V9H2V7h3V5h2Z"/>'
+        + '<path fill="#fff" d="M7 6h2v1h1v2H9v1H7V9H6V7h1Z"/></svg>';
+      [[-48,-24],[-28,-42],[8,-46],[40,-30],[48,14],[28,38],[-8,42],[-40,24]]
+        .forEach(([x, y], i) => {
+          const pixel = document.createElement('span');
+          pixel.className = 'eye-hit-pixel';
+          pixel.style.setProperty('--hit-x', `${x}px`);
+          pixel.style.setProperty('--hit-y', `${y}px`);
+          pixel.style.setProperty('--hit-color', i % 2 ? '#fff' : '#ffd65c');
+          effect.append(pixel);
+        });
+      eyeButton.append(effect);
+      effectTimer = window.setTimeout(() => effect.remove(), 650);
+    }
     eyeButton.addEventListener('click', () => {
       window.clearTimeout(restoreTimer);
       window.clearTimeout(blinkTimer);
       eyeMessage.textContent = '痛った';
+      playPixelHit();
       if (eyeImage) {
         const closedEye = new URL(originalEye);
         closedEye.hash = 'ouch';

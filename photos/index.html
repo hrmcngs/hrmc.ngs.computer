@@ -7,10 +7,10 @@
   <link rel="icon" type="image/svg+xml" href="/image/icon.svg">
   <title>Photos — hrmc.ngs.computer</title>
   <link rel="stylesheet" href="/src/css/style.css">
-  <link rel="stylesheet" href="/src/css/photos.css?v=2026-09-05-4">
+  <link rel="stylesheet" href="/src/css/photos.css?v=2026-09-05-6">
   <script src="/src/js/theme.js"></script>
   <script src="/src/js/photo-viewer.js?v=2026-09-05-2" defer></script>
-  <script src="/src/js/photos.js?v=2026-09-05-6" defer></script>
+  <script src="/src/js/photos.js?v=2026-09-05-7" defer></script>
 </head>
 <body>
   <main class="section photos-page">
@@ -24,6 +24,12 @@
         <p>日々の景色や、撮った写真をまとめています。</p>
         <p>写真をクリックして拡大。ホイール・ピンチでズームできます。</p>
       </header>
+      <div class="photo-categories" role="group" aria-label="写真のカテゴリー">
+        <button type="button" data-photo-category="all" aria-pressed="true" aria-controls="photos-grid">すべて</button>
+        <button type="button" data-photo-category="pebkac" aria-pressed="false" aria-controls="photos-grid">P.E.B.K.A.C.</button>
+        <button type="button" data-photo-category="food" aria-pressed="false" aria-controls="photos-grid">作ったご飯</button>
+        <button type="button" data-photo-category="scenery" aria-pressed="false" aria-controls="photos-grid">風景なり</button>
+      </div>
       <p id="photos-status" class="photos-status" role="status">写真を読み込み中…</p>
       <div id="photos-grid" class="photos-grid"></div>
       <noscript><p>写真を表示するにはJavaScriptを有効にしてください。</p></noscript>

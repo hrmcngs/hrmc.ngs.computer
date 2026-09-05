@@ -1,21 +1,5 @@
 [
   {
-    "src": "/image/photos/DSC_1232.jpeg",
-    "alt": "写真 1"
-  },
-  {
-    "src": "/image/photos/DSC_2230.jpeg",
-    "alt": "写真 2"
-  },
-  {
-    "src": "/image/photos/IMG_0749.jpg",
-    "alt": "写真 3"
-  },
-  {
-    "src": "/image/photos/IMG_0957.jpg",
-    "alt": "写真 4"
-  },
-  {
     "src": "/image/photos/IMG_1077.jpg",
     "alt": "写真 5"
   },
@@ -41,6 +25,22 @@
   },
   {
     "src": "/image/photos/IMG_1657.jpg",
+    "alt": "写真 11"
+  },
+  {
+    "src": "/image/photos/scenery/DSC_1232.jpeg",
+    "alt": "写真 8"
+  },
+  {
+    "src": "/image/photos/scenery/DSC_2230.jpeg",
+    "alt": "写真 9"
+  },
+  {
+    "src": "/image/photos/scenery/IMG_0749.jpg",
+    "alt": "写真 10"
+  },
+  {
+    "src": "/image/photos/scenery/IMG_0957.jpg",
     "alt": "写真 11"
   }
 ]

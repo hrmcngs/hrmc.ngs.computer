@@ -249,6 +249,45 @@ body {
   outline-offset: 4px;
 }
 
+.eye-hit-effect {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.eye-hit-star {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  left: calc(50% - 20px);
+  top: calc(50% - 20px);
+  animation: eye-hit-star 600ms steps(3, end) both;
+}
+.eye-hit-pixel {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  left: calc(50% - 3px);
+  top: calc(50% - 3px);
+  background: var(--hit-color);
+  box-shadow: 2px 2px #111;
+  animation: eye-hit-scatter 600ms steps(5, end) both;
+}
+@keyframes eye-hit-star {
+  0% { transform: scale(0.5); opacity: 1; }
+  20%, 45% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.5); opacity: 0; }
+}
+@keyframes eye-hit-scatter {
+  0% { transform: translate(0, 0); opacity: 1; }
+  65% { opacity: 1; }
+  100% { transform: translate(var(--hit-x), var(--hit-y)); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eye-hit-star { animation: none; }
+  .eye-hit-pixel { display: none; }
+}
+
 .access-watcher-eye {
   display: block;
   width: 100%;

@@ -4,6 +4,9 @@
   const status = document.getElementById('photos-status');
   let loading = false;
   let previousList = null;
+  let allPhotos = [];
+  let activeCategory = 'all';
+  const categoryButtons = document.querySelectorAll('[data-photo-category]');
   const local = ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
 
   async function request(url, options = {}) {
@@ -43,6 +46,51 @@
     return [...files].sort();
   }
 
+  function renderPhotos(photos) {
+    const fragment = document.createDocumentFragment();
+    const gallery = [];
+    for (const photo of photos) {
+      if (!photo || typeof photo.src !== 'string' || !photo.src.trim()) continue;
+      const url = new URL(photo.src, window.location.origin);
+      if (!['http:', 'https:'].includes(url.protocol)) continue;
+      const folder = url.pathname.split('/')[3];
+      if (activeCategory !== 'all' && folder !== activeCategory) continue;
+      const selected = gallery.length;
+      gallery.push({ ...photo, src: url.href });
+      const figure = document.createElement('figure');
+      figure.className = 'photo';
+      const link = document.createElement('a');
+      link.href = url.href;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.addEventListener('click', event => {
+        if (!window.openPhotoViewer || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        window.openPhotoViewer(gallery, selected, link);
+      });
+      const img = document.createElement('img');
+      img.src = url.href;
+      img.alt = photo.alt || photo.caption || '写真';
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.addEventListener('error', () => {
+        link.replaceWith(document.createTextNode('写真を読み込めませんでした。'));
+      }, { once: true });
+      link.append(img);
+      figure.append(link);
+      if (photo.caption) {
+        const caption = document.createElement('figcaption');
+        caption.textContent = photo.caption;
+        figure.append(caption);
+      }
+      fragment.append(figure);
+    }
+    window.updatePhotoViewer?.(gallery);
+    grid.replaceChildren(fragment);
+    status.hidden = grid.childElementCount > 0;
+    status.textContent = activeCategory === 'all' ? '写真は準備中です。' : 'このカテゴリーの写真は準備中です。';
+  }
+
   async function loadPhotos() {
     if (loading) return;
     loading = true;
@@ -79,47 +127,9 @@
       }
       const serialized = JSON.stringify(photos);
       if (serialized === previousList) return;
-      const fragment = document.createDocumentFragment();
-      const gallery = [];
-      for (const photo of photos) {
-        if (!photo || typeof photo.src !== 'string' || !photo.src.trim()) continue;
-        const url = new URL(photo.src, window.location.origin);
-        if (!['http:', 'https:'].includes(url.protocol)) continue;
-        const selected = gallery.length;
-        gallery.push({ ...photo, src: url.href });
-        const figure = document.createElement('figure');
-        figure.className = 'photo';
-        const link = document.createElement('a');
-        link.href = url.href;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.addEventListener('click', event => {
-          if (!window.openPhotoViewer || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
-          event.preventDefault();
-          window.openPhotoViewer(gallery, selected, link);
-        });
-        const img = document.createElement('img');
-        img.src = url.href;
-        img.alt = photo.alt || photo.caption || '写真';
-        img.loading = 'lazy';
-        img.decoding = 'async';
-        img.addEventListener('error', () => {
-          link.replaceWith(document.createTextNode('写真を読み込めませんでした。'));
-        }, { once: true });
-        link.append(img);
-        figure.append(link);
-        if (photo.caption) {
-          const caption = document.createElement('figcaption');
-          caption.textContent = photo.caption;
-          figure.append(caption);
-        }
-        fragment.append(figure);
-      }
-      window.updatePhotoViewer?.(gallery);
-      grid.replaceChildren(fragment);
+      allPhotos = photos;
+      renderPhotos(allPhotos);
       previousList = serialized;
-      status.hidden = grid.childElementCount > 0;
-      status.textContent = '写真は準備中です。';
     } catch (error) {
       if (previousList === null) {
         status.textContent = '写真を読み込めませんでした。時間をおいて再読み込みしてください。';
@@ -129,6 +139,13 @@
       loading = false;
     }
   }
+  categoryButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      activeCategory = button.dataset.photoCategory;
+      categoryButtons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+      if (previousList !== null) renderPhotos(allPhotos);
+    });
+  });
   loadPhotos();
   window.setInterval(() => { if (!document.hidden) loadPhotos(); }, 5000);
   window.addEventListener('focus', loadPhotos);
