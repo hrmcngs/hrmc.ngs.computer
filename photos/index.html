@@ -9,8 +9,8 @@
   <link rel="stylesheet" href="/src/css/style.css">
   <link rel="stylesheet" href="/src/css/photos.css?v=2026-09-05-6">
   <script src="/src/js/theme.js"></script>
-  <script src="/src/js/photo-viewer.js?v=2026-09-05-2" defer></script>
-  <script src="/src/js/photos.js?v=2026-09-05-7" defer></script>
+  <script src="/src/js/photo-viewer.js?v=2026-09-05-3" defer></script>
+  <script src="/src/js/photos.js?v=2026-09-05-8" defer></script>
 </head>
 <body>
   <main class="section photos-page">
@@ -25,10 +25,10 @@
         <p>写真をクリックして拡大。ホイール・ピンチでズームできます。</p>
       </header>
       <div class="photo-categories" role="group" aria-label="写真のカテゴリー">
-        <button type="button" data-photo-category="all" aria-pressed="true" aria-controls="photos-grid">すべて</button>
+        <button type="button" data-photo-category="all" aria-pressed="true" aria-controls="photos-grid">all</button>
+        <button type="button" data-photo-category="scenery" aria-pressed="false" aria-controls="photos-grid">YOLO</button>
         <button type="button" data-photo-category="pebkac" aria-pressed="false" aria-controls="photos-grid">P.E.B.K.A.C.</button>
-        <button type="button" data-photo-category="food" aria-pressed="false" aria-controls="photos-grid">作ったご飯</button>
-        <button type="button" data-photo-category="scenery" aria-pressed="false" aria-controls="photos-grid">風景なり</button>
+        <button type="button" data-photo-category="food" aria-pressed="false" aria-controls="photos-grid">NOM NOM</button>
       </div>
       <p id="photos-status" class="photos-status" role="status">写真を読み込み中…</p>
       <div id="photos-grid" class="photos-grid"></div>

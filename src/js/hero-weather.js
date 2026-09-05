@@ -651,7 +651,27 @@
   }
 
   // ── アニメーション ─────────────────────────────────
+  let animationFrame = null;
+  let animationReady = false;
+  let heroVisible = true;
+  function syncAnimation() {
+    const shouldRun = animationReady && heroVisible && !document.hidden;
+    if (shouldRun && animationFrame === null) animationFrame = requestAnimationFrame(animate);
+    else if (!shouldRun && animationFrame !== null) {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = null;
+    }
+  }
+  document.addEventListener('visibilitychange', syncAnimation);
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(entries => {
+      heroVisible = entries[0].isIntersecting;
+      syncAnimation();
+    }).observe(canvas);
+  }
   function animate(){
+    animationFrame = null;
+    if (!animationReady || !heroVisible || document.hidden) return;
     frame++;
     const bright=getBright();
     ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -670,7 +690,7 @@
     drawGlitch();
     if(Math.random()<1/180)triggerGlitch();
 
-    requestAnimationFrame(animate);
+    syncAnimation();
   }
 
   // ── コンソールAPI ──────────────────────────────────
@@ -724,7 +744,8 @@
 
     resize();
     rebuildAll();
-    animate();
+    animationReady = true;
+    syncAnimation();
     fetchWeather();
     console.log(`%c[heroWeather] started — ${particles.length} particles`, 'color:#3ecfcf');
   }

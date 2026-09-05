@@ -9,8 +9,8 @@
 | 保存先 | カテゴリー |
 | --- | --- |
 | `image/photos/pebkac/` | P.E.B.K.A.C. |
-| `image/photos/food/` | 作ったご飯 |
-| `image/photos/scenery/` | 風景なり |
+| `image/photos/food/` | NOM NOM |
+| `image/photos/scenery/` | YOLO |
 
 `image/photos/` 直下の写真は「すべて」に表示されます。
 カテゴリーに入れるには、写真を対応するフォルダーへ移動してください。

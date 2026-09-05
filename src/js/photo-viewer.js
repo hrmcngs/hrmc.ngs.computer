@@ -10,8 +10,16 @@
   let start, pinching = false;
   const pointers = new Map();
   const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+  let drawFrame = null;
 
   function draw() {
+    if (drawFrame !== null) return;
+    drawFrame = window.requestAnimationFrame(() => {
+      drawFrame = null;
+      paint();
+    });
+  }
+  function paint() {
     const maxX = Math.max(0, (image.offsetWidth * scale - stage.clientWidth) / 2);
     const maxY = Math.max(0, (image.offsetHeight * scale - stage.clientHeight) / 2);
     x = clamp(x, -maxX, maxX);

@@ -6,6 +6,17 @@
   let previousList = null;
   let allPhotos = [];
   let activeCategory = 'all';
+  let currentGallery = [];
+  const cards = new Map();
+  const photoObserver = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      const img = entry.target;
+      img.src = img.dataset.src;
+      delete img.dataset.src;
+      photoObserver.unobserve(img);
+    }
+  }, { rootMargin: '120px 0px' }) : null;
   const categoryButtons = document.querySelectorAll('[data-photo-category]');
   const local = ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
 
@@ -49,14 +60,23 @@
   function renderPhotos(photos) {
     const fragment = document.createDocumentFragment();
     const gallery = [];
+    photoObserver?.disconnect();
+    const present = new Set(allPhotos.filter(photo => photo && typeof photo.src === 'string')
+      .map(photo => new URL(photo.src, window.location.origin).href));
+    for (const src of cards.keys()) if (!present.has(src)) cards.delete(src);
     for (const photo of photos) {
       if (!photo || typeof photo.src !== 'string' || !photo.src.trim()) continue;
       const url = new URL(photo.src, window.location.origin);
       if (!['http:', 'https:'].includes(url.protocol)) continue;
       const folder = url.pathname.split('/')[3];
       if (activeCategory !== 'all' && folder !== activeCategory) continue;
-      const selected = gallery.length;
       gallery.push({ ...photo, src: url.href });
+      const signature = JSON.stringify(photo);
+      const cached = cards.get(url.href);
+      if (cached?.signature === signature) {
+        fragment.append(cached.figure);
+        continue;
+      }
       const figure = document.createElement('figure');
       figure.className = 'photo';
       const link = document.createElement('a');
@@ -66,10 +86,13 @@
       link.addEventListener('click', event => {
         if (!window.openPhotoViewer || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
         event.preventDefault();
-        window.openPhotoViewer(gallery, selected, link);
+        const selected = currentGallery.findIndex(item => item.src === url.href);
+        if (selected >= 0) window.openPhotoViewer(currentGallery, selected, link);
       });
       const img = document.createElement('img');
-      img.src = url.href;
+      // src は表示直前に設定する。元画像のデータは変更しない。
+      if (photoObserver) img.dataset.src = url.href;
+      else img.src = url.href;
       img.alt = photo.alt || photo.caption || '写真';
       img.loading = 'lazy';
       img.decoding = 'async';
@@ -83,10 +106,13 @@
         caption.textContent = photo.caption;
         figure.append(caption);
       }
+      cards.set(url.href, { figure, signature });
       fragment.append(figure);
     }
+    currentGallery = gallery;
     window.updatePhotoViewer?.(gallery);
     grid.replaceChildren(fragment);
+    grid.querySelectorAll('img[data-src]').forEach(img => photoObserver?.observe(img));
     status.hidden = grid.childElementCount > 0;
     status.textContent = activeCategory === 'all' ? '写真は準備中です。' : 'このカテゴリーの写真は準備中です。';
   }
@@ -141,6 +167,7 @@
   }
   categoryButtons.forEach(button => {
     button.addEventListener('click', () => {
+      if (activeCategory === button.dataset.photoCategory) return;
       activeCategory = button.dataset.photoCategory;
       categoryButtons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
       if (previousList !== null) renderPhotos(allPhotos);
