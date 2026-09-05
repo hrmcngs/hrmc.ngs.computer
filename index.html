@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nixie+One&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="src/css/style.css?v=2026-09-05-5">
+  <link rel="stylesheet" href="src/css/style.css?v=2026-09-05-6">
   <script src="src/js/theme.js"></script>
 </head>
 <body>
@@ -37,6 +37,13 @@
     <aside class="access-watcher" id="access-watcher" aria-live="polite">
       <button class="access-watcher-character" type="button" aria-label="目をつつく">
         <img class="access-watcher-eye" src="image/access-eye.svg?v=2026-09-05-2" alt="">
+        <svg class="access-watcher-eye access-watcher-eye-closed" viewBox="0 0 84 60" aria-hidden="true">
+          <rect width="84" height="60" rx="18" fill="#fff"/>
+          <g transform="scale(3)" shape-rendering="crispEdges" fill="#111">
+            <path d="M2 10h3v1h4v1h10v-1h4v-1h3v1h-2v1h-4v1H8v-1H4v-1H2Z"/>
+            <path d="M5 12h1v2H5ZM9 13h1v2H9ZM14 13h1v3h-1ZM18 13h1v2h-1ZM22 12h1v2h-1Z"/>
+          </g>
+        </svg>
       </button>
       <div class="access-watcher-copy">
         <span class="access-watcher-message">アクセス数として<br>あなたを見ているよ</span>
@@ -130,6 +137,6 @@
   <script src="src/js/matrix-cam.js?v=2026-09-02-1"></script>
   <script src="src/js/terminal.js?v=2026-09-01-1"></script>
   <script src="src/js/hero-weather.js?v=2026-09-05-2"></script>
-  <script src="src/js/access-count.js?v=2026-09-05-7"></script>
+  <script src="src/js/access-count.js?v=2026-09-05-8"></script>
 </body>
 </html>

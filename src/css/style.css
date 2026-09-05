@@ -283,6 +283,10 @@ body {
   overflow: visible;
 }
 
+.access-watcher-eye-closed { display: none; }
+.access-watcher-character.is-crying > img.access-watcher-eye { display: none; }
+.access-watcher-character.is-crying > .access-watcher-eye-closed { display: block; }
+
 .access-watcher-eye path,
 .access-watcher-eye ellipse,
 .access-watcher-eye circle {

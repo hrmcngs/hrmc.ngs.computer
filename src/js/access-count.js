@@ -5,24 +5,14 @@
   const eyeMessage = document.querySelector('.access-watcher-message');
   if (eyeButton && eyeMessage) {
     const originalMessage = eyeMessage.innerHTML;
-    const eyeImage = eyeButton.querySelector('img');
-    const originalEye = eyeImage?.src;
     let restoreTimer;
     eyeButton.addEventListener('click', () => {
       window.clearTimeout(restoreTimer);
       eyeMessage.textContent = '痛いよ';
-      eyeButton.classList.remove('is-crying');
-      // 連打したときも涙を最初から流す。
-      void eyeButton.offsetWidth;
+      // 涙と閉じた目を同じ状態で表示し、連打時は復帰時刻だけ延長する。
       eyeButton.classList.add('is-crying');
-      if (eyeImage) {
-        const closedEye = new URL(originalEye);
-        closedEye.hash = 'ouch';
-        eyeImage.src = closedEye.href;
-      }
       restoreTimer = window.setTimeout(() => {
         eyeMessage.innerHTML = originalMessage;
-        if (eyeImage) eyeImage.src = originalEye;
         eyeButton.classList.remove('is-crying');
       }, 2000);
     });
