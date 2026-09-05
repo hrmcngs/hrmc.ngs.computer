@@ -311,7 +311,7 @@
       "tags": ["Minecraft", "Mod", "Java"]
     },
     {
-      "icon": "https://raw.githubusercontent.com/hrmcngs/github-stats-charts/main/charts/activity.svg",
+      "icon": "charts/activity.svg",
       "title": "github-stats-charts",
       "desc": "GitHub活動のチャート表示ウィジェット（テンプレート）",
       "url": "https://github.com/hrmcngs/github-stats-charts",

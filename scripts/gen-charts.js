@@ -72,7 +72,10 @@ async function ghJson(p) {
 
 async function searchCount(kind, q) {
   const d = await ghJson(`/search/${kind}?q=${encodeURIComponent(q)}&per_page=1`);
-  return typeof d.total_count === 'number' ? d.total_count : 0;
+  if (d.incomplete_results || !Number.isSafeInteger(d.total_count) || d.total_count < 0) {
+    throw new Error('Incomplete or invalid GitHub search count');
+  }
+  return d.total_count;
 }
 
 async function repoList(ownerPath) {
@@ -159,14 +162,13 @@ async function fetchData() {
   });
   const langs = Object.entries(langBytes).sort((a, b) => b[1] - a[1]);
 
-  // 活動件数（検索API・1つ失敗しても0で続行）
-  const safe = (p) => p.catch(() => 0);
+  // 取得失敗時は生成を中断し、保存済みの件数・SVGを維持する。
   const [commits, prs, issues, reviews, involved] = await Promise.all([
-    safe(searchCount('commits', `author:${user} author-date:>=${since}`)),
-    safe(searchCount('issues', `type:pr author:${user} created:>=${since}`)),
-    safe(searchCount('issues', `type:issue author:${user} created:>=${since}`)),
-    safe(searchCount('issues', `type:pr reviewed-by:${user} created:>=${since}`)),
-    safe(searchCount('issues', `type:pr involves:${user} created:>=${since}`)),
+    searchCount('commits', `author:${user} author-date:>=${since}`),
+    searchCount('issues', `type:pr author:${user} created:>=${since}`),
+    searchCount('issues', `type:issue author:${user} created:>=${since}`),
+    searchCount('issues', `type:pr reviewed-by:${user} created:>=${since}`),
+    searchCount('issues', `type:pr involves:${user} created:>=${since}`),
   ]);
 
   // contribution（草）データ（jogruber の公開API）

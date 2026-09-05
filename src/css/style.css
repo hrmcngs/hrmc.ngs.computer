@@ -227,13 +227,9 @@ body {
   display: flex;
   align-items: center;
   gap: 0.9rem;
-  padding: 0.8rem 1rem 0.8rem 0.8rem;
+  padding: 0;
   color: var(--text);
-  background: rgba(13, 13, 15, 0.72);
-  border: 1px solid rgba(62, 207, 207, 0.25);
-  border-radius: 18px;
-  box-shadow: 0 14px 45px rgba(0, 0, 0, 0.35), inset 0 0 24px rgba(62, 207, 207, 0.04);
-  backdrop-filter: blur(12px);
+  background: transparent;
 }
 
 .access-watcher-character {
@@ -308,9 +304,30 @@ body {
 }
 
 .access-watcher-copy {
+  position: relative;
   display: flex;
   flex-direction: column;
   line-height: 1.35;
+  min-width: 178px;
+  padding: 0.72rem 0.9rem;
+  color: #111115;
+  background: rgba(255, 255, 255, 0.94);
+  border: 2px solid #111115;
+  border-radius: 16px;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.3);
+}
+
+.access-watcher-copy::before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-left: 2px solid #111115;
+  border-bottom: 2px solid #111115;
+  transform: translateY(-50%) rotate(45deg);
 }
 
 .access-watcher-message {
@@ -323,11 +340,11 @@ body {
   font-family: var(--font-mono);
   font-size: 0.67rem;
   letter-spacing: 0.07em;
-  color: var(--text-muted);
+  color: #555;
 }
 
 .access-watcher-counts strong {
-  color: var(--accent2);
+  color: #5a46e8;
   font-size: 0.78rem;
   font-weight: 400;
 }
@@ -1527,8 +1544,7 @@ body {
     right: 1rem;
     bottom: 1rem;
     gap: 0.65rem;
-    padding: 0.6rem 0.75rem 0.6rem 0.6rem;
-    border-radius: 14px;
+    padding: 0;
   }
 
   .access-watcher-character {
@@ -1537,6 +1553,7 @@ body {
   }
 
   .access-watcher-message { font-size: 0.72rem; }
+  .access-watcher-copy { min-width: 158px; padding: 0.6rem 0.72rem; }
   .access-watcher-counts { font-size: 0.58rem; }
   .access-watcher-counts strong { font-size: 0.68rem; }
 

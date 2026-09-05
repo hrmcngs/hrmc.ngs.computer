@@ -41,7 +41,7 @@
 
   const API = 'https://api.github.com';
   const CACHE_TTL = 6 * 60 * 60 * 1000; // 6時間
-  const CACHE_VERSION = 'v2';           // データ構造を変えたら上げる（古いキャッシュを無効化）
+  const CACHE_VERSION = 'v3';           // データ構造を変えたら上げる（古いキャッシュを無効化）
   const DEFAULT_PERIOD_DAYS = 365;      // 集計期間の既定値（過去1年・data-period-days で変更可）
 
   // GitHub Linguist の主要言語カラー
@@ -111,7 +111,10 @@
   // 検索APIの total_count を返す（commits / issues）
   async function searchCount(kind, query) {
     const d = await ghJson(`/search/${kind}?q=${encodeURIComponent(query)}&per_page=1`);
-    return typeof d.total_count === 'number' ? d.total_count : 0;
+    if (d.incomplete_results || !Number.isSafeInteger(d.total_count) || d.total_count < 0) {
+      throw new Error('Incomplete or invalid GitHub search count');
+    }
+    return d.total_count;
   }
 
   // 公開リポジトリを全件取得（ownerPath は /users/NAME または /orgs/NAME・最大300件）
@@ -158,7 +161,7 @@
   }
 
   async function fetchStats(user, manualOrgs, since) {
-    const safe = (p) => p.catch(() => null); // 1指標が失敗しても全体は続行
+    // 指標の取得失敗も load() に伝え、保存済みデータへフォールバックする。
     const sinceMs = Date.parse(since);
 
     // ユーザー情報・本人リポジトリ・所属org・contribution（草）を並行取得
@@ -178,11 +181,11 @@
 
     // search API: 集計期間内の活動件数（commits は author-date、その他は created で絞る）
     const [commits, prs, issues, reviews, involved] = await Promise.all([
-      safe(searchCount('commits', `author:${user} author-date:>=${since}`)),
-      safe(searchCount('issues', `type:pr author:${user} created:>=${since}`)),
-      safe(searchCount('issues', `type:issue author:${user} created:>=${since}`)),
-      safe(searchCount('issues', `type:pr reviewed-by:${user} created:>=${since}`)),
-      safe(searchCount('issues', `type:pr involves:${user} created:>=${since}`)),
+      searchCount('commits', `author:${user} author-date:>=${since}`),
+      searchCount('issues', `type:pr author:${user} created:>=${since}`),
+      searchCount('issues', `type:issue author:${user} created:>=${since}`),
+      searchCount('issues', `type:pr reviewed-by:${user} created:>=${since}`),
+      searchCount('issues', `type:pr involves:${user} created:>=${since}`),
     ]);
 
     // 本人＋org のリポジトリを集約（fork除外・重複除去・集計期間内に更新されたもの）
@@ -489,6 +492,12 @@
         const res = await fetch('/charts/data.json', { cache: 'no-cache' });
         if (res.ok) {
           const fb = await res.json();
+          // 他ユーザーのサンプルや欠損した指標は表示しない。
+          if (String(fb.login || '').toLowerCase() !== user.toLowerCase()
+              || !fb.metrics || !['commits', 'prs', 'issues', 'reviews', 'involved', 'repos']
+                .every((key) => Number.isSafeInteger(fb.metrics[key]) && fb.metrics[key] >= 0)) {
+            throw new Error('Invalid fallback stats');
+          }
           fb.period = periodText;
           render(root, fb);
           return;
