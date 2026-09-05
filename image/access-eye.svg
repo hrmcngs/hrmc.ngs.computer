@@ -2,11 +2,14 @@
   <style>
     .open{animation:eye-open 5.2s step-end infinite}
     .closed{visibility:hidden;animation:eye-closed 5.2s step-end infinite}
+    #ouch:target ~ g .open{animation:none;visibility:hidden}
+    #ouch:target ~ g .closed{animation:none;visibility:visible}
     @keyframes eye-open{0%,47%,80%{visibility:visible}44%,77%{visibility:hidden}}
     @keyframes eye-closed{0%,47%,80%{visibility:hidden}44%,77%{visibility:visible}}
     @media (prefers-reduced-motion:reduce){.open,.closed{animation:none}}
   </style>
   <rect width="84" height="60" rx="18" fill="#fff"/>
+  <g id="ouch"/>
   <!-- One pixel is a 3 × 3 unit square; blinking switches whole pixel frames. -->
   <g transform="scale(3)" shape-rendering="crispEdges">
     <g class="open">

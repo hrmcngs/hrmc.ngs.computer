@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Hiromichiの写真。日々の景色や、撮った写真をまとめています。">
+  <link rel="icon" type="image/svg+xml" href="/image/icon.svg">
+  <title>Photos — hrmc.ngs.computer</title>
+  <link rel="stylesheet" href="/src/css/style.css">
+  <link rel="stylesheet" href="/src/css/photos.css?v=2026-09-05-4">
+  <script src="/src/js/theme.js"></script>
+  <script src="/src/js/photo-viewer.js?v=2026-09-05-2" defer></script>
+  <script src="/src/js/photos.js?v=2026-09-05-5" defer></script>
+</head>
+<body>
+  <main class="section photos-page">
+    <div class="container">
+      <nav class="photos-nav" aria-label="ページ移動">
+        <a href="/">← Home</a>
+        <a href="/about/">About →</a>
+      </nav>
+      <header class="photos-header">
+        <h1 class="section-title in-view">Photos</h1>
+        <p>日々の景色や、撮った写真をまとめています。</p>
+        <p>写真をクリックして拡大。ホイール・ピンチでズームできます。</p>
+      </header>
+      <p id="photos-status" class="photos-status" role="status">写真を読み込み中…</p>
+      <div id="photos-grid" class="photos-grid"></div>
+      <noscript><p>写真を表示するにはJavaScriptを有効にしてください。</p></noscript>
+    </div>
+  </main>
+  <dialog id="photo-viewer" class="photo-viewer" aria-label="写真ビューアー">
+    <div class="viewer-toolbar">
+      <span class="viewer-counter" aria-live="polite"></span>
+      <div class="viewer-tools">
+        <button type="button" data-action="out" aria-label="縮小">−</button>
+        <button type="button" data-action="reset" aria-label="ズームをリセット">100%</button>
+        <button type="button" data-action="in" aria-label="拡大">＋</button>
+        <a class="viewer-original" target="_blank" rel="noopener noreferrer">元画像 ↗</a>
+        <button type="button" data-action="close" aria-label="閉じる" autofocus>×</button>
+      </div>
+    </div>
+    <div class="viewer-stage"><img alt="" draggable="false"></div>
+    <div class="viewer-footer">
+      <button type="button" data-action="prev" aria-label="前の写真">←</button>
+      <p class="viewer-caption" aria-live="polite"></p>
+      <button type="button" data-action="next" aria-label="次の写真">→</button>
+    </div>
+  </dialog>
+</body>
+</html>

@@ -699,7 +699,10 @@ fetch('/content.json', { cache: 'no-store' })
         // 例: 上に余白が多く絵が下寄りの画像は [0, -13] で中央に見せる。
         const off = Array.isArray(w.iconOffset) ? w.iconOffset : null;
         const offStyle = off ? `transform:translate(${Number(off[0]) || 0}%,${Number(off[1]) || 0}%);` : '';
-        const icon = w.icon.startsWith('http')
+        // サイト内の画像パスも画像として扱う（絵文字・インラインSVGは従来どおり）。
+        const isImageIcon = /^https?:\/\//i.test(w.icon)
+          || /\.(?:svg|png|jpe?g|gif|webp|avif|ico)(?:[?#].*)?$/i.test(w.icon);
+        const icon = isImageIcon
           ? `<img src="${safeUrl(iconSrc)}" data-icon-url="${escHtml(w.icon)}" loading="lazy" decoding="async" fetchpriority="low" alt="${escHtml(w.title)}" style="width:100%;height:100%;object-fit:contain;${offStyle}">`
           : w.icon;
         const tags = (w.tags ?? []).map(t => `<span class="work-tag">${escHtml(t)}</span>`).join('');

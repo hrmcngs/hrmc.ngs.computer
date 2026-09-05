@@ -234,11 +234,19 @@ body {
 
 .access-watcher-character {
   position: relative;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
   width: 78px;
   height: 58px;
   flex: 0 0 auto;
   border-radius: 18px;
   background: #fff;
+}
+
+.access-watcher-character:focus-visible {
+  outline: 3px solid #7c6af7;
+  outline-offset: 4px;
 }
 
 .access-watcher-eye {

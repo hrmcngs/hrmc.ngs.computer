@@ -1,6 +1,41 @@
 (() => {
   'use strict';
 
+  const eyeButton = document.querySelector('.access-watcher-character');
+  const eyeMessage = document.querySelector('.access-watcher-message');
+  if (eyeButton && eyeMessage) {
+    const originalMessage = eyeMessage.innerHTML;
+    const eyeImage = eyeButton.querySelector('img');
+    const originalEye = eyeImage?.src;
+    let restoreTimer;
+    let blinkTimer;
+    let flinch;
+    eyeButton.addEventListener('click', () => {
+      window.clearTimeout(restoreTimer);
+      window.clearTimeout(blinkTimer);
+      eyeMessage.textContent = '痛った';
+      if (eyeImage) {
+        const closedEye = new URL(originalEye);
+        closedEye.hash = 'ouch';
+        eyeImage.src = closedEye.href;
+        blinkTimer = window.setTimeout(() => { eyeImage.src = originalEye; }, 420);
+      }
+      flinch?.cancel();
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        flinch = eyeButton.animate([
+          { transform: 'translate(0, 0) rotate(0)' },
+          { transform: 'translate(-4px, 2px) rotate(-8deg)', offset: 0.15 },
+          { transform: 'translate(4px, -2px) rotate(6deg)', offset: 0.35 },
+          { transform: 'translate(-2px, 0) rotate(-3deg)', offset: 0.6 },
+          { transform: 'translate(0, 0) rotate(0)' },
+        ], { duration: 420, easing: 'steps(2, end)' });
+      }
+      restoreTimer = window.setTimeout(() => {
+        eyeMessage.innerHTML = originalMessage;
+      }, 2000);
+    });
+  }
+
   // カウンターは Abacus を使う（無登録・APIキー不要・CORS対応）。
   // 以前使っていた CounterAPI v1 は廃止され HTTP 410 を返すようになった。v2 は
   // サインアップと APIキーが必須で、クライアントサイドJSに置くと公開されてしまう

@@ -37,6 +37,9 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - name: Generate photo catalog
+        run: python3 scripts/photo_catalog.py
+
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
