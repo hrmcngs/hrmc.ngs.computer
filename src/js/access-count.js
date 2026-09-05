@@ -10,7 +10,7 @@
     let restoreTimer;
     eyeButton.addEventListener('click', () => {
       window.clearTimeout(restoreTimer);
-      eyeMessage.textContent = '痛った';
+      eyeMessage.textContent = '痛いよ';
       eyeButton.classList.remove('is-crying');
       // 連打したときも涙を最初から流す。
       void eyeButton.offsetWidth;
