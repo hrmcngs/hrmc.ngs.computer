@@ -1,0 +1,209 @@
+/* Shared palette also supports selecting the macOS card theme independently. */
+:root {
+  --mac-text: #202b41;
+  --mac-muted: #536078;
+  --mac-border: #c4ccda;
+  --mac-glass: rgba(242,245,255,.9);
+  --mac-window: rgba(247,249,255,.96);
+  --mac-bar: #e5e8f0;
+  --mac-titlebar: linear-gradient(#f8f9fd, #e5e8f0);
+  --mac-wall-warm: #f5ad9a;
+  --mac-wall-cool: #a19bf0;
+  --mac-wall-base: linear-gradient(145deg, #386ab0 5%, #5552a5 45%, #b15b99 75%, #ec9c92);
+  --mac-accent: #005ac7;
+  --mac-accent2: #176b70;
+}
+:root[data-appearance="dark"] {
+  --mac-text: #edf0fa;
+  --mac-muted: #b0bad0;
+  --mac-border: #495268;
+  --mac-glass: rgba(30,35,51,.94);
+  --mac-window: rgba(30,35,49,.97);
+  --mac-bar: #303749;
+  --mac-titlebar: linear-gradient(#353d50, #292f40);
+  --mac-wall-warm: #613d68;
+  --mac-wall-cool: #343c79;
+  --mac-wall-base: linear-gradient(145deg, #101c38 5%, #24234d 45%, #462845 75%, #654256);
+  --mac-accent: #91baff;
+  --mac-accent2: #7dd9cf;
+}
+:root[data-site-theme="macos"] body {
+  color-scheme: light;
+  --text: var(--mac-text);
+  --text-muted: var(--mac-muted);
+  --border: var(--mac-border);
+  --surface: var(--mac-window);
+  --accent: var(--mac-accent);
+  --accent2: var(--mac-accent2);
+}
+:root[data-site-theme="macos"][data-appearance="dark"] body { color-scheme: dark; }
+#mac-appearance {
+  min-height: 28px;
+  max-width: 82px;
+  padding: 3px 5px;
+  border: 1px solid var(--mac-border);
+  border-radius: 7px;
+  background: var(--mac-window);
+  color: var(--mac-text);
+  font: inherit;
+  cursor: pointer;
+}
+#mac-appearance:focus-visible { outline: 3px solid var(--mac-accent); outline-offset: 2px; }
+
+/* Desktop chrome is present only when the macOS site theme is selected. */
+.mac-menu { display: none; }
+
+:root[data-site-theme="macos"] body {
+  background-image:
+    radial-gradient(ellipse at 12% 90%, var(--mac-wall-warm) 0, transparent 48%),
+    radial-gradient(ellipse at 85% 10%, var(--mac-wall-cool) 0, transparent 50%),
+    var(--mac-wall-base);
+}
+:root[data-site-theme="macos"] { scroll-padding-top: 64px; }
+:root[data-site-theme="macos"] .noise,
+:root[data-site-theme="macos"] .hero-bg { display: none; }
+:root[data-site-theme="macos"] .mac-menu {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  min-height: 38px;
+  padding: 6px 24px;
+  background: var(--mac-glass);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border-bottom: 1px solid var(--mac-border);
+  font-size: 13px;
+}
+.mac-menu a { color: inherit; text-decoration: none; }
+.mac-brand { display: flex; align-items: center; gap: 12px; }
+.mac-menu nav { display: flex; gap: 22px; }
+.mac-menu-caption { margin-left: auto; color: var(--mac-muted); }
+#mac-clock { white-space: nowrap; font-variant-numeric: tabular-nums; }
+:root[data-site-theme="macos"] .hero {
+  min-height: 620px;
+  justify-content: center;
+  padding: 90px 24px 90px;
+}
+:root[data-site-theme="macos"] .hero-content {
+  padding: 40px;
+  text-align: center;
+  filter: none;
+}
+:root[data-site-theme="macos"] .hero-tag { color: #fff; letter-spacing: .2em; }
+:root[data-site-theme="macos"] .hero-title {
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  letter-spacing: -.055em;
+  overflow-wrap: anywhere;
+  text-shadow: 0 4px 32px #25356455;
+}
+:root[data-site-theme="macos"] .hero-sub { color: #fff; }
+:root[data-site-theme="macos"] .scroll-btn { color: #fff; }
+:root[data-site-theme="macos"] .access-watcher {
+  bottom: 30px;
+  right: 28px;
+  padding: 14px 20px;
+  border: 1px solid var(--mac-border);
+  border-radius: 22px;
+  background: var(--mac-glass);
+  box-shadow: 0 12px 40px #1d214522;
+}
+:root[data-site-theme="macos"] .section {
+  max-width: 1080px;
+  margin: 0 auto 32px;
+  padding: 0 0 36px;
+  border: 1px solid var(--mac-border);
+  border-radius: 16px;
+  background: var(--mac-window);
+  box-shadow: 0 20px 65px #17204240;
+  overflow: hidden;
+}
+:root[data-site-theme="macos"] .section > .container { max-width: none; }
+:root[data-site-theme="macos"] .section-title {
+  position: relative;
+  margin: 0 -2rem 28px;
+  padding: 12px 82px;
+  background: var(--mac-titlebar);
+  border-bottom: 1px solid var(--mac-border);
+  font-size: 14px;
+  text-align: center;
+  letter-spacing: 0;
+}
+:root[data-site-theme="macos"] .section-title::before,
+:root[data-card-theme="macos"] .work-card::before {
+  content: "";
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #ff6058;
+  box-shadow: 18px 0 #ffbd2e, 36px 0 #28c840;
+}
+:root[data-site-theme="macos"] .section-title .tag { display: none; }
+/* The section supplies the terminal's only window frame and title bar. */
+:root[data-site-theme="macos"] #terminal { padding-bottom: 0; }
+:root[data-site-theme="macos"] #terminal > .container { padding: 0; }
+:root[data-site-theme="macos"] #terminal .section-title { margin: 0; }
+:root[data-site-theme="macos"] #terminal .term-wrap {
+  max-width: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+:root[data-site-theme="macos"] #terminal .term-bar { display: none; }
+:root[data-site-theme="macos"] .term-body,
+:root[data-site-theme="macos"] .term-input-row { --accent: #92bcff; --accent2: #73d8c6; color: #e8e8f0; }
+:root[data-site-theme="macos"] .footer { color: #fff; background: transparent; }
+:root[data-site-theme="macos"] .footer-copy { color: #fff; }
+:root[data-site-theme="macos"] a:focus-visible { outline: 3px solid #0878ed; outline-offset: 4px; }
+
+/* Keep live download counts, but render them as plain system text. */
+:root[data-card-theme="macos"] .work-card {
+  position: relative;
+  padding: 48px 20px 20px;
+  background: linear-gradient(var(--mac-bar) 0 36px, var(--mac-window) 36px);
+  border: 1px solid var(--mac-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px #22314b12;
+  color: var(--mac-text);
+  --text-muted: var(--mac-muted);
+}
+:root[data-card-theme="macos"] .work-card::after,
+:root[data-card-theme="macos"] .nixie::before,
+:root[data-card-theme="macos"] .nixie::after,
+:root[data-card-theme="macos"] .nixie-tube::before,
+:root[data-card-theme="macos"] .nixie-tube::after,
+:root[data-card-theme="macos"] .nixie-digit::before,
+:root[data-card-theme="macos"] .nixie-ghost { display: none; }
+:root[data-card-theme="macos"] .work-card .work-icon { background: none; padding: 0; border: 0; box-shadow: none; }
+:root[data-card-theme="macos"] .work-card .work-icon img { filter: none; }
+:root[data-card-theme="macos"] .work-card .work-dl { margin: auto 0 0; padding: 12px 0 0; background: none; box-shadow: none; border-color: var(--mac-border); }
+:root[data-card-theme="macos"] .work-card .nixie { padding: 0; gap: 0; background: none; box-shadow: none; border: 0; }
+:root[data-card-theme="macos"] .nixie-tube,
+:root[data-card-theme="macos"] .nixie-sep { width: auto; height: auto; padding: 0; background: none; border: 0; box-shadow: none; color: var(--mac-text); font: 600 14px/1.5 Menlo, monospace; text-shadow: none; }
+:root[data-card-theme="macos"] .work-card .nixie-tube .nixie-digit { color: var(--mac-text); text-shadow: none; animation: none; filter: none; }
+:root[data-card-theme="macos"] .work-tag { opacity: 1; border-color: var(--mac-border); }
+:root[data-card-theme="macos"] .work-card:focus-visible { outline: 3px solid #0878ed; outline-offset: 3px; }
+
+@media (max-width: 1120px) {
+  :root[data-site-theme="macos"] .section { margin-right: 20px; margin-left: 20px; }
+}
+@media (max-width: 600px) {
+  :root[data-site-theme="macos"] .mac-menu { gap: 8px; padding: 8px 12px; font-size: 11px; }
+  .mac-menu nav { gap: 8px; }
+  .mac-menu-caption { display: none; }
+  #mac-clock { margin-left: auto; }
+  :root[data-site-theme="macos"] .hero { padding: 80px 12px 130px; }
+  :root[data-site-theme="macos"] .hero-content { padding: 16px 0; }
+  :root[data-site-theme="macos"] .access-watcher { right: 16px; bottom: 25px; max-width: calc(100% - 32px); }
+  :root[data-site-theme="macos"] .section { margin-right: 12px; margin-left: 12px; }
+  :root[data-site-theme="macos"] .section > .container { padding: 0 20px; }
+  :root[data-site-theme="macos"] .section-title { margin-right: -20px; margin-left: -20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-site-theme="macos"] { scroll-behavior: auto; }
+}

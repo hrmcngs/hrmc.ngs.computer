@@ -122,7 +122,9 @@
       if (!text) return;
       cfg = JSON.parse(stripComments(text));
       // preset があればそれで両方決める。無ければ site / card を個別に見る。
-      if (cfg.preset) setPreset(cfg.preset);
+      const preview = new URLSearchParams(location.search).get('theme');
+      if (preview && cfg.presets?.[preview]) setPreset(preview);
+      else if (cfg.preset) setPreset(cfg.preset);
       else {
         if (cfg.site) setSite(cfg.site);
         if (cfg.card) setCard(cfg.card);

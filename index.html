@@ -9,15 +9,28 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nixie+One&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="src/css/style.css?v=2026-09-05-7">
+  <link rel="stylesheet" href="src/css/macos.css?v=2026-09-07-4">
+  <script src="src/js/appearance.js?v=2026-09-07-1"></script>
   <script src="src/js/theme.js"></script>
 </head>
 <body>
+  <header class="mac-menu" aria-label="デスクトップメニュー">
+    <a class="mac-brand" href="#desktop">▧ <strong>hrmc</strong></a>
+    <nav aria-label="メニューバー"><a href="#about">About</a><a href="#works">Works</a><a href="#links">Links</a></nav>
+    <span class="mac-menu-caption">Personal desktop</span>
+    <select id="mac-appearance" aria-label="表示モード">
+      <option value="system">自動</option>
+      <option value="light">ライト</option>
+      <option value="dark">ダーク</option>
+    </select>
+    <time id="mac-clock"></time>
+  </header>
 
   <!-- ノイズオーバーレイ -->
   <div class="noise"></div>
 
   <!-- ヒーロー -->
-  <section class="hero">
+  <section class="hero" id="desktop">
     <div class="hero-bg">
       <!-- <img src="image/zukei_background.jpg" alt="" class="hero-bg-img"> -->
       <div class="hero-overlay"></div>
@@ -133,6 +146,7 @@
 
   <script src="src/js/content.js?v=2026-09-05-2"></script>
   <script src="src/js/index.js?v=2026-09-05-2"></script>
+  <script src="src/js/macos.js?v=2026-09-07-1"></script>
   <script src="src/js/hero-weather.js?v=2026-09-05-3"></script>
   <script src="src/js/access-count.js?v=2026-09-05-8"></script>
 </body>

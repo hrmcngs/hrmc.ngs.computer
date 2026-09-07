@@ -8,7 +8,7 @@
   //
   // preset を消して site / card を個別に指定することもできる（下の2行）。
   // ------------------------------------------------------------------
-  "preset": "digital",
+  "preset": "macos",
 
   // "site": "midnight",   // preset を使わないときだけ有効
   // "card": "safe",
@@ -17,6 +17,8 @@
   // サイトの配色 × カードの見た目 の組み合わせ
   // ------------------------------------------------------------------
   "presets": {
+    // macOSのデスクトップ風。半透明のメニューバー
+    "macos": { "site": "macos", "card": "macos" },
     // 最初に作ったドット数字のDL表示 × 今のサイト配色
     "digital": { "site": "midnight", "card": "retro" },
 
@@ -54,6 +56,18 @@
   //   "siteImageDim": 0.75
   // ------------------------------------------------------------------
   "siteThemes": {
+    "macos": {
+      "--bg": "#243b87",
+      "--bg2": "#e9edf7",
+      "--surface": "rgba(255,255,255,0.88)",
+      "--border": "rgba(35,48,80,0.16)",
+      "--accent": "#005ac7",
+      "--accent2": "#176b70",
+      "--text": "#202b41",
+      "--text-muted": "#536078",
+      "--font-en": "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif",
+      "--font-jp": "-apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif"
+    },
     // 既定。style.css の :root と同じ値
     "midnight": {
       "--bg": "#0d0d0f",
@@ -148,6 +162,7 @@
   //   "caseImageDim": 0.45      // 写真の上に重ねる黒の濃さ 0〜1（暗いほど文字が読める）
   // ------------------------------------------------------------------
   "cardThemes": {
+    "macos": {},
     // 既定。分厚い鋼板の金庫
     "safe": {},
 
