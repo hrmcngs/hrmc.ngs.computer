@@ -80,8 +80,7 @@
   text-align: center;
   letter-spacing: 0;
 }
-:root[data-site-theme="macos"] .section-title::before,
-:root[data-card-theme="macos"] .work-card::before {
+:root[data-site-theme="macos"] .section-title::before {
   content: "";
   position: absolute;
   top: 18px;
@@ -104,8 +103,6 @@
   box-shadow: none;
 }
 :root[data-site-theme="macos"] #terminal .term-bar { display: none; }
-:root[data-site-theme="macos"] .term-body,
-:root[data-site-theme="macos"] .term-input-row { --accent: #92bcff; --accent2: #73d8c6; color: #e8e8f0; }
 :root[data-site-theme="macos"] .footer { color: var(--mac-desktop-text); background: transparent; }
 :root[data-site-theme="macos"] .footer-copy { color: var(--mac-desktop-text); }
 :root[data-site-theme="macos"] a:focus-visible { outline: 3px solid #0878ed; outline-offset: 4px; }
@@ -113,14 +110,20 @@
 /* Keep live download counts, but render them as plain system text. */
 :root[data-card-theme="macos"] .work-card {
   position: relative;
-  padding: 48px 20px 20px;
-  background: linear-gradient(var(--mac-bar) 0 36px, var(--mac-window) 36px);
-  border: 1px solid var(--mac-border);
+  padding: 24px 20px 20px;
+  background: var(--mac-bar);
+  border: 1px solid color-mix(in srgb, var(--mac-muted) 75%, var(--mac-border));
   border-radius: 12px;
-  box-shadow: 0 4px 14px #22314b12;
+  box-shadow: none;
   color: var(--mac-text);
   --text-muted: var(--mac-muted);
 }
+:root[data-card-theme="macos"] .work-card:hover,
+:root[data-card-theme="macos"] .work-card:focus-visible {
+  border-color: var(--mac-accent);
+  background: color-mix(in srgb, var(--mac-bar) 94%, var(--mac-accent));
+}
+:root[data-card-theme="macos"] .work-card::before,
 :root[data-card-theme="macos"] .work-card::after,
 :root[data-card-theme="macos"] .nixie::before,
 :root[data-card-theme="macos"] .nixie::after,
@@ -164,3 +167,20 @@
   .mac-menu .mac-appearance-controls { grid-column: 1 / -1; grid-row: 2; }
   .mac-menu #mac-clock { grid-column: 3; grid-row: 1; }
 }
+
+/* Every palette uses the window surface and follows light/dark mode. */
+:root[data-site-theme="macos"] #terminal {
+  --term-bg: transparent;
+  --term-typed: var(--mac-text);
+  --term-text: var(--mac-muted);
+  --term-link: var(--mac-accent);
+  --term-success: var(--mac-accent2);
+  --term-error: #b42335;
+}
+:root[data-site-theme="macos"] .term-body,
+:root[data-site-theme="macos"] .term-input-row {
+  --accent: var(--mac-accent);
+  --accent2: var(--mac-accent2);
+  color: var(--mac-text);
+}
+:root[data-site-theme="macos"][data-appearance="dark"] #terminal { --term-error: #ff9ca8; }

@@ -68,7 +68,7 @@
 .mac-appearance-controls { display: flex; align-items: center; gap: 8px; margin-left: auto; }
 #mac-palette { max-width: 100px; }
 
-:root[data-mac-palette="ghost"] {
+:root[data-mac-palette="mono"] {
   --mac-bg: #f5f5f5;
   --mac-bg2: #e9e9e9;
   --mac-text: #252525;
@@ -86,7 +86,7 @@
   --mac-desktop-text: #252525;
 }
 
-:root[data-mac-palette="ghost"][data-appearance="dark"] {
+:root[data-mac-palette="mono"][data-appearance="dark"] {
   --mac-bg: #181818;
   --mac-bg2: #222222;
   --mac-text: #eeeeee;
@@ -141,37 +141,73 @@
 }
 
 :root[data-mac-palette="rose"] {
-  --mac-bg: #fcf3f5;
-  --mac-bg2: #f2e3e9;
-  --mac-text: #422b36;
-  --mac-muted: #775461;
-  --mac-border: #d7bdc8;
-  --mac-window: #fff7fa;
-  --mac-bar: #efdde5;
-  --mac-accent: #a12c61;
-  --mac-accent2: #845025;
-  --mac-wall-warm: #8b486e;
-  --mac-wall-cool: #775386;
-  --mac-glass: #f2e3e9f2;
-  --mac-titlebar: linear-gradient(#fff7fa, #efdde5);
-  --mac-wall-base: linear-gradient(145deg, #6d426d, #a56079);
+  --mac-bg: #fff3f1;
+  --mac-bg2: #f7e0dc;
+  --mac-text: #492421;
+  --mac-muted: #7b4c46;
+  --mac-border: #d6aaa3;
+  --mac-window: #fff7f5;
+  --mac-bar: #f3d8d2;
+  --mac-accent: #b32228;
+  --mac-accent2: #95382b;
+  --mac-wall-warm: #b83235;
+  --mac-wall-cool: #8b202d;
+  --mac-glass: #f7e0dcf2;
+  --mac-titlebar: linear-gradient(#fff7f5, #f3d8d2);
+  --mac-wall-base: linear-gradient(145deg, #721c26, #b73530);
   --mac-desktop-text: #fff;
 }
 
 :root[data-mac-palette="rose"][data-appearance="dark"] {
-  --mac-bg: #281a24;
-  --mac-bg2: #34232f;
-  --mac-text: #f8e7f0;
-  --mac-muted: #d1afc1;
-  --mac-border: #634558;
-  --mac-window: #342430;
-  --mac-bar: #442e3d;
-  --mac-accent: #f0a2c9;
-  --mac-accent2: #e8bd92;
-  --mac-wall-warm: #693c58;
-  --mac-wall-cool: #4b365d;
-  --mac-glass: #34232ff2;
-  --mac-titlebar: linear-gradient(#342430, #442e3d);
-  --mac-wall-base: linear-gradient(145deg, #291c37, #4b263e);
+  --mac-bg: #2b1517;
+  --mac-bg2: #391d20;
+  --mac-text: #ffebe6;
+  --mac-muted: #ddb3aa;
+  --mac-border: #784447;
+  --mac-window: #381d20;
+  --mac-bar: #4c272b;
+  --mac-accent: #ff9992;
+  --mac-accent2: #f5b39b;
+  --mac-wall-warm: #8d292e;
+  --mac-wall-cool: #651c2a;
+  --mac-glass: #391d20f2;
+  --mac-titlebar: linear-gradient(#381d20, #4c272b);
+  --mac-wall-base: linear-gradient(145deg, #3d111c, #721e23);
   --mac-desktop-text: #fff;
+}
+
+/* Ghost: deep teal, mint and pale green from the supplied reference. */
+:root[data-mac-palette="ghost"] {
+  --mac-bg: #f0faf5;
+  --mac-bg2: #dcefe3;
+  --mac-text: #163e42;
+  --mac-muted: #426568;
+  --mac-border: #a1c7b5;
+  --mac-window: #f5fcf7;
+  --mac-bar: #d2eadb;
+  --mac-accent: #236175;
+  --mac-accent2: #17644e;
+  --mac-wall-warm: #4fd3a7;
+  --mac-wall-cool: #addfba;
+  --mac-glass: #dcefe3f2;
+  --mac-titlebar: linear-gradient(#f5fcf7, #d2eadb);
+  --mac-wall-base: linear-gradient(145deg, #addfba, #4fd3a7);
+  --mac-desktop-text: #163e42;
+}
+:root[data-mac-palette="ghost"][data-appearance="dark"] {
+  --mac-bg: #122a2d;
+  --mac-bg2: #19383b;
+  --mac-text: #e4f7ed;
+  --mac-muted: #acd0c2;
+  --mac-border: #3e6865;
+  --mac-window: #193337;
+  --mac-bar: #244449;
+  --mac-accent: #4fd3a7;
+  --mac-accent2: #addfba;
+  --mac-wall-warm: #236175;
+  --mac-wall-cool: #234f46;
+  --mac-glass: #19383bf2;
+  --mac-titlebar: linear-gradient(#244449, #193337);
+  --mac-wall-base: linear-gradient(145deg, #14303d, #1e5045);
+  --mac-desktop-text: #e4f7ed;
 }

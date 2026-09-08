@@ -3,7 +3,7 @@
   const root = document.documentElement;
   const key = 'hrmc-macos-appearance';
   const paletteKey = 'hrmc-macos-palette';
-  const palettes = ['classic', 'ghost', 'ocean', 'rose'];
+  const palettes = ['classic', 'ghost', 'mono', 'ocean', 'rose'];
   let palette = 'classic';
   try {
     const saved = localStorage.getItem(paletteKey);
