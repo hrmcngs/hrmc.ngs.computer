@@ -7,14 +7,33 @@
   <link rel="icon" type="image/svg+xml" href="/image/icon.svg">
   <title>Photos — hrmc.ngs.computer</title>
   <link rel="stylesheet" href="/src/css/style.css">
-  <link rel="stylesheet" href="/src/css/photos.css?v=2026-09-05-6">
+  <link rel="stylesheet" href="/src/css/appearance.css?v=2026-09-08-2">
+  <link rel="stylesheet" href="/src/css/photos.css?v=2026-09-08-2">
+  <script src="/src/js/appearance.js?v=2026-09-08-2"></script>
   <script src="/src/js/theme.js"></script>
   <script src="/src/js/photo-viewer.js?v=2026-09-05-3" defer></script>
   <script src="/src/js/photos.js?v=2026-09-05-8" defer></script>
 </head>
-<body>
+<body class="photos-desktop">
   <main class="section photos-page">
     <div class="container">
+      <div class="photos-titlebar">
+        <span class="photos-window-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="photos-app-title">Photos</span>
+        <div class="mac-appearance-controls">
+          <select id="mac-palette" aria-label="カラーテーマ">
+            <option value="classic">Classic</option>
+            <option value="ghost">Ghost</option>
+            <option value="ocean">Ocean</option>
+            <option value="rose">Rose</option>
+          </select>
+          <select id="mac-appearance" aria-label="表示モード">
+          <option value="system">自動</option>
+          <option value="light">ライト</option>
+          <option value="dark">ダーク</option>
+        </select>
+        </div>
+      </div>
       <nav class="photos-nav" aria-label="ページ移動">
         <a href="/">← Home</a>
         <a href="/about/">About →</a>

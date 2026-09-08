@@ -125,3 +125,145 @@
   color: var(--accent);
 }
 .photo-categories button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+/* macOS photo library: a single app window on the desktop. */
+.photos-titlebar { display: none; }
+:root[data-site-theme="macos"] .photos-desktop {
+  background-image:
+    radial-gradient(ellipse at 12% 90%, var(--mac-wall-warm), transparent 48%),
+    radial-gradient(ellipse at 85% 10%, var(--mac-wall-cool), transparent 50%),
+    var(--mac-wall-base);
+}
+:root[data-site-theme="macos"] .photos-page {
+  padding: clamp(16px, 4vw, 56px);
+}
+:root[data-site-theme="macos"] .photos-page > .container {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  grid-template-rows: auto auto auto 1fr;
+  grid-template-areas: "title title" "navigation heading" "categories status" "categories gallery";
+  max-width: 1320px;
+  min-height: calc(100svh - 112px);
+  padding: 0;
+  border: 1px solid var(--mac-border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(to right, var(--mac-bg2) 200px, var(--mac-bg) 200px);
+  box-shadow: 0 28px 80px #10142655, 0 4px 12px #10142633;
+}
+:root[data-site-theme="macos"] .photos-titlebar {
+  grid-area: title;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: 54px;
+  padding: 10px 20px;
+  background: var(--mac-titlebar);
+  border-bottom: 1px solid var(--mac-border);
+}
+.photos-window-lights { display: flex; gap: 8px; }
+.photos-window-lights i { width: 12px; height: 12px; border-radius: 50%; background: #ff6058; }
+.photos-window-lights i:nth-child(2) { background: #ffbd2e; }
+.photos-window-lights i:nth-child(3) { background: #28c840; }
+.photos-app-title { font-size: 14px; font-weight: 600; }
+.photos-titlebar .mac-appearance-controls { font-size: 12px; }
+:root[data-site-theme="macos"] .photos-nav {
+  grid-area: navigation;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 4px;
+  margin: 0;
+  padding: 20px 12px 12px;
+  font-size: 13px;
+  border-right: 1px solid var(--mac-border);
+}
+:root[data-site-theme="macos"] .photos-nav a { padding: 8px 12px; border-radius: 6px; }
+:root[data-site-theme="macos"] .photos-nav a:hover { background: var(--mac-bar); }
+:root[data-site-theme="macos"] .photos-header {
+  grid-area: heading;
+  margin: 0;
+  padding: 28px 28px 20px;
+}
+:root[data-site-theme="macos"] .photos-header .section-title {
+  font-size: clamp(24px, 3vw, 32px);
+  letter-spacing: -.03em;
+  margin-bottom: 8px;
+}
+:root[data-site-theme="macos"] .photos-header p { font-size: 13px; }
+:root[data-site-theme="macos"] .photo-categories {
+  grid-area: categories;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 4px;
+  padding: 8px 12px 24px;
+  margin: 0;
+  border-right: 1px solid var(--mac-border);
+}
+:root[data-site-theme="macos"] .photo-categories::before {
+  content: "ライブラリ";
+  padding: 0 12px 6px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+:root[data-site-theme="macos"] .photo-categories button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  padding: 8px 10px;
+  background: transparent;
+  font-size: 13px;
+}
+:root[data-site-theme="macos"] .photo-categories button::before { content: "▧"; font-size: 18px; color: var(--accent); }
+:root[data-site-theme="macos"] .photo-categories button:hover { background: var(--mac-bar); }
+:root[data-site-theme="macos"] .photo-categories button[aria-pressed="true"] {
+  background: var(--mac-bar);
+  border-color: var(--mac-border);
+  box-shadow: none;
+  color: var(--text);
+  font-weight: 600;
+}
+:root[data-site-theme="macos"] .photos-status {
+  grid-area: status;
+  padding: 0 28px 20px;
+  border: 0;
+  border-radius: 0;
+  font-size: 12px;
+}
+:root[data-site-theme="macos"] .photos-grid {
+  grid-area: gallery;
+  align-content: start;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+  gap: 22px 16px;
+  padding: 0 28px 32px;
+}
+:root[data-site-theme="macos"] .photo a { border-radius: 6px; }
+:root[data-site-theme="macos"] .photo figcaption { font-size: 12px; margin-top: 8px; }
+:root[data-site-theme="macos"] .photos-page noscript { grid-column: 2; padding: 28px; }
+
+@media (max-width: 700px) {
+  :root[data-site-theme="macos"] .photos-page { padding: 12px; }
+  :root[data-site-theme="macos"] .photos-page > .container {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto auto 1fr;
+    grid-template-areas: "title" "navigation" "heading" "categories" "status" "gallery";
+    min-height: calc(100svh - 24px);
+    background: var(--mac-bg);
+  }
+  :root[data-site-theme="macos"] .photos-nav { flex-direction: row; justify-content: space-between; padding: 8px; border-right: 0; }
+  :root[data-site-theme="macos"] .photos-header { padding: 16px; }
+  :root[data-site-theme="macos"] .photo-categories { flex-direction: row; flex-wrap: wrap; padding: 0 16px 16px; border-right: 0; }
+  :root[data-site-theme="macos"] .photo-categories::before { width: 100%; padding-left: 0; }
+  :root[data-site-theme="macos"] .photo-categories button { font-size: 12px; }
+  :root[data-site-theme="macos"] .photos-status { padding: 0 16px 16px; }
+  :root[data-site-theme="macos"] .photos-grid { padding: 0 16px 24px; gap: 16px 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  :root[data-site-theme="macos"] .photos-page noscript { grid-column: 1; padding: 16px; }
+}
+
+@media (max-width: 420px) {
+  :root[data-site-theme="macos"] .photos-titlebar { flex-wrap: wrap; gap: 12px; }
+  .photos-titlebar .mac-appearance-controls { width: 100%; justify-content: flex-end; }
+}
