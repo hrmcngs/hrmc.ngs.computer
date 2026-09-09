@@ -7,11 +7,14 @@
   const palettes = ['seasonal', 'classic', 'ghost', 'mono', 'ocean', 'rose', 'engraving'];
   const paletteLabel = name => ({ seasonal: '季節（自動）', engraving: '線画' })[name] || name[0].toUpperCase() + name.slice(1);
   const seasonLabels = { spring: '春', summer: '夏', autumn: '秋', winter: '冬' };
+  const params = new URLSearchParams(location.search);
+  const linkedPalette = palettes.includes(params.get('palette')) ? params.get('palette') : null;
+  const linkedSeason = Object.hasOwn(seasonLabels, params.get('season')) ? params.get('season') : null;
   let palette = 'seasonal';
   try {
     // Adopt the seasonal default once, including browsers with an older choice.
     // Subsequent explicit selections still persist normally.
-    if (localStorage.getItem(seasonalDefaultKey) !== '1') {
+    if (!linkedPalette && localStorage.getItem(seasonalDefaultKey) !== '1') {
       localStorage.setItem(paletteKey, 'seasonal');
       localStorage.setItem(seasonalDefaultKey, '1');
     }
@@ -19,19 +22,40 @@
     if (palettes.includes(saved)) palette = saved;
   } catch {}
   const modes = ['system', 'light', 'dark'];
+  const linkedAppearance = modes.includes(params.get('appearance')) ? params.get('appearance') : null;
   const system = window.matchMedia('(prefers-color-scheme: dark)');
   let preference = 'system';
   try {
     const saved = localStorage.getItem(key);
     if (modes.includes(saved)) preference = saved;
   } catch {}
+  if (linkedPalette) palette = linkedPalette;
+  if (linkedAppearance) preference = linkedAppearance;
+
+  function updateLinkedChoice(name, value) {
+    if (!params.has(name)) return;
+    const url = new URL(location.href);
+    url.searchParams.set(name, value);
+    try { history.replaceState(history.state, '', url); } catch {}
+  }
+
+  function getShareURL() {
+    const url = new URL(window.theme?.getShareURL() ?? location.href);
+    url.searchParams.set('palette', palette);
+    // Capture the rendered mode/season so recipients see the same appearance.
+    url.searchParams.set('appearance', root.dataset.appearance);
+    if (palette === 'seasonal') url.searchParams.set('season', root.dataset.season);
+    else url.searchParams.delete('season');
+    return url.toString();
+  }
+  window.appearance = { getShareURL };
 
   function apply() {
     // Match the existing hero weather's local-calendar seasons.
     const month = new Date().getMonth() + 1;
-    const season = month >= 3 && month <= 5 ? 'spring'
+    const season = linkedSeason || (month >= 3 && month <= 5 ? 'spring'
       : month >= 6 && month <= 8 ? 'summer'
-      : month >= 9 && month <= 11 ? 'autumn' : 'winter';
+      : month >= 9 && month <= 11 ? 'autumn' : 'winter');
     root.dataset.season = season;
     root.dataset.macPalette = palette;
     const paletteSelect = document.getElementById('mac-palette');
@@ -67,10 +91,10 @@
   });
   window.addEventListener('pageshow', apply);
   window.addEventListener('storage', event => {
-    if (event.key === paletteKey || event.key === null) {
+    if (!linkedPalette && (event.key === paletteKey || event.key === null)) {
       palette = palettes.includes(event.newValue) ? event.newValue : 'seasonal';
     }
-    if (event.key === key || event.key === null) {
+    if (!linkedAppearance && (event.key === key || event.key === null)) {
       preference = modes.includes(event.newValue) ? event.newValue : 'system';
     }
     apply();
@@ -88,9 +112,30 @@
           <input type="radio" name="mac-palette-choice" value="${name}">
           <span class="palette-preview"><span class="palette-swatch" data-swatch="${name}" aria-hidden="true"></span>
           <span class="palette-name">${paletteLabel(name)}</span></span>
-        </label>`).join('')}</div></fieldset>`;
+        </label>`).join('')}</div>
+        <button type="button" class="appearance-share">この見た目のリンクをコピー</button>
+        <p class="appearance-share-status" role="status"></p>
+        <input class="appearance-share-url" aria-label="共有リンク（コピーしてください）" readonly hidden>
+      </fieldset>`;
       paletteSelect.before(picker);
       paletteSelect.hidden = true;
+      picker.querySelector('.appearance-share').addEventListener('click', async () => {
+        const status = picker.querySelector('.appearance-share-status');
+        const input = picker.querySelector('.appearance-share-url');
+        await window.theme?.ready;
+        const url = getShareURL();
+        try {
+          await navigator.clipboard.writeText(url);
+          input.hidden = true;
+          status.textContent = 'リンクをコピーしました';
+        } catch {
+          input.value = url;
+          input.hidden = false;
+          input.focus();
+          input.select();
+          status.textContent = 'リンクを選択してコピーしてください';
+        }
+      });
       picker.addEventListener('change', event => {
         if (!palettes.includes(event.target.value)) return;
         paletteSelect.value = event.target.value;
@@ -112,6 +157,7 @@
     }
     paletteSelect?.addEventListener('change', () => {
       palette = palettes.includes(paletteSelect.value) ? paletteSelect.value : 'seasonal';
+      updateLinkedChoice('palette', palette);
       try { localStorage.setItem(paletteKey, palette); } catch {}
       apply();
     });
@@ -174,6 +220,7 @@
     apply();
     select.addEventListener('change', () => {
       preference = modes.includes(select.value) ? select.value : 'system';
+      updateLinkedChoice('appearance', preference);
       try { localStorage.setItem(key, preference); } catch {}
       apply();
     });

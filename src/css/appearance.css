@@ -321,6 +321,34 @@
 }
 .palette-panel legend { float: left; width: 100%; margin-bottom: 12px; font-size: 12px; font-weight: 600; }
 .palette-options { clear: both; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.appearance-share {
+  width: 100%;
+  margin-top: 12px;
+  padding: 9px 8px;
+  border: 1px solid var(--mac-border);
+  border-radius: 7px;
+  background: var(--mac-window);
+  color: var(--mac-text);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.appearance-share:hover { background: var(--mac-bg2); }
+.appearance-share:focus-visible, .appearance-share-url:focus-visible { outline: 2px solid var(--mac-accent); outline-offset: 2px; }
+.appearance-share-status { margin: 8px 0 0; font-size: 12px; color: var(--mac-muted); }
+.appearance-share-status:empty { display: none; }
+.appearance-share-url {
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+  border: 1px solid var(--mac-border);
+  border-radius: 5px;
+  background: var(--mac-window);
+  color: var(--mac-text);
+  font: inherit;
+  font-size: 12px;
+}
 .palette-option { position: relative; cursor: pointer; }
 .palette-option input { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .palette-preview { display: grid; gap: 6px; padding: 5px; border: 2px solid transparent; border-radius: 9px; font-size: 12px; }

@@ -12,6 +12,7 @@
   const root = document.documentElement;
   let cfg = null;
   const applied = { site: null, card: null };
+  const hasTheme = (group, name) => Boolean(name && Object.hasOwn(group ?? {}, name));
 
   // JSONC（// と /* */ のコメント付きJSON）を読む。
   // 文字列リテラルの中の // は消さないよう、素朴なスキャナで処理する。
@@ -74,7 +75,7 @@
   }
 
   function setSite(name) {
-    const next = cfg?.siteThemes?.[name];
+    const next = hasTheme(cfg?.siteThemes, name) ? cfg.siteThemes[name] : null;
     if (name && !next) { console.warn(`[theme] siteThemes に "${name}" がありません`); return; }
     clearVars(cfg?.siteThemes?.[applied.site]);
     applied.site = name || null;
@@ -83,7 +84,7 @@
   }
 
   function setCard(name) {
-    const next = cfg?.cardThemes?.[name];
+    const next = hasTheme(cfg?.cardThemes, name) ? cfg.cardThemes[name] : null;
     if (name && !next) { console.warn(`[theme] cardThemes に "${name}" がありません`); return; }
     clearVars(cfg?.cardThemes?.[applied.card]);
     applied.card = name || null;
@@ -94,7 +95,7 @@
 
   // サイトとカードの組み合わせに名前を付けたもの。1つ選ぶと両方が切り替わる。
   function setPreset(name) {
-    const p = cfg?.presets?.[name];
+    const p = hasTheme(cfg?.presets, name) ? cfg.presets[name] : null;
     if (!p) { console.warn(`[theme] presets に "${name}" がありません`); return; }
     setSite(p.site);
     setCard(p.card);
@@ -103,6 +104,18 @@
 
   window.theme = {
     setSite, setCard, setPreset,
+    getShareURL() {
+      const url = new URL(location.href);
+      const preset = root.dataset.preset;
+      const p = hasTheme(cfg?.presets, preset) ? cfg.presets[preset] : null;
+      if (p && p.site === applied.site && p.card === applied.card) url.searchParams.set('theme', preset);
+      else url.searchParams.delete('theme');
+      for (const kind of ['site', 'card']) {
+        if (applied[kind]) url.searchParams.set(kind, applied[kind]);
+        else url.searchParams.delete(kind);
+      }
+      return url.toString();
+    },
     reset() {
       if (cfg?.preset) setPreset(cfg.preset);
       else { setSite(cfg?.site); setCard(cfg?.card); }
@@ -116,19 +129,23 @@
     },
   };
 
-  fetch('/theme.jsonc', { cache: 'no-store' })
+  window.theme.ready = fetch('/theme.jsonc', { cache: 'no-store' })
     .then(r => (r.ok ? r.text() : null))
     .then(text => {
       if (!text) return;
       cfg = JSON.parse(stripComments(text));
       // preset があればそれで両方決める。無ければ site / card を個別に見る。
-      const preview = new URLSearchParams(location.search).get('theme');
-      if (preview && cfg.presets?.[preview]) setPreset(preview);
+      const params = new URLSearchParams(location.search);
+      const preview = params.get('theme');
+      if (hasTheme(cfg.presets, preview)) setPreset(preview);
       else if (cfg.preset) setPreset(cfg.preset);
       else {
         if (cfg.site) setSite(cfg.site);
         if (cfg.card) setCard(cfg.card);
       }
+      // Explicit site/card choices override the preset's corresponding part.
+      if (hasTheme(cfg.siteThemes, params.get('site'))) setSite(params.get('site'));
+      if (hasTheme(cfg.cardThemes, params.get('card'))) setCard(params.get('card'));
     })
     .catch(e => console.warn('[theme] theme.jsonc を読めませんでした（既定の見た目を使用）', e));
 })();
