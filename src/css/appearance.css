@@ -212,6 +212,80 @@
   --mac-desktop-text: #e4f7ed;
 }
 
+/* Seasonal hues also drive the preview when another palette is selected. */
+:root { --season-hue: 215; --season-companion: 190; }
+:root[data-season="spring"] { --season-hue: 335; --season-companion: 105; }
+:root[data-season="summer"] { --season-hue: 185; --season-companion: 155; }
+:root[data-season="autumn"] { --season-hue: 28; --season-companion: 8; }
+:root[data-season="winter"] { --season-hue: 215; --season-companion: 190; }
+:root[data-mac-palette="seasonal"] {
+  --mac-bg: hsl(var(--season-hue) 35% 96%);
+  --mac-bg2: hsl(var(--season-hue) 30% 91%);
+  --mac-text: hsl(var(--season-hue) 30% 18%);
+  --mac-muted: hsl(var(--season-hue) 20% 36%);
+  --mac-border: hsl(var(--season-hue) 24% 75%);
+  --mac-window: hsl(var(--season-hue) 40% 98%);
+  --mac-bar: hsl(var(--season-hue) 30% 89%);
+  --mac-glass: hsl(var(--season-hue) 35% 96% / .94);
+  --mac-titlebar: linear-gradient(var(--mac-window), var(--mac-bar));
+  --mac-accent: hsl(var(--season-hue) 65% 32%);
+  --mac-accent2: hsl(var(--season-companion) 48% 28%);
+  --mac-wall-warm: hsl(var(--season-hue) 65% 78%);
+  --mac-wall-cool: hsl(var(--season-companion) 42% 72%);
+  --mac-wall-base: linear-gradient(145deg, hsl(var(--season-hue) 40% 68%), hsl(var(--season-companion) 42% 80%));
+  --mac-desktop-text: hsl(var(--season-hue) 35% 18%);
+}
+:root[data-mac-palette="seasonal"][data-appearance="dark"] {
+  --mac-bg: hsl(var(--season-hue) 22% 10%);
+  --mac-bg2: hsl(var(--season-hue) 22% 15%);
+  --mac-text: hsl(var(--season-hue) 28% 94%);
+  --mac-muted: hsl(var(--season-hue) 22% 74%);
+  --mac-border: hsl(var(--season-hue) 22% 32%);
+  --mac-window: hsl(var(--season-hue) 22% 13%);
+  --mac-bar: hsl(var(--season-hue) 22% 19%);
+  --mac-glass: hsl(var(--season-hue) 22% 12% / .94);
+  --mac-accent: hsl(var(--season-hue) 70% 75%);
+  --mac-accent2: hsl(var(--season-companion) 48% 73%);
+  --mac-wall-warm: hsl(var(--season-hue) 38% 24%);
+  --mac-wall-cool: hsl(var(--season-companion) 30% 21%);
+  --mac-wall-base: linear-gradient(145deg, hsl(var(--season-hue) 32% 10%), hsl(var(--season-companion) 28% 17%));
+  --mac-desktop-text: hsl(var(--season-hue) 28% 94%);
+}
+
+/* Engraved wallpaper with quiet paper/ink surfaces for readable content. */
+:root[data-mac-palette="engraving"] {
+  --mac-bg: #f5f3eb;
+  --mac-bg2: #e8e5da;
+  --mac-text: #292a27;
+  --mac-muted: #62635a;
+  --mac-border: #b6b6a9;
+  --mac-window: #faf8f1;
+  --mac-bar: #e8e5da;
+  --mac-glass: #f5f3ebf2;
+  --mac-titlebar: repeating-linear-gradient(155deg, #3938320a 0 1px, transparent 1px 5px), linear-gradient(#faf8f1, #e8e5da);
+  --mac-accent: #44483c;
+  --mac-accent2: #68634e;
+  --mac-wall-warm: transparent;
+  --mac-wall-cool: transparent;
+  --mac-wall-base: url('/image/engraving-lines-light.svg'), linear-gradient(145deg, #f1eee3, #d8d6c9);
+  --mac-desktop-text: #292a27;
+}
+:root[data-mac-palette="engraving"][data-appearance="dark"] {
+  --mac-bg: #191a18;
+  --mac-bg2: #252622;
+  --mac-text: #eeeee5;
+  --mac-muted: #b7b9ac;
+  --mac-border: #51544a;
+  --mac-window: #20211e;
+  --mac-bar: #2b2d27;
+  --mac-glass: #191a18f2;
+  --mac-titlebar: repeating-linear-gradient(155deg, #e9e6dc0a 0 1px, transparent 1px 5px), linear-gradient(#2b2d27, #20211e);
+  --mac-accent: #e2e5d1;
+  --mac-accent2: #c9c4a8;
+  --mac-wall-base: url('/image/engraving-lines-dark.svg'), linear-gradient(145deg, #151613, #292c24);
+  --mac-desktop-text: #eeeee5;
+}
+
 /* Patterned palette previews retain names and selection marks for clarity. */
 .mac-appearance-controls { position: relative; }
 #mac-palette-picker summary {
@@ -259,25 +333,60 @@
 summary .palette-swatch { width: 24px; height: 20px; }
 .palette-preview .palette-swatch { width: 100%; height: 42px; }
 .palette-swatch[data-swatch="classic"] { background: linear-gradient(135deg, #386ab0, #a19bf0 50%, #f5ad9a); }
+.palette-swatch[data-swatch="seasonal"] {
+  background: linear-gradient(135deg, hsl(var(--season-hue) 55% 55%), hsl(var(--season-hue) 65% 78%), hsl(var(--season-companion) 42% 72%));
+}
 .palette-swatch[data-swatch="ghost"] { background: linear-gradient(115deg, #236175 0 25%, #4fd3a7 25% 65%, #addfba 65%); }
 .palette-swatch[data-swatch="mono"] { background: repeating-linear-gradient(135deg, #454545 0 8px, #aaa 8px 16px, #eee 16px 24px); }
 .palette-swatch[data-swatch="ocean"] { background: repeating-radial-gradient(ellipse at 0 100%, #104d73 0 10px, #237f88 10px 20px, #77cde9 20px 30px); }
 .palette-swatch[data-swatch="rose"] { background: radial-gradient(circle at 25% 35%, #ff9992 0 12%, transparent 13%), radial-gradient(circle at 75% 65%, #ff9992 0 15%, transparent 16%), linear-gradient(135deg, #721c26, #b83235); }
+.palette-swatch[data-swatch="engraving"] {
+  background: repeating-radial-gradient(ellipse at -20% 120%, #e9e6dc 0 1px, transparent 1px 4px), #252822;
+}
 
-.appearance-modes {
+#mac-appearance-picker {
+  position: relative;
+  flex-shrink: 0;
+  --appearance-sun: var(--mac-accent);
+  --appearance-moon: var(--mac-accent2);
+}
+#mac-appearance-picker summary {
   display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 3px 8px;
+  border: 1px solid var(--mac-border);
+  border-radius: 7px;
+  background: var(--mac-window);
+  color: var(--mac-text);
+  cursor: pointer;
+  list-style: none;
+}
+#mac-appearance-picker summary::-webkit-details-marker { display: none; }
+#mac-appearance-picker summary:focus-visible { outline: 2px solid var(--mac-accent); outline-offset: 2px; }
+.appearance-current { display: grid; place-items: center; width: 26px; height: 26px; }
+.appearance-modes {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
   flex-shrink: 0;
   gap: 2px;
   padding: 2px;
   border: 1px solid var(--mac-border);
   border-radius: 9px;
   background: var(--mac-bg2);
+  box-shadow: 0 8px 24px #00000030;
 }
 .appearance-modes button {
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 28px;
+  width: 34px;
+  height: 32px;
   padding: 0;
   border: 1px solid transparent;
   border-radius: 6px;
@@ -286,13 +395,26 @@ summary .palette-swatch { width: 24px; height: 20px; }
   cursor: pointer;
 }
 .appearance-modes button:hover { color: var(--mac-text); background: var(--mac-window); }
+.appearance-modes button[data-appearance-mode="light"] { color: var(--appearance-sun); }
+.appearance-modes button[data-appearance-mode="dark"] { color: var(--appearance-moon); }
 .appearance-modes button[aria-pressed="true"] {
   color: var(--mac-accent);
   background: var(--mac-window);
   border-color: var(--mac-border);
   box-shadow: 0 1px 3px #00000018;
 }
+.appearance-modes button[data-appearance-mode="light"][aria-pressed="true"],
+#mac-appearance-picker[data-selected-mode="light"] .appearance-current {
+  color: var(--appearance-sun);
+}
+.appearance-modes button[data-appearance-mode="dark"][aria-pressed="true"],
+#mac-appearance-picker[data-selected-mode="dark"] .appearance-current {
+  color: var(--appearance-moon);
+}
+#mac-appearance-picker[data-selected-mode="system"] .appearance-current { color: var(--mac-accent); }
 .appearance-modes button:focus-visible { outline: 2px solid var(--mac-accent); outline-offset: 2px; }
+.appearance-celestial { display: block; }
 @media (pointer: coarse) {
+  #mac-appearance-picker summary { min-height: 40px; }
   .appearance-modes button { width: 40px; height: 40px; }
 }
