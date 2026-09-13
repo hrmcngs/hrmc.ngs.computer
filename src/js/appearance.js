@@ -3,21 +3,15 @@
   const root = document.documentElement;
   const key = 'hrmc-macos-appearance';
   const paletteKey = 'hrmc-macos-palette';
-  const seasonalDefaultKey = 'hrmc-seasonal-default-v1';
+  const defaultPalette = 'ghost';
   const palettes = ['seasonal', 'classic', 'ghost', 'mono', 'ocean', 'rose', 'engraving'];
   const paletteLabel = name => ({ seasonal: '季節（自動）', engraving: '線画' })[name] || name[0].toUpperCase() + name.slice(1);
   const seasonLabels = { spring: '春', summer: '夏', autumn: '秋', winter: '冬' };
   const params = new URLSearchParams(location.search);
   const linkedPalette = palettes.includes(params.get('palette')) ? params.get('palette') : null;
   const linkedSeason = Object.hasOwn(seasonLabels, params.get('season')) ? params.get('season') : null;
-  let palette = 'seasonal';
+  let palette = defaultPalette;
   try {
-    // Adopt the seasonal default once, including browsers with an older choice.
-    // Subsequent explicit selections still persist normally.
-    if (!linkedPalette && localStorage.getItem(seasonalDefaultKey) !== '1') {
-      localStorage.setItem(paletteKey, 'seasonal');
-      localStorage.setItem(seasonalDefaultKey, '1');
-    }
     const saved = localStorage.getItem(paletteKey);
     if (palettes.includes(saved)) palette = saved;
   } catch {}
@@ -92,7 +86,7 @@
   window.addEventListener('pageshow', apply);
   window.addEventListener('storage', event => {
     if (!linkedPalette && (event.key === paletteKey || event.key === null)) {
-      palette = palettes.includes(event.newValue) ? event.newValue : 'seasonal';
+      palette = palettes.includes(event.newValue) ? event.newValue : defaultPalette;
     }
     if (!linkedAppearance && (event.key === key || event.key === null)) {
       preference = modes.includes(event.newValue) ? event.newValue : 'system';
@@ -156,7 +150,7 @@
       });
     }
     paletteSelect?.addEventListener('change', () => {
-      palette = palettes.includes(paletteSelect.value) ? paletteSelect.value : 'seasonal';
+      palette = palettes.includes(paletteSelect.value) ? paletteSelect.value : defaultPalette;
       updateLinkedChoice('palette', palette);
       try { localStorage.setItem(paletteKey, palette); } catch {}
       apply();
