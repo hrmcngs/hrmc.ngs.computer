@@ -3,12 +3,20 @@ https://hrmc.ngs.computer/
 gh workflow run update-charts.yml
 > ビルドchart SVGsの
 
-gh run watch 
+gh run watch
 > 途中経過を見る
 
 action
 ./scripts/setup-dispatch.sh --all
-## テーマ
+## 名前・SNSの検索向け設定
+
+`content.json` の `identity` で本名・別名・説明を、`terminal.socialLinks` で公開するプロフィールURLを管理します。個人以外の関連アカウントには `"identity": "related"` を付け、本人を示す `sameAs` から除外します。`links.items` はカードの色・アイコンなどの表示設定です。
+
+変更後は `sbcl --script scripts/build-seo.lisp` を実行してください（Common Lisp / SBCL、追加Lispライブラリ不要）。トップ・Aboutの静的HTML、構造化データ、`robots.txt`、`sitemap.xml` を更新します。GitHub Pagesへのデプロイ時にもSBCLをインストールして自動実行します。ローカルのSBCLはmacOSなら `brew install sbcl`、Ubuntuなら `sudo apt-get install sbcl` で導入できます。
+
+公開後はGoogle Search Consoleで `/sitemap.xml` を送信し、トップ・AboutのURL検査からインデックス登録をリクエストできます。各SNS側のプロフィールにも名前・別名とこのサイトへのリンクを掲載すると、対応関係を伝えやすくなります。検索への反映や順位、各SNSの掲載は検索エンジン側の判断によります。
+
+## テーマ設定
 
 `theme.jsonc` の `preset` でサイトのテーマを選べます。
 

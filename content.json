@@ -1,4 +1,10 @@
 {
+  "identity": {
+    "name": "長瀬拓通",
+    "alternateNames": ["ながせひろみち", "hiromichi-ngs", "Hiromichi Nagase", "hiromichi ngs", "hrmcngs", "0526ngs"],
+    "url": "https://hrmc.ngs.computer/",
+    "description": "長瀬拓通（ながせひろみち / hiromichi-ngs / hrmcngs）の個人サイト。Web・Minecraft Modの制作、写真、SNS・GitHubなどのプロフィールリンクをまとめています。"
+  },
   "hero": {
     "tag": "// hrmc.ngs.computer",
     "title": "hrmcngs",
@@ -118,10 +124,12 @@
       },
       {
         "label": "Drowse Lab(Twitter)",
+        "identity": "related",
         "url": "https://x.com/Drowse_Lab"
       },
       {
         "label": "Drowse Lab (Instagram)",
+        "identity": "related",
         "url": "https://instagram.com/drowse_lab/"
       },
       {

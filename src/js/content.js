@@ -561,23 +561,28 @@ siteContent
 
     // ---- Links ----
     if (links) {
+      // socialLinks をリンク先の正本とし、items は色・アイコンなどの表示設定に使う。
+      const socialItems = (terminal?.socialLinks ?? links.items).map(link => ({
+        ...links.items.find(item => item.url === link.url),
+        ...link,
+      }));
       setText('links-group-name', links.groupName);
       if (links.notice) setText('links-notice', links.notice);
       const linksEl = document.getElementById('links-row');
       if (linksEl) {
-        linksEl.innerHTML = links.items.map((l, i) => `
-          <a class="link-card" href="${safeUrl(l.url)}" target="_blank" rel="noopener noreferrer" data-platform="${escHtml(l.platform)}" data-color-idx="${i}">
+        linksEl.innerHTML = socialItems.map((l, i) => `
+          <a class="link-card" href="${escHtml(safeUrl(l.url))}" target="_blank" rel="${l.identity === 'related' ? '' : 'me '}noopener noreferrer" data-platform="${escHtml(l.platform ?? '')}" data-color-idx="${i}">
             <span class="link-icon">${PLATFORM_ICONS[l.platform] ?? ''}</span>
             <span class="link-info">
               <span class="link-platform">${escHtml(l.label)}</span>
-              <span class="link-handle">${escHtml(l.handle)}</span>
+              <span class="link-handle">${escHtml(l.handle ?? new URL(l.url).hostname)}</span>
             </span>
             <span class="link-arrow">↗</span>
           </a>
         `).join('');
         // カラーを適用（グラデーション・ノイズ対応）
         linksEl.querySelectorAll('.link-card').forEach((el, i) => {
-          const l = links.items[i];
+          const l = socialItems[i];
           if (l?.color) applyColor(el, l.color, '--link-color');
         });
       }

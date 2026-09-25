@@ -597,6 +597,13 @@ body {
   font-size: 1.05rem;
 }
 
+.profile-aliases {
+  margin: 0 0 1.5rem;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+  color: var(--text-muted);
+}
+
 .links-row {
   display: flex;
   flex-wrap: wrap;
