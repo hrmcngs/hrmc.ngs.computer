@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-25T23:35:02.202Z",
+  "generated": "2026-09-26T07:42:35.840Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 63,
@@ -11,11 +11,11 @@
     },
     "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons": {
       "count": 5955,
-      "source": "cfwidget"
+      "source": "cached-newer"
     },
     "https://curseforge.com/minecraft/mc-mods/extra-video-settings": {
       "count": 1164,
-      "source": "cfwidget"
+      "source": "cached-newer"
     },
     "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility": {
       "count": 542,
@@ -28,7 +28,7 @@
     },
     "https://curseforge.com/minecraft/mc-mods/gun-and-weapons": {
       "count": 1072,
-      "source": "cfwidget"
+      "source": "cached-newer"
     }
   }
 }
