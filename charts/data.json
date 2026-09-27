@@ -4,12 +4,12 @@
   "avatar": "https://avatars.githubusercontent.com/u/78349683?v=4",
   "htmlUrl": "https://github.com/hrmcngs",
   "metrics": {
-    "commits": 2278,
-    "prs": 379,
+    "commits": 2214,
+    "prs": 339,
     "issues": 27,
     "reviews": 2,
-    "involved": 382,
-    "repos": 21
+    "involved": 342,
+    "repos": 22
   },
   "langs": [
     [
@@ -18,7 +18,7 @@
     ],
     [
       "JavaScript",
-      2300196
+      2434721
     ],
     [
       "mcfunction",
@@ -26,7 +26,7 @@
     ],
     [
       "JSON",
-      776930
+      777010
     ],
     [
       "Swift",
@@ -34,7 +34,7 @@
     ],
     [
       "CSS",
-      428051
+      442910
     ],
     [
       "Shell",
@@ -49,6 +49,10 @@
       149408
     ],
     [
+      "TypeScript",
+      135139
+    ],
+    [
       "Python",
       79112
     ],
@@ -59,10 +63,6 @@
     [
       "Batchfile",
       27196
-    ],
-    [
-      "TypeScript",
-      16022
     ],
     [
       "PowerShell",
@@ -98,41 +98,6 @@
   ],
   "contrib": {
     "days": [
-      {
-        "date": "2025-09-21",
-        "count": 0,
-        "level": 0
-      },
-      {
-        "date": "2025-09-22",
-        "count": 5,
-        "level": 1
-      },
-      {
-        "date": "2025-09-23",
-        "count": 1,
-        "level": 1
-      },
-      {
-        "date": "2025-09-24",
-        "count": 50,
-        "level": 4
-      },
-      {
-        "date": "2025-09-25",
-        "count": 2,
-        "level": 1
-      },
-      {
-        "date": "2025-09-26",
-        "count": 153,
-        "level": 4
-      },
-      {
-        "date": "2025-09-27",
-        "count": 12,
-        "level": 1
-      },
       {
         "date": "2025-09-28",
         "count": 4,
@@ -1950,13 +1915,18 @@
       },
       {
         "date": "2026-09-26",
-        "count": 1,
+        "count": 8,
+        "level": 1
+      },
+      {
+        "date": "2026-09-27",
+        "count": 12,
         "level": 1
       }
     ],
-    "total": 3154
+    "total": 3173
   },
   "season": "autumn",
-  "weather": "rain",
-  "generatedAt": "2026-09-26T03:50:30.426Z"
+  "weather": "clear",
+  "generatedAt": "2026-09-27T05:49:00.153Z"
 }
