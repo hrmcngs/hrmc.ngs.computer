@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-28T06:58:10.376Z",
+  "generated": "2026-09-28T13:47:36.420Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 63,
@@ -29,6 +29,11 @@
     "https://curseforge.com/minecraft/mc-mods/gun-and-weapons": {
       "count": 1100,
       "source": "cfwidget"
+    },
+    "https://marketplace.visualstudio.com/items?itemName=hrmcngs.toritsu-ai": {
+      "count": 28,
+      "installs": 1,
+      "source": "vscode-marketplace"
     }
   }
 }

@@ -64,6 +64,16 @@
         ]
       },
       {
+        "title": "都立AI",
+        "desc": "都立AIの授業用APIと連携する非公式VSCode拡張。コード説明・選択範囲編集・チャットに対応。",
+        "color": "#007acc",
+        "tags": ["Vscode plugin", "AI"],
+        "links": [
+          "https://github.com/hrmcngs/toritsu-ai-vscode",
+          "https://marketplace.visualstudio.com/items?itemName=hrmcngs.toritsu-ai"
+        ]
+      },
+      {
         "title": "github-stats-charts",
         "desc": "GitHub活動のチャート表示ウィジェット（HTML/Markdown両対応・テンプレート）",
         "color": "#4dabf7",
@@ -311,6 +321,14 @@
       "tags": ["Vscode plugin", "JavaScript"]
     },
     {
+      "icon": "https://cdn.vsassets.io/v/M280_20260923.13/_content/Header/default_icon_128.png",
+      "title": "都立AI",
+      "desc": "都立AIの授業用APIと連携する非公式VSCode拡張。コード説明・選択範囲編集・チャットに対応。",
+      "url": "https://marketplace.visualstudio.com/items?itemName=hrmcngs.toritsu-ai",
+      "color": "#007acc",
+      "tags": ["Vscode plugin", "AI"]
+    },
+    {
       "icon": "https://raw.githubusercontent.com/hrmcngs/extra_video_settings/1ce4239fd3f6b8ec00d17b6a4a55820f021bf4b6/src/main/resources/icon.png",
       "title": "Extra Video Settings",
       "desc": "Embeddium拡張 / 映像設定を追加するmod",
@@ -371,6 +389,13 @@
       "color": "#696969",
       "links": [
         "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility"
+      ]
+    },
+    {
+      "title": "都立AI",
+      "color": "#007acc",
+      "links": [
+        "https://marketplace.visualstudio.com/items?itemName=hrmcngs.toritsu-ai"
       ]
     },
     {
