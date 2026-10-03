@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-02T23:09:28.496Z",
+  "generated": "2026-10-03T01:57:59.978Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 63,
@@ -14,16 +14,16 @@
       "source": "cfwidget"
     },
     "https://curseforge.com/minecraft/mc-mods/extra-video-settings": {
-      "count": 1204,
+      "count": 1205,
       "source": "cfwidget"
     },
     "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility": {
-      "count": 623,
-      "installs": 503,
+      "count": 625,
+      "installs": 504,
       "source": "vscode-marketplace"
     },
     "https://marketplace.visualstudio.com/items?itemName=hrmcngs.toritsu-ai": {
-      "count": 68,
+      "count": 75,
       "installs": 1,
       "source": "vscode-marketplace"
     },
