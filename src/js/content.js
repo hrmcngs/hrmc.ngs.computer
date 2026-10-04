@@ -303,6 +303,7 @@ function normalizeDownloadStats(value) {
     return {
       count: value.count,
       ...(typeof value.installs === 'number' ? { installs: value.installs } : {}),
+      ...(typeof value.icon === 'string' ? { icon: value.icon } : {}),
     };
   }
   return null;
@@ -312,9 +313,11 @@ function newestDownloadStats(...values) {
   const valid = values.map(normalizeDownloadStats).filter(Boolean);
   if (!valid.length) return null;
   const installs = valid.map(v => v.installs).filter(n => typeof n === 'number');
+  const icon = valid.map(v => v.icon).find(Boolean);
   return {
     count: Math.max(...valid.map(v => v.count)),
     ...(installs.length ? { installs: Math.max(...installs) } : {}),
+    ...(icon ? { icon } : {}),
   };
 }
 
@@ -533,6 +536,32 @@ function uniqueDownloadLinks(links) {
     seen.add(key);
     return true;
   });
+}
+
+function normalizeUrlKey(url) {
+  try {
+    const u = new URL(url);
+    u.hostname = u.hostname.replace(/^www\./, '').toLowerCase();
+    u.pathname = u.pathname.replace(/\/+$/, '');
+    return u.toString();
+  } catch (e) {
+    return '';
+  }
+}
+
+function setWorkIconFromStats(cardEl, stats) {
+  if (!stats?.icon) return;
+  const iconEl = cardEl.querySelector('.work-icon');
+  if (!iconEl) return;
+  const img = iconEl.querySelector('img') || document.createElement('img');
+  if (img.src === stats.icon) return;
+  img.src = safeUrl(stats.icon);
+  img.loading = 'lazy';
+  img.decoding = 'async';
+  img.fetchPriority = 'low';
+  img.alt = cardEl.querySelector('h3')?.textContent || '';
+  img.addEventListener('error', () => iconEl.remove(), { once: true });
+  if (!img.parentNode) iconEl.replaceChildren(img);
 }
 
 const siteContent = window.siteContent = fetch('/content.json', { cache: 'no-cache' })
@@ -754,6 +783,7 @@ siteContent
         // Works と terminal.build の全リンクからDL数を自動取得する。
         // stats は追加リンクを指定する場合だけ使う。
         const statByTitle = {};
+        const statByUrl = {};
         const buildByTitle = {};
         if (Array.isArray(terminal?.build)) {
           terminal.build.forEach(item => {
@@ -763,12 +793,17 @@ siteContent
         if (Array.isArray(data.stats)) {
           data.stats.forEach(p => {
             statByTitle[String(p.title).toLowerCase()] = p;
+            (p.links || []).forEach(url => {
+              const key = normalizeUrlKey(url);
+              if (key) statByUrl[key] = p;
+            });
           });
         }
         worksEl.querySelectorAll('.work-card').forEach((el, i) => {
           const work = works[i];
           const titleKey = String(work?.title ?? '').toLowerCase();
-          const conf = statByTitle[titleKey];
+          const workUrlKey = normalizeUrlKey(work?.url);
+          const conf = statByTitle[titleKey] || statByUrl[workUrlKey];
           const build = buildByTitle[titleKey];
           const configuredLinks = conf && Array.isArray(conf.links) ? conf.links : [];
           const workLinks = Array.isArray(work?.links) ? work.links : [];
@@ -779,7 +814,13 @@ siteContent
             ...buildLinks,
             ...configuredLinks,
           ]);
-          if (downloadLinks.length) showDownloadCount(el, downloadLinks);
+          if (downloadLinks.length) {
+            getGeneratedDownloads().then(generated => {
+              const iconStats = downloadLinks.map(url => generated?.[url]).filter(Boolean).find(stats => stats.icon);
+              setWorkIconFromStats(el, iconStats);
+            });
+            showDownloadCount(el, downloadLinks);
+          }
         });
 
         // github-stats-charts カードに「Use template / bootstrap.sh 利用回数」を表示

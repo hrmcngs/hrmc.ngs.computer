@@ -321,7 +321,7 @@
       "tags": ["Vscode plugin", "JavaScript"]
     },
     {
-      "icon": "https://cdn.vsassets.io/v/M280_20260923.13/_content/Header/default_icon_128.png",
+      "icon": "https://hrmcngs.gallerycdn.vsassets.io/extensions/hrmcngs/toritsu-ai/0.12.6/1791031386281/Microsoft.VisualStudio.Services.Icons.Default",
       "title": "都立AI",
       "desc": "都立AIの授業用APIと連携する非公式VSCode拡張。コード説明・選択範囲編集・チャットに対応。",
       "url": "https://marketplace.visualstudio.com/items?itemName=hrmcngs.toritsu-ai",

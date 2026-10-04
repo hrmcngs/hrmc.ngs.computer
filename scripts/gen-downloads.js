@@ -127,10 +127,14 @@ async function vscode(id) {
   const stats = ext?.statistics ?? [];
   const downloads = stats.find(s => s.statisticName === 'downloadCount');
   const installs = stats.find(s => s.statisticName === 'install');
+  const version = ext?.versions?.[0];
+  const icon = version?.files?.find(file => file.assetType === 'Microsoft.VisualStudio.Services.Icons.Default')?.source
+    ?? (version?.assetUri ? `${version.assetUri}/Microsoft.VisualStudio.Services.Icons.Default` : null);
   if (!downloads && !installs) return null;
   return {
     count: downloads ? Math.round(downloads.value) : Math.round(installs.value),
     ...(installs ? { installs: Math.round(installs.value) } : {}),
+    ...(icon ? { icon } : {}),
   };
 }
 
