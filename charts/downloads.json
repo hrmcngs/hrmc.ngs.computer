@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-05T14:41:01.182Z",
+  "generated": "2026-10-05T21:40:17.035Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 64,
@@ -18,13 +18,13 @@
       "source": "cfwidget"
     },
     "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility": {
-      "count": 630,
+      "count": 631,
       "installs": 507,
       "icon": "https://MC-Mod-Utility.gallerycdn.vsassets.io/extensions/mc-mod-utility/mc-mod-utility/0.3.7/1790510573467/Microsoft.VisualStudio.Services.Icons.Default",
       "source": "vscode-marketplace"
     },
     "https://marketplace.visualstudio.com/items?itemName=hrmcngs.toritsu-ai": {
-      "count": 103,
+      "count": 112,
       "installs": 2,
       "icon": "https://hrmcngs.gallerycdn.vsassets.io/extensions/hrmcngs/toritsu-ai/0.12.6/1791031386281/Microsoft.VisualStudio.Services.Icons.Default",
       "source": "vscode-marketplace"
