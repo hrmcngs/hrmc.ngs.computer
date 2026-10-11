@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-10T21:45:02.186Z",
+  "generated": "2026-10-11T00:32:16.231Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 64,
@@ -10,21 +10,21 @@
       "source": "curseforge-html"
     },
     "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons": {
-      "count": 6165,
+      "count": 6166,
       "source": "cfwidget"
     },
     "https://curseforge.com/minecraft/mc-mods/extra-video-settings": {
-      "count": 1269,
+      "count": 1271,
       "source": "cfwidget"
     },
     "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility": {
       "count": 635,
-      "installs": 514,
+      "installs": 515,
       "icon": "https://MC-Mod-Utility.gallerycdn.vsassets.io/extensions/mc-mod-utility/mc-mod-utility/0.3.7/1790510573467/Microsoft.VisualStudio.Services.Icons.Default",
       "source": "vscode-marketplace"
     },
     "https://marketplace.visualstudio.com/items?itemName=hrmcngs.toritsu-ai": {
-      "count": 378,
+      "count": 379,
       "installs": 2,
       "icon": "https://hrmcngs.gallerycdn.vsassets.io/extensions/hrmcngs/toritsu-ai/0.12.17/1791292771229/Microsoft.VisualStudio.Services.Icons.Default",
       "source": "vscode-marketplace"
