@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-15T15:03:12.588Z",
+  "generated": "2026-10-15T16:13:15.467Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 65,
@@ -27,7 +27,7 @@
       "count": 687,
       "installs": 4,
       "icon": "https://hrmcngs.gallerycdn.vsassets.io/extensions/hrmcngs/toritsu-ai/0.12.19/1791900190973/Microsoft.VisualStudio.Services.Icons.Default",
-      "source": "vscode-marketplace"
+      "source": "cached-newer"
     },
     "https://curseforge.com/minecraft/mc-mods/arsenal-backpack": {
       "count": 165,
