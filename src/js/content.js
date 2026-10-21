@@ -499,22 +499,31 @@ async function showStarCounts(cardEl, urls) {
   const links = [...new Map(urls.map(starLink).filter(Boolean).map(link => [link.url, link])).values()];
   const results = await Promise.all(links.map(async link => ({ ...link, count: await getStarCount(link) })));
   for (const platform of ['GitHub', 'CurseForge']) {
-    const available = results.filter(result => result.platform === platform && result.count !== null);
-    if (!available.length) continue;
-    const count = available.reduce((sum, result) => sum + result.count, 0);
+    const projects = results.filter(result => result.platform === platform);
+    if (!projects.length) continue;
+    // Both RPGish editions must be available before displaying their total.
+    const complete = projects.every(result => result.count !== null);
+    const count = complete ? projects.reduce((sum, result) => sum + result.count, 0) : null;
+    const total = projects.length > 1;
+    const metric = total ? 'スター合計' : 'スター';
     const badge = document.createElement('div');
     badge.className = 'work-dl work-stars';
     const label = document.createElement('span');
     label.className = 'work-dl-label';
-    label.textContent = platform + (platform === 'CurseForge' ? ' 高評価：' : ' ★：');
+    label.textContent = `${platform} ${total ? '★合計' : '★'}：`;
     const number = document.createElement('span');
     number.className = 'work-dl-count nixie';
     number.setAttribute('aria-hidden', 'true');
-    badge.setAttribute('aria-label', `${platform} ${platform === 'CurseForge' ? '高評価' : 'スター'}数 ${count.toLocaleString('ja-JP')}`);
-    badge.title = available.map(result => `${result.url}: ${result.count}`).join('\n');
+    badge.setAttribute('aria-label', `${platform} ${metric} ${count === null ? '取得待ち' : count.toLocaleString('ja-JP')}`);
+    badge.title = projects.map(result => `${result.url}: ${result.count === null ? '取得待ち' : result.count}`).join('\n');
     badge.append(label, number);
     cardEl.append(badge);
-    renderNixieCount(number, String(count));
+    if (count === null) {
+      number.classList.remove('nixie');
+      number.textContent = '—';
+    } else {
+      renderNixieCount(number, String(count));
+    }
   }
 }
 

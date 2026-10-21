@@ -300,6 +300,10 @@
       "title": "RPGish-HPDisplay",
       "desc": "RPG風HP表示、ダメージ表示データパック ∩ mod",
       "url": "https://github.com/hrmcngs/RPGish-HPDisplay",
+      "links": [
+        "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack",
+        "https://curseforge.com/minecraft/mc-mods/rpgish-hpdisplay-mod"
+      ],
       "color": "#3ecfcf",
       "tags": ["DataPack", "mcfunction","mod","Java"]
     },
@@ -333,6 +337,7 @@
       "title": "Extra Video Settings",
       "desc": "Embeddium拡張 / 映像設定を追加するmod",
       "url": "https://curseforge.com/minecraft/mc-mods/extra-video-settings",
+      "links": ["https://github.com/hrmcngs/extra_video_settings"],
       "color": "#2e58fe",
       "tags": ["Minecraft", "Mod", "Java"]
     },
