@@ -466,6 +466,58 @@ function renderNixieCount(el, text) {
   });
 }
 
+// スターは減ることもあるため、最新の取得値をそのまま使う。
+const starRequests = new Map();
+let generatedStars;
+function starLink(url) {
+  try {
+    const u = new URL(url);
+    const host = u.hostname.replace(/^www\./, '').toLowerCase();
+    const parts = u.pathname.split('/').filter(Boolean);
+    if (host !== 'github.com' && host !== 'curseforge.com') return null;
+    const length = host === 'github.com' ? 2 : 3;
+    if (parts.length < length) return null;
+    const slug = parts.slice(0, length).join('/').replace(/\.git$/, '');
+    return { url: `https://${host}/${slug}`, platform: host === 'github.com' ? 'GitHub' : 'CurseForge', slug };
+  } catch (_) { return null; }
+}
+
+function getStarCount(link) {
+  if (starRequests.has(link.url)) return starRequests.get(link.url);
+  const request = (async () => {
+    const valid = n => Number.isSafeInteger(n) && n >= 0;
+    generatedStars ||= fetch('/charts/stars.json', { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : null).catch(() => null);
+    const saved = (await generatedStars)?.entries?.[link.url]?.count;
+    return valid(saved) ? saved : null;
+  })();
+  starRequests.set(link.url, request);
+  return request;
+}
+
+async function showStarCounts(cardEl, urls) {
+  const links = [...new Map(urls.map(starLink).filter(Boolean).map(link => [link.url, link])).values()];
+  const results = await Promise.all(links.map(async link => ({ ...link, count: await getStarCount(link) })));
+  for (const platform of ['GitHub', 'CurseForge']) {
+    const available = results.filter(result => result.platform === platform && result.count !== null);
+    if (!available.length) continue;
+    const count = available.reduce((sum, result) => sum + result.count, 0);
+    const badge = document.createElement('div');
+    badge.className = 'work-dl work-stars';
+    const label = document.createElement('span');
+    label.className = 'work-dl-label';
+    label.textContent = platform + (platform === 'CurseForge' ? ' 高評価：' : ' ★：');
+    const number = document.createElement('span');
+    number.className = 'work-dl-count nixie';
+    number.setAttribute('aria-hidden', 'true');
+    badge.setAttribute('aria-label', `${platform} ${platform === 'CurseForge' ? '高評価' : 'スター'}数 ${count.toLocaleString('ja-JP')}`);
+    badge.title = available.map(result => `${result.url}: ${result.count}`).join('\n');
+    badge.append(label, number);
+    cardEl.append(badge);
+    renderNixieCount(number, String(count));
+  }
+}
+
 // Works カードに配布数を表示する。Marketplaceはインストール数だけを表示する。
 async function showDownloadCount(cardEl, links) {
   const badge = document.createElement('div');
@@ -808,12 +860,9 @@ siteContent
           const configuredLinks = conf && Array.isArray(conf.links) ? conf.links : [];
           const workLinks = Array.isArray(work?.links) ? work.links : [];
           const buildLinks = Array.isArray(build?.links) ? build.links : [];
-          const downloadLinks = uniqueDownloadLinks([
-            work?.url,
-            ...workLinks,
-            ...buildLinks,
-            ...configuredLinks,
-          ]);
+          const allLinks = [work?.url, ...workLinks, ...buildLinks, ...configuredLinks];
+          showStarCounts(el, allLinks);
+          const downloadLinks = uniqueDownloadLinks(allLinks);
           if (downloadLinks.length) {
             getGeneratedDownloads().then(generated => {
               const iconStats = downloadLinks.map(url => generated?.[url]).filter(Boolean).find(stats => stats.icon);

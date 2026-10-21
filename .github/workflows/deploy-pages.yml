@@ -37,13 +37,13 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Generate photo catalog
-        run: python3 scripts/photo_catalog.py
-
       - name: Install SBCL
         run: |
           sudo apt-get update
           sudo apt-get install -y sbcl
+
+      - name: Generate photo catalog
+        run: sbcl --script scripts/photo-catalog.lisp
 
       - name: Generate searchable profiles
         run: sbcl --script scripts/build-seo.lisp

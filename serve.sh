@@ -28,14 +28,9 @@ fi
 
 echo "http://localhost:$PORT/ で起動します（停止: Ctrl+C）"
 
-# 利用できるものでサーバーを起動（python3 → python → npx serve の順）
-if command -v python3 >/dev/null 2>&1; then
-  exec python3 scripts/photo_catalog.py --serve "$PORT"
-elif command -v python >/dev/null 2>&1; then
-  exec python scripts/photo_catalog.py --serve "$PORT"
-elif command -v npx >/dev/null 2>&1; then
-  exec npx --yes serve -l "$PORT" .
-else
-  echo "エラー: python3 / python / npx のいずれも見つかりません。" >&2
+# SBCLで静的ファイルとライブ写真カタログを配信する。
+if ! command -v sbcl >/dev/null 2>&1; then
+  echo "エラー: SBCLが必要です（macOS: brew install sbcl / Ubuntu: sudo apt-get install sbcl）。" >&2
   exit 1
 fi
+exec sbcl --script scripts/photo-catalog.lisp --serve "$PORT"

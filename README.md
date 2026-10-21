@@ -47,3 +47,19 @@ Home／Photos のカラーテーマを開き、「この見た目のリンクを
 `site`・`card` は `theme` の対応する設定より優先します。配色・明暗はmacOSの表示に適用されます。URLの有効な指定はブラウザの保存設定より優先され、開くだけではその指定を保存しません。画面で手動変更した選択は通常どおり保存します。不明な値は無視します。
 
 コピーしたリンクでは、端末や開いた時期が違っても同じ見た目になるよう、表示中の明暗と季節を固定します。受け取る人の端末設定に合わせたい場合は `appearance=system`、季節を自動更新したい場合は `palette=seasonal` にして `season` を省略してください。現在のページ・アンカー・その他のパラメータは維持します。
+
+### スター数の生成
+
+`node scripts/gen-stars.js`（または `sbcl --script scripts/gen-stars.lisp`）で `charts/stars.json` を更新します。SBCLとNode.js 20以上が必要です。Common Lispがリンク収集・URL正規化・重複除去・値の検証・取得失敗時の保存値引き継ぎを担当し、Node.jsはページ取得とAPI通信を担当します。JSON処理はSEO生成と `scripts/json.lisp` を共用しています。
+
+GitHub Actionsで15分ごとに実行します。CurseForgeの高評価数はSecret `CURSEFORGE_API_KEY` が必要で、GitHubのスター数は公開リポジトリページ内の正確な数値を取得するため、API・トークンは使いません。ブラウザは生成済みの `charts/stars.json` だけを読み込みます。Lispは生成時のみ動くため、閲覧者側に追加の実行負荷はかかりません。
+
+検証: `sbcl --script scripts/test-gen-stars.lisp`、`sbcl --script scripts/test-build-seo.lisp`。
+
+### 写真カタログとローカルサーバー
+
+写真一覧の生成: `sbcl --script scripts/photo-catalog.lisp`。`photos/data.json` の説明・キャプションを引き継ぎ、画像フォルダーから一覧を更新します。
+
+ローカル表示: `./serve.sh`（既定8000番、`./serve.sh 3000`で変更）。SBCLだけで静的ファイルと写真一覧を配信し、写真の追加・削除をリクエストごとに反映します。追加Lispライブラリは不要です。
+
+検証: `sbcl --script scripts/test-photo-catalog.lisp`。

@@ -30,7 +30,7 @@
     }
   }
 
-  // 通常の python -m http.server でも、実際のフォルダーから写真を発見する。
+  // フォルダー一覧を提供するサーバーでも、実際のフォルダーから写真を発見する。
   async function localPhotoFiles() {
     const files = new Set();
     const visited = new Set();
