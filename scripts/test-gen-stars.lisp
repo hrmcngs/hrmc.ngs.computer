@@ -15,3 +15,7 @@
   (assert (not (gethash "c" merged)))
   (assert (equal (json-text merged) "{\"a\":{\"count\":0},\"b\":{\"count\":3}}")))
 (format t "Star aggregation tests passed.~%")
+
+;; Old thumbs-up counts must never be reused as Favorite counts.
+(assert (not (star-count-p (read-json "{\"platform\":\"CurseForge\",\"count\":0}"))))
+(assert (star-count-p (read-json "{\"platform\":\"CurseForge\",\"metric\":\"favorites\",\"count\":0}")))

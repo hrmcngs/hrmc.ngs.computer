@@ -85,8 +85,6 @@ jobs:
 
       - name: Update star counts
         run: node scripts/gen-stars.js
-        env:
-          CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
 
       - name: Generate chart SVGs
         if: steps.check.outputs.skip != 'true'

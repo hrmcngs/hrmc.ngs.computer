@@ -44,6 +44,14 @@ function githubStarsFromHtml(html) {
   return null;
 }
 
+function curseforgeFavoritesFromHtml(html) {
+  // Read the Favorite tooltip's number; do not confuse it with thumbsUpCount.
+  const match = html.match(/\b(?:title|aria-label|data-tooltip-content|data-tooltip)=["']Favorite \((\d{1,3}(?:,\d{3})+|\d+)\)["']/i);
+  if (!match) return null;
+  const count = Number(match[1].replaceAll(',', ''));
+  return validCount(count) ? count : null;
+}
+
 async function fetchStars(url) {
   const u = new URL(url);
   const host = u.hostname.replace(/^www\./, '').toLowerCase();
@@ -54,16 +62,16 @@ async function fetchStars(url) {
     endpoint = `https://github.com/${parts.slice(0, 2).map(encodeURIComponent).join('/')}`;
     headers.Accept = 'text/html';
   } else if (host === 'curseforge.com' && parts.length >= 3) {
-    // CurseForgeの公開指標はthumbsUpCount（高評価数）。未提供は0にしない。
-    if (!process.env.CURSEFORGE_API_KEY || parts[0] !== 'minecraft') return null;
-    endpoint = `https://api.curseforge.com/v1/mods/search?gameId=432&slug=${encodeURIComponent(parts[2])}&pageSize=50`;
-    headers['x-api-key'] = process.env.CURSEFORGE_API_KEY;
+    endpoint = `https://www.curseforge.com/${parts.slice(0, 3).map(encodeURIComponent).join('/')}`;
+    headers.Accept = 'text/html';
   } else return null;
   const res = await fetch(endpoint, { headers, signal: AbortSignal.timeout(20000) });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const count = host === 'github.com' ? githubStarsFromHtml(await res.text())
-    : (await res.json()).data?.find(p => p.slug === parts[2])?.thumbsUpCount;
-  return validCount(count) ? { count, platform: host === 'github.com' ? 'GitHub' : 'CurseForge' } : null;
+    : curseforgeFavoritesFromHtml(await res.text());
+  if (!validCount(count)) throw new Error('Project count not present in public page; keeping previous verified value');
+  return { count, platform: host === 'github.com' ? 'GitHub' : 'CurseForge',
+    metric: host === 'github.com' ? 'stars' : 'favorites' };
 }
 
 // Node handles HTTP only; Lisp owns collection, deduplication and persistence.
@@ -85,4 +93,4 @@ async function main() {
 }
 
 if (require.main === module) main().catch(error => { console.error(error); process.exitCode = 1; });
-module.exports = { fetchStars, githubStarsFromHtml };
+module.exports = { fetchStars, githubStarsFromHtml, curseforgeFavoritesFromHtml };

@@ -1,7 +1,7 @@
 'use strict';
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { githubStarsFromHtml, fetchStars } = require('./gen-stars');
+const { githubStarsFromHtml, fetchStars, curseforgeFavoritesFromHtml } = require('./gen-stars');
 
 test('embedded repository counts include zero and exact large values', () => {
   for (const n of [0, 7, 12345]) {
@@ -35,6 +35,15 @@ test('GitHub fetch uses the public page without authorization or API', async () 
     assert.equal(options.headers.Accept, 'text/html');
     return { ok: true, text: async () => '<span id="repo-stars-counter-star">2</span>' };
   };
-  try { assert.deepEqual(await fetchStars('https://github.com/a/b'), { count: 2, platform: 'GitHub' }); }
+  try { assert.deepEqual(await fetchStars('https://github.com/a/b'), { count: 2, platform: 'GitHub', metric: 'stars' }); }
   finally { global.fetch = original; }
+});
+
+test('CurseForge favorites use the Favorite tooltip, not thumbs-up counts', () => {
+  assert.equal(curseforgeFavoritesFromHtml('<button title="Favorite (32)">32</button>'), 32);
+  assert.equal(curseforgeFavoritesFromHtml('<button aria-label="Favorite (10)">10</button>'), 10);
+  assert.equal(curseforgeFavoritesFromHtml('<button data-tooltip-content="Favorite (0)">0</button>'), 0);
+  assert.equal(curseforgeFavoritesFromHtml('<button title="Favorite (1,234)">1.2K</button>'), 1234);
+  assert.equal(curseforgeFavoritesFromHtml('{"thumbsUpCount":0}'), null);
+  assert.equal(curseforgeFavoritesFromHtml('<h1>Just a moment...</h1>'), null);
 });

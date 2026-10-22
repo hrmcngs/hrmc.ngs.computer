@@ -37,7 +37,10 @@
 
 (defun star-count-p (entry)
   (let ((n (and (hash-table-p entry) (gethash "count" entry))))
-    (and (consp n) (eq (first n) :number)
+    (and (hash-table-p entry)
+         (or (not (equal (gethash "platform" entry) "CurseForge"))
+             (equal (gethash "metric" entry) "favorites"))
+         (consp n) (eq (first n) :number)
          (let ((text (second n)))
            (and (plusp (length text)) (every #'digit-char-p text)
                 (<= (parse-integer text) 9007199254740991))))))

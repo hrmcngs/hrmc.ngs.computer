@@ -495,7 +495,9 @@ async function getStarCount(link) {
         return lastStarEntries;
       }).catch(() => lastStarEntries);
   }
-  const saved = (await generatedStars)?.[link.url]?.count;
+  const entry = (await generatedStars)?.[link.url];
+  if (link.platform === 'CurseForge' && entry?.metric !== 'favorites') return null;
+  const saved = entry?.count;
   return Number.isSafeInteger(saved) && saved >= 0 ? saved : null;
 }
 
@@ -517,7 +519,7 @@ async function showStarCounts(cardEl, urls) {
         const count = complete ? projects.reduce((sum, result) => sum + result.count, 0) : null;
         const total = projects.length > 1;
         const metric = platform === 'CurseForge'
-          ? (total ? '高評価合計' : '高評価')
+          ? (total ? 'お気に入り合計' : 'お気に入り')
           : (total ? 'スター合計' : 'スター');
         let elements = badges.get(platform);
         if (!elements) {

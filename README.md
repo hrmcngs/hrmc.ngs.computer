@@ -50,9 +50,9 @@ Home／Photos のカラーテーマを開き、「この見た目のリンクを
 
 ### スター数の生成
 
-`node scripts/gen-stars.js`（または `sbcl --script scripts/gen-stars.lisp`）で `charts/stars.json` を更新します。SBCLとNode.js 20以上が必要です。Common Lispがリンク収集・URL正規化・重複除去・値の検証・取得失敗時の保存値引き継ぎを担当し、Node.jsはページ取得とAPI通信を担当します。JSON処理はSEO生成と `scripts/json.lisp` を共用しています。
+`node scripts/gen-stars.js`（または `sbcl --script scripts/gen-stars.lisp`）で `charts/stars.json` を更新します。SBCLとNode.js 20以上が必要です。Common Lispがリンク収集・URL正規化・重複除去・値の検証・取得失敗時の保存値引き継ぎを担当し、Node.jsは公開ページの取得を担当します。JSON処理はSEO生成と `scripts/json.lisp` を共用しています。
 
-GitHub Actionsで15分ごとに実行します。CurseForgeの高評価数はSecret `CURSEFORGE_API_KEY` が必要で、GitHubのスター数は公開リポジトリページ内の正確な数値を取得するため、API・トークンは使いません。ブラウザは生成済みの `charts/stars.json` だけを読み込みます。Lispは生成時のみ動くため、閲覧者側に追加の実行負荷はかかりません。
+GitHub Actionsで15分ごとに実行します。GitHubのスター数とCurseForgeのFavorite（お気に入り数）は、公開ページから取得します。CurseForge公式APIの `thumbsUpCount` は別の指標なので使用しません。アクセス拒否や解析失敗時は確認済みのお気に入り数だけを維持し、旧形式の高評価数は引き継ぎません。ページからの自動取得はCurseForge側のアクセス制限により失敗する場合があります。`CURSEFORGE_API_KEY` は引き続きダウンロード数の取得に使用します。ブラウザは生成済みの `charts/stars.json` だけを読み込みます。Lispは生成時のみ動くため、閲覧者側に追加の実行負荷はかかりません。
 
 検証: `sbcl --script scripts/test-gen-stars.lisp`、`sbcl --script scripts/test-build-seo.lisp`。
 
