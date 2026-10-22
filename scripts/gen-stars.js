@@ -7,20 +7,36 @@ const validCount = n => Number.isSafeInteger(n) && n >= 0;
 
 // Read only GitHub's repository metadata, never rounded "1.2k" labels.
 function githubStarsFromHtml(html) {
-  for (const script of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
-    if (!/data-target=["']react-app\.embeddedData["']/.test(script[1])) continue;
+  // Locate GitHub's known metadata field, not arbitrary HTML tags. Nothing
+  // extracted here is rendered as HTML; only validated integers are returned.
+  const lower = html.toLowerCase();
+  for (const quote of ['"', "'"]) {
+    const marker = `data-target=${quote}react-app.embeddedData${quote}`;
+    const position = html.indexOf(marker);
+    if (position < 0) continue;
+    const start = html.indexOf('>', position + marker.length);
+    const end = lower.indexOf('</script', start + 1);
+    if (start < 0 || end < 0) continue;
     try {
-      const payload = JSON.parse(script[2]).payload;
+      const payload = JSON.parse(html.slice(start + 1, end)).payload;
       const count = payload?.sidebarAbout?.stargazerCount
         ?? payload?.codeViewRepoRoute?.overview?.sidebarAboutData?.stargazerCount;
       if (validCount(count)) return count;
     } catch (_) {}
   }
-  const counter = html.match(/<[^>]+\bid=["']repo-stars-counter-star["'][^>]*>([\s\S]*?)<\/[^>]+>/i);
-  if (counter) {
-    const title = counter[0].match(/\btitle=["']([\d,]+)["']/i)?.[1];
-    const text = title ?? counter[1].replace(/<[^>]*>/g, '').trim();
-    if (/^\d[\d,]*$/.test(text)) {
+  for (const quote of ['"', "'"]) {
+    const marker = `id=${quote}repo-stars-counter-star${quote}`;
+    const position = html.indexOf(marker);
+    if (position < 0) continue;
+    const start = html.lastIndexOf('<', position);
+    const end = html.indexOf('>', position + marker.length);
+    if (start < 0 || end < 0) continue;
+    const title = html.slice(start, end).match(/\btitle=["'](\d{1,3}(?:,\d{3})+|\d+)["']/i)?.[1];
+    const nextTag = html.indexOf('<', end + 1);
+    // Reject nested markup instead of trying to sanitize it by removing tags.
+    const text = title ?? (nextTag < 0 || !html.startsWith('</', nextTag)
+      ? '' : html.slice(end + 1, nextTag).trim());
+    if (/^(?:\d{1,3}(?:,\d{3})+|\d+)$/.test(text)) {
       const count = Number(text.replaceAll(',', ''));
       if (validCount(count)) return count;
     }

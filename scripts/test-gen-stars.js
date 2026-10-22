@@ -15,6 +15,17 @@ test('legacy counters use exact titles and reject rounded or missing counts', ()
   assert.equal(githubStarsFromHtml('<span id="repo-stars-counter-star">0</span>'), 0);
   assert.equal(githubStarsFromHtml('<span id="repo-stars-counter-star">1.2k</span>'), null);
   assert.equal(githubStarsFromHtml('<h1>Sign in</h1><p>123 stars</p>'), null);
+  assert.equal(githubStarsFromHtml('<span id="repo-stars-counter-star"><b>12</b></span>'), null);
+  assert.equal(githubStarsFromHtml('<span id="repo-stars-counter-star">1,2</span>'), null);
+  assert.equal(githubStarsFromHtml('<span id="repo-stars-counter-star">9007199254740992</span>'), null);
+  assert.equal(githubStarsFromHtml('<span id="repo-stars-counter-star"><scrip<script>removed</script>t>12</span>'), null);
+});
+test('embedded JSON accepts HTML closing-tag variants without filtering markup', () => {
+  const data = JSON.stringify({ payload: { sidebarAbout: { stargazerCount: 8 } } });
+  for (const ending of ['</script>', '</SCRIPT>', '</script >', '</script ignored="yes">']) {
+    assert.equal(githubStarsFromHtml(`<SCRIPT data-target='react-app.embeddedData'>${data}${ending}`), 8);
+  }
+  assert.equal(githubStarsFromHtml('<script data-target="react-app.embeddedData">{"payload":</script>'), null);
 });
 test('GitHub fetch uses the public page without authorization or API', async () => {
   const original = global.fetch;
