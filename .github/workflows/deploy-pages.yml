@@ -16,6 +16,11 @@ on:
       - 'charts/**'
   workflow_dispatch:
   workflow_call:
+    inputs:
+      source_ref:
+        description: Commit containing the generated chart and star data
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -33,6 +38,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref || github.sha }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

@@ -467,8 +467,9 @@ function renderNixieCount(el, text) {
 }
 
 // スターは減ることもあるため、最新の取得値をそのまま使う。
-const starRequests = new Map();
 let generatedStars;
+let generatedStarsAt = 0;
+let lastStarEntries = {};
 function starLink(url) {
   try {
     const u = new URL(url);
@@ -482,49 +483,74 @@ function starLink(url) {
   } catch (_) { return null; }
 }
 
-function getStarCount(link) {
-  if (starRequests.has(link.url)) return starRequests.get(link.url);
-  const request = (async () => {
-    const valid = n => Number.isSafeInteger(n) && n >= 0;
-    generatedStars ||= fetch('/charts/stars.json', { cache: 'no-cache' })
-      .then(r => r.ok ? r.json() : null).catch(() => null);
-    const saved = (await generatedStars)?.entries?.[link.url]?.count;
-    return valid(saved) ? saved : null;
-  })();
-  starRequests.set(link.url, request);
-  return request;
+async function getStarCount(link) {
+  if (!generatedStars || Date.now() - generatedStarsAt >= DL_CACHE_TTL) {
+    generatedStarsAt = Date.now();
+    generatedStars = fetch('/charts/stars.json', { cache: 'no-store' })
+      .then(async response => {
+        if (!response.ok) throw new Error('Star data unavailable');
+        const data = await response.json();
+        if (!data?.entries || typeof data.entries !== 'object') throw new Error('Invalid star data');
+        lastStarEntries = data.entries;
+        return lastStarEntries;
+      }).catch(() => lastStarEntries);
+  }
+  const saved = (await generatedStars)?.[link.url]?.count;
+  return Number.isSafeInteger(saved) && saved >= 0 ? saved : null;
 }
 
 async function showStarCounts(cardEl, urls) {
   const links = [...new Map(urls.map(starLink).filter(Boolean).map(link => [link.url, link])).values()];
-  const results = await Promise.all(links.map(async link => ({ ...link, count: await getStarCount(link) })));
-  for (const platform of ['GitHub', 'CurseForge']) {
-    const projects = results.filter(result => result.platform === platform);
-    if (!projects.length) continue;
-    // Both RPGish editions must be available before displaying their total.
-    const complete = projects.every(result => result.count !== null);
-    const count = complete ? projects.reduce((sum, result) => sum + result.count, 0) : null;
-    const total = projects.length > 1;
-    const metric = total ? 'スター合計' : 'スター';
-    const badge = document.createElement('div');
-    badge.className = 'work-dl work-stars';
-    const label = document.createElement('span');
-    label.className = 'work-dl-label';
-    label.textContent = `${platform} ${total ? '★合計' : '★'}：`;
-    const number = document.createElement('span');
-    number.className = 'work-dl-count nixie';
-    number.setAttribute('aria-hidden', 'true');
-    badge.setAttribute('aria-label', `${platform} ${metric} ${count === null ? '取得待ち' : count.toLocaleString('ja-JP')}`);
-    badge.title = projects.map(result => `${result.url}: ${result.count === null ? '取得待ち' : result.count}`).join('\n');
-    badge.append(label, number);
-    cardEl.append(badge);
-    if (count === null) {
-      number.classList.remove('nixie');
-      number.textContent = '—';
-    } else {
-      renderNixieCount(number, String(count));
-    }
+  if (!links.length) return;
+  const badges = new Map();
+  let refreshing = false;
+  async function refreshBadges() {
+    if (refreshing) return;
+    refreshing = true;
+    try {
+      const results = await Promise.all(links.map(async link => ({ ...link, count: await getStarCount(link) })));
+      for (const platform of ['GitHub', 'CurseForge']) {
+        const projects = results.filter(result => result.platform === platform);
+        if (!projects.length) continue;
+        // Both RPGish editions must be available before displaying their total.
+        const complete = projects.every(result => result.count !== null);
+        const count = complete ? projects.reduce((sum, result) => sum + result.count, 0) : null;
+        const total = projects.length > 1;
+        const metric = total ? 'スター合計' : 'スター';
+        let elements = badges.get(platform);
+        if (!elements) {
+          const badge = document.createElement('div');
+          badge.className = 'work-dl work-stars';
+          const label = document.createElement('span');
+          label.className = 'work-dl-label';
+          label.textContent = `${platform} ${total ? '★合計' : '★'}：`;
+          const number = document.createElement('span');
+          number.className = 'work-dl-count nixie';
+          number.setAttribute('aria-hidden', 'true');
+          badge.append(label, number);
+          cardEl.append(badge);
+          elements = { badge, number };
+          badges.set(platform, elements);
+        }
+        const { badge, number } = elements;
+        badge.setAttribute('aria-label', `${platform} ${metric} ${count === null ? '取得待ち' : count.toLocaleString('ja-JP')}`);
+        badge.title = projects.map(result => `${result.url}: ${result.count === null ? '取得待ち' : result.count}`).join('\n');
+        if (count === null) {
+          number.classList.remove('nixie');
+          number.textContent = '—';
+        } else {
+          number.classList.add('nixie');
+          if (!number.querySelector('.nixie-tube')) number.replaceChildren();
+          renderNixieCount(number, String(count));
+        }
+      }
+    } finally { refreshing = false; }
   }
+  await refreshBadges();
+  const timer = setInterval(() => {
+    if (!cardEl.isConnected) { clearInterval(timer); return; }
+    refreshBadges();
+  }, DL_CACHE_TTL);
 }
 
 // Works カードに配布数を表示する。Marketplaceはインストール数だけを表示する。

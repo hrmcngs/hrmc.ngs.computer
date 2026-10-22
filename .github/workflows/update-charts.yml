@@ -31,6 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       charts_changed: ${{ steps.commit.outputs.changed }}
+      charts_commit: ${{ steps.commit.outputs.sha }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -118,14 +119,17 @@ jobs:
             git push
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
   # charts/ が更新されたら Pages を再デプロイする。
   # bot の push では push トリガーが発火しないため、ここから明示的に呼ぶ。
   deploy:
     needs: update
-    if: needs.update.outputs.charts_changed == 'true'
+    if: needs.update.outputs.charts_changed == 'true' || github.event_name == 'workflow_dispatch'
     permissions:
       contents: read
       pages: write
       id-token: write
     uses: ./.github/workflows/deploy-pages.yml
+    with:
+      source_ref: ${{ needs.update.outputs.charts_commit }}
