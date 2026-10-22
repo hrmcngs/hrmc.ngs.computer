@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-22T15:59:05.571Z",
+  "generated": "2026-10-22T17:36:09.947Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 67,
@@ -17,21 +17,21 @@
       "projectId": 961882
     },
     "https://curseforge.com/minecraft/mc-mods/extra-video-settings": {
-      "count": 1378,
+      "count": 1379,
       "source": "curseforge-api",
       "projectId": 1474041
     },
     "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility": {
-      "count": 733,
+      "count": 735,
       "installs": 536,
       "icon": "https://MC-Mod-Utility.gallerycdn.vsassets.io/extensions/mc-mod-utility/mc-mod-utility/0.3.12/1792150675250/Microsoft.VisualStudio.Services.Icons.Default",
-      "source": "cached-newer"
+      "source": "vscode-marketplace"
     },
     "https://marketplace.visualstudio.com/items?itemName=hrmcngs.toritsu-ai": {
       "count": 722,
       "installs": 5,
       "icon": "https://hrmcngs.gallerycdn.vsassets.io/extensions/hrmcngs/toritsu-ai/0.12.19/1791900190973/Microsoft.VisualStudio.Services.Icons.Default",
-      "source": "cached-newer"
+      "source": "vscode-marketplace"
     },
     "https://curseforge.com/minecraft/mc-mods/arsenal-backpack": {
       "count": 180,
