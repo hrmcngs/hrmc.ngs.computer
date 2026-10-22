@@ -516,14 +516,16 @@ async function showStarCounts(cardEl, urls) {
         const complete = projects.every(result => result.count !== null);
         const count = complete ? projects.reduce((sum, result) => sum + result.count, 0) : null;
         const total = projects.length > 1;
-        const metric = total ? 'スター合計' : 'スター';
+        const metric = platform === 'CurseForge'
+          ? (total ? '高評価合計' : '高評価')
+          : (total ? 'スター合計' : 'スター');
         let elements = badges.get(platform);
         if (!elements) {
           const badge = document.createElement('div');
           badge.className = 'work-dl work-stars';
           const label = document.createElement('span');
           label.className = 'work-dl-label';
-          label.textContent = `${platform} ${total ? '★合計' : '★'}：`;
+          label.textContent = `${platform} ${platform === 'CurseForge' ? metric : (total ? '★合計' : '★')}：`;
           const number = document.createElement('span');
           number.className = 'work-dl-count nixie';
           number.setAttribute('aria-hidden', 'true');
