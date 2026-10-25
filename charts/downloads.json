@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-25T06:34:41.327Z",
+  "generated": "2026-10-25T12:01:09.799Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 68,
@@ -17,13 +17,13 @@
       "projectId": 961882
     },
     "https://curseforge.com/minecraft/mc-mods/extra-video-settings": {
-      "count": 1393,
+      "count": 1394,
       "source": "curseforge-api",
       "projectId": 1474041
     },
     "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility": {
-      "count": 789,
-      "installs": 541,
+      "count": 796,
+      "installs": 542,
       "icon": "https://MC-Mod-Utility.gallerycdn.vsassets.io/extensions/mc-mod-utility/mc-mod-utility/0.3.16/1792861524691/Microsoft.VisualStudio.Services.Icons.Default",
       "source": "vscode-marketplace"
     },
@@ -39,7 +39,7 @@
       "projectId": 1564519
     },
     "https://curseforge.com/minecraft/mc-mods/gun-and-weapons": {
-      "count": 1401,
+      "count": 1403,
       "source": "curseforge-api",
       "projectId": 1620729
     }
