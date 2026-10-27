@@ -501,6 +501,38 @@ async function getStarCount(link) {
   return Number.isSafeInteger(saved) && saved >= 0 ? saved : null;
 }
 
+const workStatFitters = new WeakMap();
+function fitWorkStat(badge) {
+  let schedule = workStatFitters.get(badge);
+  if (!schedule) {
+    const content = document.createElement('span');
+    content.className = 'work-dl-content';
+    content.append(...badge.childNodes);
+    badge.append(content);
+    let pending = false;
+    schedule = () => {
+      if (pending) return;
+      pending = true;
+      requestAnimationFrame(() => {
+        pending = false;
+        if (!badge.isConnected) return;
+        content.style.zoom = '1';
+        const style = getComputedStyle(badge);
+        const available = badge.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+        const natural = content.scrollWidth;
+        if (available > 0 && natural > available) {
+          content.style.zoom = String(available / natural);
+        }
+      });
+    };
+    workStatFitters.set(badge, schedule);
+    if ('ResizeObserver' in window) new ResizeObserver(schedule).observe(badge);
+    else window.addEventListener('resize', schedule);
+    document.fonts?.ready.then(schedule);
+  }
+  schedule();
+}
+
 async function showStarCounts(cardEl, urls) {
   const links = [...new Map(urls.map(starLink).filter(Boolean).map(link => [link.url, link])).values()];
   if (!links.length) return;
@@ -547,6 +579,7 @@ async function showStarCounts(cardEl, urls) {
           if (!number.querySelector('.nixie-tube')) number.replaceChildren();
           renderNixieCount(number, String(count));
         }
+        fitWorkStat(badge);
       }
     } finally { refreshing = false; }
   }
@@ -596,6 +629,7 @@ async function showDownloadCount(cardEl, links) {
       labelEl.textContent = 'ダウンロード：';
       renderNixieCount(countEl, String(count));
     }
+    fitWorkStat(badge);
   }
 
   await refreshBadge();
@@ -937,6 +971,7 @@ siteContent
               // このカードもダウンロード数と同じくニキシー時計として見せる
               el.classList.add('is-nixie-clock');
               renderNixieCount(countEl, String(usage.total));
+              fitWorkStat(badge);
               enableNixieShuffleOnHover(el, countEl);
             });
           })

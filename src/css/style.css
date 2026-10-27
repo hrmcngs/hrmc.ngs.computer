@@ -779,6 +779,15 @@ body {
   color: var(--text-muted);
 }
 
+/* ラベルと数字をまとめて縮小し、改行も省略もせずカード内に収める。 */
+.work-dl-content {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: inherit;
+  white-space: nowrap;
+}
+
 .work-dl-count {
   flex-shrink: 0;
   font-family: var(--font-mono);
