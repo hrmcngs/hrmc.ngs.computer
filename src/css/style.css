@@ -765,7 +765,9 @@ body {
 .work-dl {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  min-width: 0;
+  white-space: nowrap;
   column-gap: 0.35rem;
   row-gap: 0.25rem;
   margin-top: 0.6rem;
@@ -773,10 +775,14 @@ body {
 }
 
 .work-dl-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--text-muted);
 }
 
 .work-dl-count {
+  flex-shrink: 0;
   font-family: var(--font-mono);
   font-weight: 700;
   letter-spacing: 0.02em;
