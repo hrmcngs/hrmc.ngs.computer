@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-26T21:07:42.768Z",
+  "generated": "2026-10-27T00:25:59.454Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 68,
@@ -7,12 +7,12 @@
       "projectId": 1492629
     },
     "https://curseforge.com/minecraft/mc-mods/rpgish-hpdisplay-mod": {
-      "count": 150,
+      "count": 151,
       "source": "curseforge-api",
       "projectId": 1544555
     },
     "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons": {
-      "count": 6434,
+      "count": 6437,
       "source": "curseforge-api",
       "projectId": 961882
     },
@@ -22,8 +22,8 @@
       "projectId": 1474041
     },
     "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility": {
-      "count": 859,
-      "installs": 544,
+      "count": 887,
+      "installs": 545,
       "icon": "https://MC-Mod-Utility.gallerycdn.vsassets.io/extensions/mc-mod-utility/mc-mod-utility/0.3.22/1792982615915/Microsoft.VisualStudio.Services.Icons.Default",
       "source": "vscode-marketplace"
     },
@@ -34,12 +34,12 @@
       "source": "vscode-marketplace"
     },
     "https://curseforge.com/minecraft/mc-mods/arsenal-backpack": {
-      "count": 189,
+      "count": 190,
       "source": "curseforge-api",
       "projectId": 1564519
     },
     "https://curseforge.com/minecraft/mc-mods/gun-and-weapons": {
-      "count": 1415,
+      "count": 1416,
       "source": "curseforge-api",
       "projectId": 1620729
     }
