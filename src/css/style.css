@@ -775,9 +775,7 @@ body {
 }
 
 .work-dl-label {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex-shrink: 0;
   color: var(--text-muted);
 }
 
