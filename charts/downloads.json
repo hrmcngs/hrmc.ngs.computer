@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-28T17:25:18.608Z",
+  "generated": "2026-10-28T21:50:18.743Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 68,
@@ -17,7 +17,7 @@
       "projectId": 961882
     },
     "https://curseforge.com/minecraft/mc-mods/extra-video-settings": {
-      "count": 1406,
+      "count": 1408,
       "source": "curseforge-api",
       "projectId": 1474041
     },
@@ -34,7 +34,7 @@
       "source": "vscode-marketplace"
     },
     "https://curseforge.com/minecraft/mc-mods/arsenal-backpack": {
-      "count": 190,
+      "count": 191,
       "source": "curseforge-api",
       "projectId": 1564519
     },
