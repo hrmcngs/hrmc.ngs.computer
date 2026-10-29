@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-28T21:50:18.743Z",
+  "generated": "2026-10-29T07:40:15.063Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 68,
@@ -22,8 +22,8 @@
       "projectId": 1474041
     },
     "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility": {
-      "count": 902,
-      "installs": 549,
+      "count": 912,
+      "installs": 550,
       "icon": "https://MC-Mod-Utility.gallerycdn.vsassets.io/extensions/mc-mod-utility/mc-mod-utility/0.3.22/1792982615915/Microsoft.VisualStudio.Services.Icons.Default",
       "source": "vscode-marketplace"
     },
