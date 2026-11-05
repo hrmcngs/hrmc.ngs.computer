@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-05T02:42:15.304Z",
+  "generated": "2026-11-05T09:52:02.844Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 70,
@@ -12,12 +12,12 @@
       "projectId": 1544555
     },
     "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons": {
-      "count": 6534,
+      "count": 6536,
       "source": "curseforge-api",
       "projectId": 961882
     },
     "https://curseforge.com/minecraft/mc-mods/extra-video-settings": {
-      "count": 1437,
+      "count": 1439,
       "source": "curseforge-api",
       "projectId": 1474041
     },
@@ -25,7 +25,7 @@
       "count": 934,
       "installs": 557,
       "icon": "https://MC-Mod-Utility.gallerycdn.vsassets.io/extensions/mc-mod-utility/mc-mod-utility/0.3.22/1792982615915/Microsoft.VisualStudio.Services.Icons.Default",
-      "source": "cached-newer"
+      "source": "vscode-marketplace"
     },
     "https://marketplace.visualstudio.com/items?itemName=hrmcngs.toritsu-ai": {
       "count": 737,
@@ -39,7 +39,7 @@
       "projectId": 1564519
     },
     "https://curseforge.com/minecraft/mc-mods/gun-and-weapons": {
-      "count": 1493,
+      "count": 1495,
       "source": "curseforge-api",
       "projectId": 1620729
     }
