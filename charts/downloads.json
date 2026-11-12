@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-12T13:05:30.669Z",
+  "generated": "2026-11-12T20:49:40.566Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 72,
@@ -12,34 +12,34 @@
       "projectId": 1544555
     },
     "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons": {
-      "count": 6596,
+      "count": 6608,
       "source": "curseforge-api",
       "projectId": 961882
     },
     "https://curseforge.com/minecraft/mc-mods/extra-video-settings": {
-      "count": 1473,
+      "count": 1474,
       "source": "curseforge-api",
       "projectId": 1474041
     },
     "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility": {
-      "count": 944,
-      "installs": 564,
+      "count": 946,
+      "installs": 565,
       "icon": "https://MC-Mod-Utility.gallerycdn.vsassets.io/extensions/mc-mod-utility/mc-mod-utility/0.3.22/1792982615915/Microsoft.VisualStudio.Services.Icons.Default",
       "source": "vscode-marketplace"
     },
     "https://marketplace.visualstudio.com/items?itemName=hrmcngs.toritsu-ai": {
-      "count": 744,
+      "count": 746,
       "installs": 7,
       "icon": "https://hrmcngs.gallerycdn.vsassets.io/extensions/hrmcngs/toritsu-ai/0.12.19/1791900190973/Microsoft.VisualStudio.Services.Icons.Default",
       "source": "vscode-marketplace"
     },
     "https://curseforge.com/minecraft/mc-mods/arsenal-backpack": {
-      "count": 192,
+      "count": 193,
       "source": "curseforge-api",
       "projectId": 1564519
     },
     "https://curseforge.com/minecraft/mc-mods/gun-and-weapons": {
-      "count": 1544,
+      "count": 1553,
       "source": "curseforge-api",
       "projectId": 1620729
     }
