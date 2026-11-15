@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-14T20:34:51.898Z",
+  "generated": "2026-11-15T00:20:01.621Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 74,
@@ -12,7 +12,7 @@
       "projectId": 1544555
     },
     "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons": {
-      "count": 6631,
+      "count": 6638,
       "source": "curseforge-api",
       "projectId": 961882
     },
@@ -31,7 +31,7 @@
       "count": 748,
       "installs": 7,
       "icon": "https://hrmcngs.gallerycdn.vsassets.io/extensions/hrmcngs/toritsu-ai/0.12.19/1791900190973/Microsoft.VisualStudio.Services.Icons.Default",
-      "source": "vscode-marketplace"
+      "source": "cached-newer"
     },
     "https://curseforge.com/minecraft/mc-mods/arsenal-backpack": {
       "count": 194,
@@ -39,7 +39,7 @@
       "projectId": 1564519
     },
     "https://curseforge.com/minecraft/mc-mods/gun-and-weapons": {
-      "count": 1573,
+      "count": 1577,
       "source": "curseforge-api",
       "projectId": 1620729
     }
