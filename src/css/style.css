@@ -560,6 +560,79 @@ body {
   color: #fff;
 }
 
+/* ===== Future ===== */
+.future-intro {
+  max-width: 680px;
+  margin: -1.5rem 0 2rem;
+  color: var(--text-muted);
+  line-height: 1.9;
+}
+
+.future-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.future-card {
+  position: relative;
+  padding: 1.5rem;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.future-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--future-color, var(--accent));
+}
+
+.future-card--now { --future-color: #3ecfcf; }
+.future-card--next { --future-color: #7c6af7; }
+.future-card--future { --future-color: #f87171; }
+
+.future-stage {
+  margin-bottom: 0.8rem;
+  color: var(--future-color);
+  font-family: var(--font-en);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.future-card h3 {
+  margin-bottom: 0.65rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.future-card .future-desc {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.8;
+}
+
+.future-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.1rem;
+}
+
+.future-tag {
+  padding: 0.2em 0.65em;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  font-family: var(--font-en);
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+}
+
 /* ===== Links ===== */
 .links-group {
   margin-bottom: 3rem;
@@ -1552,6 +1625,8 @@ body {
 .about-grid,
 .links-group,
 .works-grid,
+.future-intro,
+.future-grid,
 .omake-section,
 .katana-grid {
   opacity: 0;
@@ -1644,6 +1719,16 @@ body {
 
   .about-text p {
     font-size: 0.95rem;
+  }
+
+  /* Future */
+  .future-intro {
+    margin-top: -0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .future-grid {
+    grid-template-columns: 1fr;
   }
 
   /* Links */

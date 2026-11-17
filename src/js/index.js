@@ -1,6 +1,6 @@
 // Intersection Observer でスクロールアニメーション
 const targets = document.querySelectorAll(
-  '.section-title, .about-grid, .links-group, .works-grid, .omake-section, .katana-grid'
+  '.section-title, .about-grid, .links-group, .works-grid, .future-intro, .future-grid, .omake-section, .katana-grid'
 );
 
 const observer = new IntersectionObserver(

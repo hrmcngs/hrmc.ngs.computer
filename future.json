@@ -1,0 +1,23 @@
+{
+  "intro": "今できることから始めて、いつか誰かの開発や研究の土台になるものを作りたい。関心と目標の記録です。",
+  "items": [
+    {
+      "stage": "now",
+      "title": "WebとMinecraftの開発基盤を育てる",
+      "desc": "Modやアドオンを作る人が、最初の一歩を短くできるツールとテンプレートを磨く。",
+      "tags": ["Minecraft", "Developer Tools"]
+    },
+    {
+      "stage": "next",
+      "title": "セキュリティを学ぶ",
+      "desc": "Webの通信・認証・代表的な脆弱性から学び、作ったものを安全に公開できる力をつける。",
+      "tags": ["Web Security", "Cryptography"]
+    },
+    {
+      "stage": "future",
+      "title": "Brain–Machine Interfaceを研究する",
+      "desc": "信号処理やリアルタイム通信を学び、人とコンピューターをつなぐ研究と開発に挑戦する。",
+      "tags": ["BMI", "Signal Processing"]
+    }
+  ]
+}

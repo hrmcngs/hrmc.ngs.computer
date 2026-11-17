@@ -689,11 +689,13 @@ function setWorkIconFromStats(cardEl, stats) {
   if (!img.parentNode) iconEl.replaceChildren(img);
 }
 
-const siteContent = window.siteContent = fetch('/content.json', { cache: 'no-cache' })
-  .then(r => r.json());
+const siteContent = window.siteContent = Promise.all([
+  fetch('/content.json', { cache: 'no-cache' }).then(r => r.json()),
+  fetch('/future.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null).catch(() => null),
+]).then(([data, future]) => ({ ...data, future }));
 siteContent
   .then(data => {
-    const { hero, footer, terminal, links, about, profile, works } = data;
+    const { hero, footer, terminal, links, about, future, profile, works } = data;
 
     // ---- Hero ----
     if (hero) {
@@ -850,6 +852,27 @@ siteContent
         codeEl.textContent = block;
         if (typeof hljs !== 'undefined') hljs.highlightElement(codeEl);
       }
+    }
+
+    // ---- Future ----
+    const futureEl = document.getElementById('future-grid');
+    const futureIntroEl = document.getElementById('future-intro');
+    if (futureIntroEl && future?.intro) futureIntroEl.textContent = future.intro;
+    if (futureEl && Array.isArray(future?.items)) {
+      const stageLabels = { now: 'NOW', next: 'NEXT', future: 'SOMEDAY' };
+      futureEl.innerHTML = future.items.map(item => {
+        const tags = (item.tags ?? [])
+          .map(tag => `<span class="future-tag">${escHtml(tag)}</span>`)
+          .join('');
+        return `
+          <article class="future-card future-card--${escHtml(item.stage ?? 'future')}">
+            <p class="future-stage">${escHtml(stageLabels[item.stage] ?? item.stage ?? '')}</p>
+            <h3>${escHtml(item.title)}</h3>
+            <p class="future-desc">${escHtml(item.desc)}</p>
+            ${tags ? `<div class="future-tags">${tags}</div>` : ''}
+          </article>
+        `;
+      }).join('');
     }
 
     // ---- Works ----

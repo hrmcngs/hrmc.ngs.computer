@@ -1,5 +1,18 @@
 https://hrmc.ngs.computer/
 
+## やりたいことリストの編集
+
+トップページの `Future` は `future.json` だけで編集できます。
+
+- `intro`: セクションの紹介文
+- `items`: 上から表示する目標の一覧
+- `stage`: `now`（現在）、`next`（次）、`future`（いつか）のいずれか
+- `title`: 目標の名前
+- `desc`: 説明
+- `tags`: 関連する言葉。不要なら `[]`
+
+項目を増やすときは、`items` 内の `{ ... }` をカンマで区切って追加してください。
+
 gh workflow run update-charts.yml
 > ビルドchart SVGsの
 
