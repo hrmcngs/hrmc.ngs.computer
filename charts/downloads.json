@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-16T23:14:32.620Z",
+  "generated": "2026-11-17T05:06:57.640Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 75,
@@ -7,7 +7,7 @@
       "projectId": 1492629
     },
     "https://curseforge.com/minecraft/mc-mods/rpgish-hpdisplay-mod": {
-      "count": 154,
+      "count": 155,
       "source": "curseforge-api",
       "projectId": 1544555
     },
@@ -17,7 +17,7 @@
       "projectId": 961882
     },
     "https://curseforge.com/minecraft/mc-mods/extra-video-settings": {
-      "count": 1488,
+      "count": 1490,
       "source": "curseforge-api",
       "projectId": 1474041
     },
@@ -25,7 +25,7 @@
       "count": 951,
       "installs": 571,
       "icon": "https://MC-Mod-Utility.gallerycdn.vsassets.io/extensions/mc-mod-utility/mc-mod-utility/0.3.22/1792982615915/Microsoft.VisualStudio.Services.Icons.Default",
-      "source": "cached-newer"
+      "source": "vscode-marketplace"
     },
     "https://marketplace.visualstudio.com/items?itemName=hrmcngs.toritsu-ai": {
       "count": 750,
@@ -39,7 +39,7 @@
       "projectId": 1564519
     },
     "https://curseforge.com/minecraft/mc-mods/gun-and-weapons": {
-      "count": 1592,
+      "count": 1595,
       "source": "curseforge-api",
       "projectId": 1620729
     }
