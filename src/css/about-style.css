@@ -1,4 +1,8 @@
     /* ===== About page extras ===== */
+    .about-body > .mac-menu { order: 0; flex: 0 0 auto; }
+    .about-body > .about-page { order: 1; }
+    .about-body > .section { order: 2; }
+
     .about-page {
       min-height: 100dvh;
       padding: 8rem 0 6rem;
@@ -133,6 +137,67 @@
     .profile-chips .chip {
       opacity: 0;
       animation: chip-pop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+
+    .profile-left > nav {
+      margin: 0 0 2rem;
+    }
+
+    .profile-left > nav ul {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.55rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .profile-left > nav a {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      min-width: 0;
+      padding: 0.65rem 0.75rem;
+      color: var(--text-muted);
+      background: color-mix(in srgb, var(--surface) 78%, transparent);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: var(--font-en);
+      font-size: 0.72rem;
+      line-height: 1.35;
+      text-decoration: none;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+
+    .profile-left > nav a:hover,
+    .profile-left > nav a:focus-visible {
+      color: var(--text);
+      background: color-mix(in srgb, var(--accent) 7%, var(--surface));
+      border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+    }
+
+    .profile-left > nav a > span:last-child {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .social-mark {
+      display: grid;
+      flex: 0 0 1.8rem;
+      width: 1.8rem;
+      height: 1.8rem;
+      place-items: center;
+      color: var(--text);
+      background: color-mix(in srgb, var(--accent) 10%, transparent);
+      border-radius: 7px;
+    }
+
+    .social-mark svg {
+      width: 1rem;
+      height: 1rem;
+      fill: currentColor;
     }
 
     .profile-back {
@@ -373,6 +438,36 @@
       .profile-back {
         font-size: 0.75rem;
       }
+
+      .profile-left > nav ul {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 390px) {
+      .profile-left > nav ul {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Shared light/dark header uses the current theme colors on About too. */
+    .about-body .profile-label,
+    .about-body .profile-name,
+    .about-body .profile-handle,
+    .about-body .profile-bio,
+    .about-body .profile-info,
+    .about-body .profile-back,
+    .about-body .code-wrap {
+      opacity: 1;
+      animation: none;
+    }
+
+    .about-body .profile-name {
+      color: var(--text);
+      background: none;
+      -webkit-background-clip: initial;
+      -webkit-text-fill-color: currentColor;
+      background-clip: initial;
     }
 
     /* prefers-reduced-motion */
@@ -382,3 +477,61 @@
         animation-delay: 0.01ms !important;
       }
     }
+
+    /* JavaScript pasted into a Markdown document. */
+    .about-body .code-wrap {
+      padding: 0;
+      color: var(--text);
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+    }
+
+    .about-body .code-file {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0;
+      padding: 9px 12px;
+      color: var(--catalog-muted);
+      background: color-mix(in srgb, var(--text) 6%, var(--bg));
+      border: 1px solid var(--border);
+      border-bottom: 0;
+      border-radius: 5px 5px 0 0;
+      font: 600 12px/1.5 var(--font-jp);
+    }
+
+    .about-body .code-file::before { content: none; }
+    .about-body .code-file::after { content: none; }
+    .about-body .code-file .code-dot,
+    .about-body .code-file #code-file-name { display: none; }
+    .about-body .code-language { display: inline; }
+    .about-body .code-copy {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 8px;
+      color: var(--catalog-muted);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font: inherit;
+      cursor: pointer;
+    }
+    .about-body .code-copy:hover,
+    .about-body .code-copy:focus-visible { color: var(--accent); border-color: var(--accent); }
+    .about-body .code-wrap pre { margin: 0; }
+
+    .about-body .code-wrap .hljs {
+      padding: 20px 22px !important;
+      color: var(--text);
+      background: color-mix(in srgb, var(--text) 4%, var(--bg)) !important;
+      border: 1px solid var(--border);
+      border-radius: 0 0 5px 5px;
+      font-family: var(--font-jp) !important;
+      font-size: 13px !important;
+      line-height: 1.75 !important;
+      box-shadow: none;
+    }
+
+    .about-body .code-wrap::after { content: none; }

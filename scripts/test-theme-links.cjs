@@ -35,15 +35,15 @@ async function openPage(search = '', stored = {}, unavailable = false) {
 }
 
 (async () => {
-  const linked = await openPage('theme=macos&palette=engraving&appearance=dark', {
+  const linked = await openPage('theme=macos&palette=mono&appearance=dark', {
     'hrmc-macos-palette': 'rose', 'hrmc-macos-appearance': 'light',
   });
-  assert.equal(linked.root.dataset.macPalette, 'engraving');
+  assert.equal(linked.root.dataset.macPalette, 'mono');
   assert.equal(linked.root.dataset.appearance, 'dark');
   assert.equal(linked.root.dataset.siteTheme, 'macos');
   assert.deepEqual(linked.writes, []);
-  linked.events.storage({ key: 'hrmc-macos-palette', newValue: 'ghost' });
-  assert.equal(linked.root.dataset.macPalette, 'engraving');
+  linked.events.storage({ key: 'hrmc-macos-palette', newValue: 'mono' });
+  assert.equal(linked.root.dataset.macPalette, 'mono');
   linked.events.storage({ key: 'hrmc-macos-appearance', newValue: 'light' });
   assert.equal(linked.root.dataset.appearance, 'dark');
 
@@ -51,18 +51,18 @@ async function openPage(search = '', stored = {}, unavailable = false) {
   assert.equal(url.pathname, '/photos/');
   assert.equal(url.hash, '#album');
   assert.equal(url.searchParams.get('keep'), '1');
-  assert.equal(url.searchParams.get('palette'), 'engraving');
+  assert.equal(url.searchParams.get('palette'), 'mono');
   assert.equal(url.searchParams.get('appearance'), 'dark');
   const recipient = await openPage(url.search.slice(1), {}, true);
   for (const name of ['siteTheme', 'cardTheme', 'macPalette', 'appearance']) {
     assert.equal(recipient.root.dataset[name], linked.root.dataset[name]);
   }
 
-  const seasonal = await openPage('palette=seasonal&season=spring&appearance=system');
-  assert.equal(seasonal.root.dataset.season, 'spring');
-  const seasonalURL = new URL(seasonal.window.appearance.getShareURL());
-  assert.equal(seasonalURL.searchParams.get('season'), 'spring');
-  assert.equal(seasonalURL.searchParams.get('appearance'), 'light');
+  const fixedColor = await openPage('palette=mono&appearance=system');
+  assert.equal(fixedColor.root.dataset.macPalette, 'mono');
+  const fixedColorURL = new URL(fixedColor.window.appearance.getShareURL());
+  assert.equal(fixedColorURL.searchParams.get('palette'), 'mono');
+  assert.equal(fixedColorURL.searchParams.get('appearance'), 'light');
   assert.equal((await openPage()).root.dataset.season, 'autumn');
 
   const mixed = await openPage('theme=macos&site=midnight&card=wood');
@@ -75,11 +75,11 @@ async function openPage(search = '', stored = {}, unavailable = false) {
   assert.equal(mixedRecipient.root.dataset.cardTheme, 'wood');
 
   const invalid = await openPage('theme=__proto__&site=constructor&card=missing&palette=bad&appearance=bad&season=constructor', {
-    'hrmc-macos-palette': 'ghost', 'hrmc-macos-appearance': 'dark',
+    'hrmc-macos-palette': 'mono', 'hrmc-macos-appearance': 'dark',
   });
   assert.equal(invalid.root.dataset.siteTheme, 'macos');
-  assert.equal(invalid.root.dataset.macPalette, 'ghost');
+  assert.equal(invalid.root.dataset.macPalette, 'mono');
   assert.equal(invalid.root.dataset.appearance, 'dark');
   assert.equal(invalid.root.dataset.season, 'autumn');
-  console.log('Theme links passed: precedence, round trip, storage isolation, seasonal snapshot, mixed themes, invalid values.');
+  console.log('Theme links passed: fixed site color, light/dark mode, precedence, round trip, storage isolation, invalid values.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

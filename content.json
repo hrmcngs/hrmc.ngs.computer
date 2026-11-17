@@ -8,7 +8,7 @@
   "hero": {
     "tag": "// hrmc.ngs.computer",
     "title": "hrmcngs",
-    "sub": "Web・minecraft mod developer"
+    "sub": "Web、ツール。興味を持ったものを、動く形にしています。"
   },
   "footer": {
     "logo": "hrmc.ngs.computer",
@@ -45,11 +45,11 @@
       },
       {
         "title": "The-four-primitives-and-Weapons",
-        "desc": "Minecraft mod / Drowse-Lab",
+        "desc": "Minecraft mod",
         "color": "#f87171",
         "tags": ["Minecraft", "Mod", "Java", "mcfunction"],
         "links": [
-          "https://github.com/Drowse-Lab/The-four-primitives-and-Weapons",
+          "https://github.com/hrmcngs/The-four-primitives-and-Weapons",
           "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons"
         ]
       },
@@ -133,16 +133,6 @@
         "url": "https://bsky.app/profile/hrmcngs.bsky.social"
       },
       {
-        "label": "Drowse Lab(Twitter)",
-        "identity": "related",
-        "url": "https://x.com/Drowse_Lab"
-      },
-      {
-        "label": "Drowse Lab (Instagram)",
-        "identity": "related",
-        "url": "https://instagram.com/drowse_lab/"
-      },
-      {
         "label": "Buy Me a Coffee",
         "url": "https://buymeacoffee.com/hrmcngs"
       }
@@ -202,27 +192,6 @@
         "color": "#0085ff"
       },
       {
-        "platform": "x",
-        "label": "Drowse Lab(X)",
-        "handle": "@Drowse_Lab",
-        "url": "https://x.com/Drowse_Lab",
-        "color": "#ffffff"
-      },
-      {
-        "platform": "instagram",
-        "label": "Drowse Lab(Instagram)",
-        "handle": "@drowse_lab",
-        "url": "https://instagram.com/drowse_lab/",
-        "color": "#e1306c"
-      },
-      {
-        "platform": "github",
-        "label": "Drowse Lab (GitHub)",
-        "handle": "Drowse-Lab",
-        "url": "https://github.com/Drowse-Lab",
-        "color": "#7c6af7"
-      },
-      {
         "platform": "buymeacoffee",
         "label": "Buy Me a Coffee",
         "handle": "hrmcngs",
@@ -233,14 +202,14 @@
   },
   "about": {
     "name": "hrmcngs",
-    "bio": ["Minecraft1.20.1modとwebを作っています。", "刀が好きです。"],
+    "bio": ["Minecraft 1.20.1 ModとWebを作っています。", "刀が好きです。"],
     "chips": ["Minecraft Mod", "Web", "JavaScript", "3D Graphics", "Canvas", "Java"]
   },
   "profile": {
     "label": "// hrmc.ngs.computer",
     "name": "Hiromichi Nagase",
     "handle": "hrmcngs  ·  0526ngs",
-    "bio": ["Minecraft 1.20.1modやwebsite、appを作っています。", "絡んでくる時はラフな感じでいいですよ。", "憂鬱な時は変なポストをしていますが許してください。"],
+    "bio": ["Minecraft 1.20.1 Modやwebsite、appを作っています。", "絡んでくる時はラフな感じでいいですよ。", "憂鬱な時は変なポストをしていますが許してください。"],
     "chips": ["mcfunction", "Web", "JavaScript", "CSS", "3D Graphics", "Java"],
     "birthday": "2010-05-26",
     "education": [
@@ -248,18 +217,21 @@
         "key": "kindergarten",
         "label": "幼稚園",
         "entered": "2014-04",
+        "durationYears": 3,
         "color": "#00bfff"
       },
       {
         "key": "elementarySchool",
         "label": "小学校",
         "entered": "2017-04",
+        "durationYears": 6,
         "color": "#ffff00"
       },
       {
         "key": "juniorHighSchool",
         "label": "中学校",
         "entered": "2023-04",
+        "durationYears": 3,
         "color": {
           "type": "gradient",
           "angle": 90,
@@ -284,34 +256,24 @@
         }
       },
       {
-        "key": "sakuramatiHighSchool",
+        "key": "sakuramachiHighSchool",
         "label": "桜町高校",
         "entered": "2026-04",
+        "durationYears": 3,
         "color": "#e200ea"
       }
     ],
     "codeFile": "hrmcngs.js",
-    "codeBlock": "const log = {\n  birth:                 20100526,\n  kindergarten:          201404,\n  elementarySchool:      201704,\n  juniorHighSchool:      202304,\n  sakuramatiHighSchool:  202604,\n};"
+    "codeBlock": "const log = {\n  birth:                  20100526,\n  kindergarten:           201404,\n  elementarySchool:       201704,\n  juniorHighSchool:       202304,\n  sakuramachiHighSchool:  202604,\n};"
   },
   "works": [
 
     {
-      "icon": "https://raw.githubusercontent.com/hrmcngs/RPGish-HPDisplay/1.20.1/RPGish-HPDisplay-datapack/pack.png",
-      "title": "RPGish-HPDisplay",
-      "desc": "RPG風HP表示、ダメージ表示データパック ∩ mod",
-      "url": "https://github.com/hrmcngs/RPGish-HPDisplay",
-      "links": [
-        "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack",
-        "https://curseforge.com/minecraft/mc-mods/rpgish-hpdisplay-mod"
-      ],
-      "color": "#3ecfcf",
-      "tags": ["DataPack", "mcfunction","mod","Java"]
-    },
-    {
       "icon": "https://hrmc.ngs.computer/image/work-icons/four-primitives.png",
       "title": "The-four-primitives-and-Weapons",
-      "desc": "Drowse-Lab / Minecraft mod",
+      "desc": "4つの基本動作と武器スキルを組み合わせて戦うMinecraft Mod。",
       "url": "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons",
+      "links": ["https://github.com/hrmcngs/The-four-primitives-and-Weapons"],
       "color": "#f87171",
       "tags": ["Minecraft", "Mod", "Java", "mcfunction"]
     },
@@ -319,7 +281,7 @@
       "icon": "https://raw.githubusercontent.com/hrmcngs/MC-Mod-Utility/0d379a556a6b5f88a01b8060ea27ddb30859a306/icon.png",
       "iconOffset": [0, -13],
       "title": "MC-Mod-Utility",
-      "desc": "VSCode plugin / JavaScript",
+      "desc": "Minecraft Modの雛形作成や武器制作を支援するVS Code拡張。",
       "url": "https://marketplace.visualstudio.com/items?itemName=MC-Mod-Utility.mc-mod-utility",
       "color": "#696969",
       "tags": ["Vscode plugin", "JavaScript"]
@@ -364,6 +326,18 @@
       "url": "https://curseforge.com/minecraft/mc-mods/gun-and-weapons",
       "color": "#00004d",
       "tags": ["Minecraft", "Mod", "Java"]
+    },
+    {
+      "icon": "https://raw.githubusercontent.com/hrmcngs/RPGish-HPDisplay/1.20.1/RPGish-HPDisplay-datapack/pack.png",
+      "title": "RPGish-HPDisplay",
+      "desc": "戦闘中のHPとダメージをRPG風に表示するデータパック・Mod。",
+      "url": "https://github.com/hrmcngs/RPGish-HPDisplay",
+      "links": [
+        "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack",
+        "https://curseforge.com/minecraft/mc-mods/rpgish-hpdisplay-mod"
+      ],
+      "color": "#3ecfcf",
+      "tags": ["DataPack", "mcfunction", "Mod", "Java"]
     }
   ],
   "stats": [
@@ -379,6 +353,7 @@
       "title": "The-four-primitives-and-Weapons",
       "color": "#f87171",
       "links": [
+        "https://github.com/hrmcngs/The-four-primitives-and-Weapons",
         "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons"
       ]
     },

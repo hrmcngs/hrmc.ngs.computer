@@ -591,9 +591,9 @@ body {
   background: var(--future-color, var(--accent));
 }
 
-.future-card--now { --future-color: #3ecfcf; }
-.future-card--next { --future-color: #7c6af7; }
-.future-card--future { --future-color: #f87171; }
+.future-card--now { --future-color: var(--accent2); }
+.future-card--next { --future-color: var(--accent); }
+.future-card--future { --future-color: color-mix(in srgb, var(--accent) 55%, var(--text)); }
 
 .future-stage {
   margin-bottom: 0.8rem;

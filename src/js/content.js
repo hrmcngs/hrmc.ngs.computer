@@ -16,6 +16,16 @@ function setText(id, text) {
   if (el) el.textContent = text;
 }
 
+function ageFromBirthday(birthday, today = new Date()) {
+  const [year, month, day] = String(birthday).split('-').map(Number);
+  if (!year || !month || !day) return null;
+  let age = today.getFullYear() - year;
+  const birthdayPassed = today.getMonth() + 1 > month
+    || (today.getMonth() + 1 === month && today.getDate() >= day);
+  if (!birthdayPassed) age -= 1;
+  return age;
+}
+
 function escHtml(s) {
   return String(s)
     .replace(/&/g, '&amp;')
@@ -787,7 +797,7 @@ siteContent
         let infoHtml = '';
         if (profile.birthday) {
           const bd = new Date(profile.birthday);
-          const age = Math.floor((new Date() - bd) / (365.25 * 24 * 3600 * 1000));
+          const age = ageFromBirthday(profile.birthday);
           const formatted = `${bd.getFullYear()}.${String(bd.getMonth()+1).padStart(2,'0')}.${String(bd.getDate()).padStart(2,'0')}`;
           infoHtml += `<p class="info-birthday">生年月日 <strong>${formatted}</strong>（${age}歳）</p>`;
         }
@@ -808,20 +818,14 @@ siteContent
       if (codeEl) {
         // educationからcodeBlockを動的生成
         const now = new Date();
-        // 各学校の在学期間（年）
-        const durations = {
-          kindergarten         : 3,
-          elementarySchool     : 6,
-          juniorHighSchool     : 3,
-        };
         let block = '// @hrmcngs\n\nconst hrmcngs = {\n';
         if (profile.name)   block += `  name:   "${profile.name}",\n`;
         if (profile.handle) block += `  handle: "${profile.handle.split('·')[0].trim()}",\n`;
         if (profile.birthday) {
-          const age = Math.floor((new Date() - new Date(profile.birthday)) / (365.25 * 24 * 3600 * 1000));
+          const age = ageFromBirthday(profile.birthday, now);
           block += `  age:    ${age},\n`;
         }
-        block += `  making: ["Minecraft1.20.1mod", "Web"],\n`;
+        block += `  making: ["Minecraft 1.20.1 Mod", "Web"],\n`;
         block += `  note:   "絡んでくる時はラフな感じでいいですよ",\n`;
         block += '};\n\n// log\n\nconst log = {\n';
         if (profile.birthday) {
@@ -837,12 +841,15 @@ siteContent
               parseInt(e.entered.slice(0,4)),
               parseInt(e.entered.slice(5,7)) - 1
             );
-            const dur = durations[e.key];
-            const graduatedDate = dur
-              ? new Date(enteredDate.getFullYear() + dur, enteredDate.getMonth())
+            const durationYears = Number(e.durationYears);
+            const graduatedDate = Number.isFinite(durationYears)
+              ? new Date(enteredDate.getFullYear() + durationYears, enteredDate.getMonth())
               : null;
-            const isGraduated = graduatedDate ? now >= graduatedDate : false;
-            const label = isGraduated ? 'entered' : 'enter';
+            const label = now < enteredDate
+              ? 'enters'
+              : graduatedDate && now >= graduatedDate
+                ? 'graduated'
+                : 'attending';
             const pad = ' '.repeat(maxLen - e.key.length + 2);
             block += `  ${e.key}:${pad}${ym}, // ${label}\n`;
           });

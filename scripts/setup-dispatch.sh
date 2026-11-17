@@ -15,20 +15,20 @@
 # 使い方:
 #   # 個別指定（bare 名は hrmcngs を補完、OWNER/NAME 形式で他 owner も指定可）
 #   PAT=ghp_xxxx ./scripts/setup-dispatch.sh \
-#     MC-Mod-Utility ShelfMod Drowse-Lab/The-four-primitives-and-Weapons
+#     MC-Mod-Utility ShelfMod The-four-primitives-and-Weapons
 #
-#   # デフォルト owner 群（hrmcngs + Drowse-Lab）の全リポを一括適用:
+#   # デフォルト owner（hrmcngs）の全リポを一括適用:
 #   PAT=ghp_xxxx ./scripts/setup-dispatch.sh --all
 #
 #   # owner を明示して全リポ:
-#   PAT=ghp_xxxx ./scripts/setup-dispatch.sh --all hrmcngs Drowse-Lab some-org
+#   PAT=ghp_xxxx ./scripts/setup-dispatch.sh --all hrmcngs some-org
 #
 # 既存の notify-charts.yml がある場合は上書き更新する。
 
 set -euo pipefail
 
 DEFAULT_OWNER="hrmcngs"
-DEFAULT_ALL_OWNERS=("hrmcngs" "Drowse-Lab")
+DEFAULT_ALL_OWNERS=("hrmcngs")
 CENTRAL="hrmcngs/hrmc.ngs.computer"
 
 # --force: 既に notify-charts.yml がある repo も上書き更新する

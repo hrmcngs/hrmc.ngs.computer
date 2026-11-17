@@ -15,7 +15,7 @@
  *    <script src="src/js/mc-items.js"></script>
  *    <script>
  *      const items = await McItems.fetchItems(
- *        'https://github.com/Drowse-Lab/The-four-primitives-and-Weapons'
+ *        'https://github.com/hrmcngs/The-four-primitives-and-Weapons'
  *      );
  *      // items = [{ id, namespace, ref, name, nameEn, nameJa,
  *      //            texture, model, sourcePath }, ...]

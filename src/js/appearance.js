@@ -3,18 +3,14 @@
   const root = document.documentElement;
   const key = 'hrmc-macos-appearance';
   const paletteKey = 'hrmc-macos-palette';
-  const defaultPalette = 'ghost';
-  const palettes = ['seasonal', 'classic', 'ghost', 'mono', 'ocean', 'rose', 'engraving'];
-  const paletteLabel = name => ({ seasonal: '季節（自動）', engraving: '線画' })[name] || name[0].toUpperCase() + name.slice(1);
+  const defaultPalette = 'mono';
+  const palettes = ['mono'];
+  const paletteLabel = () => 'Mono';
   const seasonLabels = { spring: '春', summer: '夏', autumn: '秋', winter: '冬' };
   const params = new URLSearchParams(location.search);
   const linkedPalette = palettes.includes(params.get('palette')) ? params.get('palette') : null;
   const linkedSeason = Object.hasOwn(seasonLabels, params.get('season')) ? params.get('season') : null;
   let palette = defaultPalette;
-  try {
-    const saved = localStorage.getItem(paletteKey);
-    if (palettes.includes(saved)) palette = saved;
-  } catch {}
   const modes = ['system', 'light', 'dark'];
   const linkedAppearance = modes.includes(params.get('appearance')) ? params.get('appearance') : null;
   const system = window.matchMedia('(prefers-color-scheme: dark)');
@@ -98,38 +94,17 @@
     if (paletteSelect) {
       const picker = document.createElement('details');
       picker.id = 'mac-palette-picker';
-      picker.innerHTML = `<summary aria-label="カラーテーマを選ぶ">
+      picker.innerHTML = `<summary aria-label="テーマを選ぶ">
         <span class="palette-swatch" aria-hidden="true"></span>
         <span class="palette-current"></span><span aria-hidden="true">⌄</span>
-      </summary><fieldset class="palette-panel"><legend>カラーテーマ</legend>
+      </summary><fieldset class="palette-panel"><legend>Theme</legend>
         <div class="palette-options">${palettes.map(name => `<label class="palette-option">
           <input type="radio" name="mac-palette-choice" value="${name}">
           <span class="palette-preview"><span class="palette-swatch" data-swatch="${name}" aria-hidden="true"></span>
           <span class="palette-name">${paletteLabel(name)}</span></span>
-        </label>`).join('')}</div>
-        <button type="button" class="appearance-share">この見た目のリンクをコピー</button>
-        <p class="appearance-share-status" role="status"></p>
-        <input class="appearance-share-url" aria-label="共有リンク（コピーしてください）" readonly hidden>
-      </fieldset>`;
+        </label>`).join('')}</div></fieldset>`;
       paletteSelect.before(picker);
       paletteSelect.hidden = true;
-      picker.querySelector('.appearance-share').addEventListener('click', async () => {
-        const status = picker.querySelector('.appearance-share-status');
-        const input = picker.querySelector('.appearance-share-url');
-        await window.theme?.ready;
-        const url = getShareURL();
-        try {
-          await navigator.clipboard.writeText(url);
-          input.hidden = true;
-          status.textContent = 'リンクをコピーしました';
-        } catch {
-          input.value = url;
-          input.hidden = false;
-          input.focus();
-          input.select();
-          status.textContent = 'リンクを選択してコピーしてください';
-        }
-      });
       picker.addEventListener('change', event => {
         if (!palettes.includes(event.target.value)) return;
         paletteSelect.value = event.target.value;
@@ -182,11 +157,35 @@
     const labels = { light: 'ライト（太陽）', dark: 'ダーク（月）', system: '自動（端末の設定に合わせる）' };
     modeButtons.innerHTML = ['light', 'dark', 'system'].map(mode => `<button type="button"
       data-appearance-mode="${mode}" aria-label="${labels[mode]}" title="${labels[mode]}" aria-pressed="false">
-      ${icons[mode]}
+      ${icons[mode]}<span class="appearance-mode-label">${mode[0].toUpperCase() + mode.slice(1)}</span>
     </button>`).join('');
     const appearancePicker = document.createElement('details');
     appearancePicker.id = 'mac-appearance-picker';
-    appearancePicker.innerHTML = `<summary><span class="appearance-current" aria-hidden="true"></span><span aria-hidden="true">⌄</span></summary>`;
+    appearancePicker.innerHTML = `<summary>
+      <svg class="projector-illustration" viewBox="0 0 180 150" aria-hidden="true">
+        <g class="projector-reel-svg projector-reel-svg-top">
+          <circle class="projector-metal" cx="116" cy="35" r="29"/>
+          <circle class="projector-hole" cx="116" cy="20" r="7"/><circle class="projector-hole" cx="131" cy="35" r="7"/>
+          <circle class="projector-hole" cx="116" cy="50" r="7"/><circle class="projector-hole" cx="101" cy="35" r="7"/>
+          <circle class="projector-hub" cx="116" cy="35" r="4"/>
+        </g>
+        <g class="projector-reel-svg projector-reel-svg-side">
+          <circle class="projector-metal" cx="145" cy="83" r="24"/>
+          <circle class="projector-hole" cx="145" cy="71" r="6"/><circle class="projector-hole" cx="157" cy="83" r="6"/>
+          <circle class="projector-hole" cx="145" cy="95" r="6"/><circle class="projector-hole" cx="133" cy="83" r="6"/>
+          <circle class="projector-hub" cx="145" cy="83" r="3.5"/>
+        </g>
+        <path class="projector-handle-svg" d="M67 59V48q0-6 6-6h18q6 0 6 6v11"/>
+        <rect class="projector-body-svg" x="54" y="56" width="79" height="55" rx="5"/>
+        <path class="projector-seam-svg" d="M67 57v53M72 87h25M72 93h31"/>
+        <circle class="projector-dial-svg" cx="78" cy="72" r="5"/><circle class="projector-dial-svg" cx="94" cy="72" r="4"/>
+        <path class="projector-lens-svg" d="M54 69H31v25h23M31 72H19v19h12"/>
+        <ellipse class="projector-glass-svg" cx="18" cy="81.5" rx="5" ry="11"/>
+        <path class="projector-mount-svg" d="M83 111v8h20v-8M87 119l-15 28M98 119l16 28M93 119v28"/>
+      </svg>
+      <span class="projector-projection" aria-hidden="true"></span>
+      <span class="appearance-current" aria-hidden="true"></span><span aria-hidden="true">⌄</span>
+    </summary>`;
     appearancePicker.append(modeButtons);
     select.before(appearancePicker);
     select.hidden = true;

@@ -19,34 +19,43 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nixie+One&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="src/css/style.css?v=2026-09-25-1">
-  <link rel="stylesheet" href="/src/css/appearance.css?v=2026-09-09-9">
-  <link rel="stylesheet" href="src/css/macos.css?v=2026-09-08-6">
-  <script src="src/js/appearance.js?v=2026-09-13-1"></script>
+  <link rel="stylesheet" href="src/css/style.css?v=2026-11-17-1">
+  <link rel="stylesheet" href="/src/css/appearance.css?v=2026-11-18-1">
+  <link rel="stylesheet" href="src/css/macos.css?v=2026-11-17-1">
+  <link rel="stylesheet" href="src/css/catalog.css?v=2026-11-18-32">
+  <script src="src/js/appearance.js?v=2026-11-18-2"></script>
   <script src="src/js/theme.js?v=2026-09-09-1"></script>
 </head>
-<body>
+<body class="catalog-home">
   <header class="mac-menu" aria-label="デスクトップメニュー">
-    <a class="mac-brand" href="#desktop">▧ <strong>hrmc</strong></a>
-    <nav aria-label="メニューバー"><a href="#about">About</a><a href="#photos">Photos</a><a href="#works">Works</a><a href="#future">Future</a><a href="#links">Links</a></nav>
-    <span class="mac-menu-caption">Personal desktop</span>
+    <a class="mac-brand" href="#desktop">hrmcngs</a>
     <div class="mac-appearance-controls">
-          <select id="mac-palette" aria-label="カラーテーマ">
-            <option value="seasonal">季節（自動）</option>
-            <option value="classic">Classic</option>
-            <option value="ghost">Ghost</option>
-            <option value="mono">Mono</option>
-            <option value="ocean">Ocean</option>
-            <option value="rose">Rose</option>
-            <option value="engraving">線画</option>
-          </select>
           <select id="mac-appearance" aria-label="表示モード">
-      <option value="system">自動</option>
-      <option value="light">ライト</option>
-      <option value="dark">ダーク</option>
-    </select>
+            <option value="system">System</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
         </div>
-    <time id="mac-clock"></time>
+    <details class="film-menu">
+      <summary aria-label="メニューを開く">
+        <span class="menu-reel" aria-hidden="true"><span class="roll-cylinder">
+          <span class="roll-face" style="--face:0"></span><span class="roll-face" style="--face:1"></span>
+          <span class="roll-face" style="--face:2"></span><span class="roll-face" style="--face:3"></span>
+          <span class="roll-face" style="--face:4"></span><span class="roll-face" style="--face:5"></span>
+          <span class="roll-face" style="--face:6"></span><span class="roll-face" style="--face:7"></span>
+          <span class="roll-face" style="--face:8"></span><span class="roll-face" style="--face:9"></span>
+          <span class="roll-face" style="--face:10"></span><span class="roll-face" style="--face:11"></span>
+        </span></span>
+        <span class="reel-label" lang="en">MENU</span>
+      </summary>
+      <div class="film-window"><div class="film-panel">
+        <p class="film-caption" aria-hidden="true">HRMCNGS / NAVIGATION</p>
+        <nav aria-label="メインメニュー">
+          <a href="/">Home</a><a href="/works/">Works</a>
+          <a href="/about/">About</a><a href="/photos/">Photos</a>
+        </nav>
+      </div></div>
+    </details>
   </header>
 
   <!-- ノイズオーバーレイ -->
@@ -63,33 +72,8 @@
     <div class="hero-content">
       <p class="hero-tag" id="hero-tag">// hrmc.ngs.computer</p>
       <h1 class="hero-title" id="hero-title">hrmcngs</h1>
-      <p class="hero-sub" id="hero-sub">Web・minecraft mod developer</p>
-      <a href="#terminal" class="scroll-btn">
-        <span>scroll</span>
-        <svg width="16" height="24" viewBox="0 0 16 24"><path d="M8 0v20M1 13l7 7 7-7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </a>
+      <p class="hero-sub" id="hero-sub">Web、ツール。興味を持ったものを、動く形にしています。</p>
     </div>
-
-    <aside class="access-watcher" id="access-watcher" aria-live="polite">
-      <button class="access-watcher-character" type="button" aria-label="目をつつく">
-        <img class="access-watcher-eye" src="image/access-eye.svg?v=2026-09-05-2" alt="">
-        <svg class="access-watcher-eye access-watcher-eye-closed" viewBox="0 0 84 60" aria-hidden="true">
-          <rect width="84" height="60" rx="18" fill="#fff"/>
-          <g transform="scale(3)" shape-rendering="crispEdges" fill="#111">
-            <path d="M2 10h3v1h4v1h10v-1h4v-1h3v1h-2v1h-4v1H8v-1H4v-1H2Z"/>
-            <path d="M5 12h1v2H5ZM9 13h1v2H9ZM14 13h1v3h-1ZM18 13h1v2h-1ZM22 12h1v2h-1Z"/>
-          </g>
-        </svg>
-      </button>
-      <div class="access-watcher-copy">
-        <span class="access-watcher-message">アクセス数として<br>あなたを見ているよ</span>
-        <span class="access-watcher-counts">
-          TOTAL <strong id="access-watcher-total">---</strong>
-          <i aria-hidden="true">/</i>
-          TODAY <strong id="access-watcher-today">---</strong>
-        </span>
-      </div>
-    </aside>
 
   </section>
 
@@ -123,7 +107,7 @@
     <div class="container">
       <h2 class="section-title"><span class="tag">03</span> Works</h2>
       <div class="works-grid" id="works-grid"></div>
-
+      <a class="works-more" href="/works/">すべての作品を見る →</a>
     </div>
   </section>
 
@@ -153,8 +137,6 @@
 <a class="link-card" href="https://instagram.com/0526ngs" target="_blank" rel="me noopener noreferrer">Instagram (sub)</a>
 <a class="link-card" href="https://pixiv.net/users/83520943" target="_blank" rel="me noopener noreferrer">Pixiv</a>
 <a class="link-card" href="https://bsky.app/profile/hrmcngs.bsky.social" target="_blank" rel="me noopener noreferrer">Bluesky</a>
-<a class="link-card" href="https://x.com/Drowse_Lab" target="_blank" rel="noopener noreferrer">Drowse Lab(Twitter)</a>
-<a class="link-card" href="https://instagram.com/drowse_lab/" target="_blank" rel="noopener noreferrer">Drowse Lab (Instagram)</a>
 <a class="link-card" href="https://buymeacoffee.com/hrmcngs" target="_blank" rel="me noopener noreferrer">Buy Me a Coffee</a>
 </div>
 <!-- /generated:social -->
@@ -192,10 +174,8 @@
     </div>
   </footer>
 
-  <script src="src/js/content.js?v=2026-09-25-1"></script>
-  <script src="src/js/index.js?v=2026-09-05-2"></script>
-  <script src="src/js/macos.js?v=2026-09-07-1"></script>
-  <script src="src/js/hero-weather.js?v=2026-09-05-3"></script>
-  <script src="src/js/access-count.js?v=2026-09-05-8"></script>
+  <script src="src/js/content.js?v=2026-11-18-6"></script>
+  <script src="src/js/index.js?v=2026-11-17-1"></script>
+  <script src="src/js/film-menu.js?v=2026-11-17-1"></script>
 </body>
 </html>

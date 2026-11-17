@@ -1,5 +1,5 @@
 async function fetchDirectoryContents(path) {
-    const repo = 'Drowse-Lab/The-four-primitives-and-Weapons';
+    const repo = 'hrmcngs/The-four-primitives-and-Weapons';
     const branch = 'main'; // ブランチ名の確認
     const apiUrl = `https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`;
 
