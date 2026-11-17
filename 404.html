@@ -1,51 +1,73 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" data-site-theme="macos">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/svg+xml" href="image/icon.svg">
-  <title>404 — /lost+found/</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/svg+xml" href="/image/icon.svg">
+  <title>404 — Page not found | hrmc.ngs.computer</title>
   <link rel="stylesheet" href="/src/css/style.css">
-  <link rel="stylesheet" href="/src/css/404-style.css">
+  <link rel="stylesheet" href="/src/css/appearance.css?v=2026-11-18-1">
+  <link rel="stylesheet" href="/src/css/macos.css?v=2026-11-17-1">
+  <link rel="stylesheet" href="/src/css/404-style.css?v=2026-11-18-3">
+  <link rel="stylesheet" href="/src/css/catalog.css?v=2026-11-18-32">
+  <script src="/src/js/appearance.js?v=2026-11-18-2"></script>
   <script src="/src/js/theme.js?v=2026-09-09-1"></script>
 </head>
-<body class="lf-body">
-
-  <div class="noise"></div>
-  <div class="lf-scanlines" aria-hidden="true"></div>
-  <div class="lf-vignette" aria-hidden="true"></div>
+<body class="catalog-home lf-body">
+  <header class="mac-menu">
+    <a class="mac-brand" href="/">hrmcngs</a>
+    <div class="mac-appearance-controls">
+      <select id="mac-appearance" aria-label="表示モード">
+        <option value="system">System</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+      </select>
+    </div>
+    <details class="film-menu">
+      <summary aria-label="メニューを開く">
+        <span class="menu-reel" aria-hidden="true"><span class="roll-cylinder">
+          <span class="roll-face" style="--face:0"></span><span class="roll-face" style="--face:1"></span>
+          <span class="roll-face" style="--face:2"></span><span class="roll-face" style="--face:3"></span>
+          <span class="roll-face" style="--face:4"></span><span class="roll-face" style="--face:5"></span>
+          <span class="roll-face" style="--face:6"></span><span class="roll-face" style="--face:7"></span>
+          <span class="roll-face" style="--face:8"></span><span class="roll-face" style="--face:9"></span>
+          <span class="roll-face" style="--face:10"></span><span class="roll-face" style="--face:11"></span>
+        </span></span>
+        <span class="reel-label">MENU</span>
+      </summary>
+      <div class="film-window"><div class="film-panel">
+        <p class="film-caption" aria-hidden="true">HRMCNGS / NAVIGATION</p>
+        <nav aria-label="メインメニュー">
+          <a href="/">Home</a><a href="/works/">Works</a><a href="/about/">About</a><a href="/photos/">Photos</a>
+        </nav>
+      </div></div>
+    </details>
+  </header>
 
   <main class="lf-page">
-    <div class="lf-container">
-
-      <div class="lf-header">
-        <h1 class="lf-code" data-text="Not Found">Not Found</h1>
-        <p class="lf-sub">/lost+found/</p>
+    <div class="lf-film-frame">
+      <div class="lf-frame-meta" aria-hidden="true">
+        <span>FRAME 404</span><span>LOST / FOUND</span><span>NO SIGNAL</span>
       </div>
+      <div class="lf-frame-content">
+        <div class="lf-copy">
+          <p class="lf-kicker">// HTTP 404</p>
+          <h1><span aria-hidden="true"># </span>Lost frame</h1>
+          <p class="lf-message"><span aria-hidden="true">&gt; </span>探しているページのフィルムが見つかりません。</p>
+          <p class="lf-path" aria-label="見つからなかったパス"></p>
+        </div>
 
-      <section class="lf-sign" aria-label="忘れ物センター 案内板">
-        <a class="lf-sign-board" href="/" aria-label="ホームへ戻る">
-          <span class="lf-sign-arrow" aria-hidden="true">←</span>
-          <img class="lf-sign-icon" src="/image/lost+found.svg" alt="">
-          <div class="lf-sign-text">
-            <p class="lf-sign-ja">忘れ物センター</p>
-            <p class="lf-sign-en">Lost &amp; Found</p>
-            <p class="lf-sign-hours">営業時間 8:00〜19:30</p>
-          </div>
+        <a class="lf-return" href="/">
+          <img src="/image/lost+found.svg" alt="">
+          <span><strong>忘れ物センター</strong><small>← Homeへ戻る</small></span>
         </a>
-      </section>
-
+      </div>
+      <p class="lf-frame-count" aria-hidden="true">00:04:04 / END OF REEL</p>
     </div>
   </main>
 
-  <script>
-        console.error("404 - Page Not Found");
-        console.log("わざわざ404ページでデバックモードするの暇すぎ、勉強したら？");
-  </script>
-  <script src="/src/js/404.js" defer></script>
-
+  <script src="/src/js/404.js?v=2026-11-18-2"></script>
+  <script src="/src/js/film-menu.js?v=2026-11-17-1"></script>
 </body>
 </html>
