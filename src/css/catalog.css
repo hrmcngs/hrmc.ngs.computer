@@ -1166,6 +1166,106 @@
   animation:projector-idle-reel 15s linear infinite reverse;
 }
 
+/* A compact film-counter display for live access numbers. */
+:root .catalog-home .hero .access-watcher{
+  position:absolute;
+  top:50%;
+  right:0;
+  bottom:auto;
+  z-index:4;
+  display:flex;
+  width:max-content;
+  max-width:100%;
+  align-items:center;
+  gap:0;
+  margin:0;
+  transform:translateY(-50%);
+  color:var(--text);
+  background:color-mix(in srgb,var(--text) 3%,var(--bg));
+  border:1px solid var(--border);
+  border-radius:4px;
+}
+
+:root .catalog-home .hero .access-watcher-status{
+  position:relative;
+  width:36px;
+  align-self:stretch;
+  flex:0 0 36px;
+  border-right:1px solid var(--border);
+}
+:root .catalog-home .hero .access-watcher-status::before{
+  content:"";
+  position:absolute;
+  top:13px;
+  left:14px;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 8px color-mix(in srgb,var(--accent) 46%,transparent);
+  animation:access-counter-pulse 2.6s steps(2,end) infinite;
+}
+:root .catalog-home .hero .access-watcher-status::after{
+  content:"REC";
+  position:absolute;
+  right:0;
+  bottom:7px;
+  left:0;
+  color:var(--catalog-muted);
+  font-size:6px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-align:center;
+}
+
+:root .catalog-home .hero .access-watcher-copy{
+  min-width:0;
+  padding:7px 11px 8px;
+  color:var(--text);
+  background:transparent;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  line-height:1.4;
+}
+
+:root .catalog-home .hero .access-watcher-copy::before{display:none}
+:root .catalog-home .hero .access-watcher-message{
+  color:var(--catalog-muted);
+  font-size:9px;
+  font-weight:600;
+  letter-spacing:.13em;
+}
+:root .catalog-home .hero .access-watcher-counts{
+  margin-top:3px;
+  color:var(--catalog-muted);
+  font-size:9px;
+  font-variant-numeric:tabular-nums;
+}
+:root .catalog-home .hero .access-watcher-counts strong{color:var(--text);font-size:11px}
+:root .catalog-home .hero .access-watcher-counts i{color:var(--border)}
+
+@keyframes access-counter-pulse{
+  0%,72%,100%{opacity:.45}
+  78%,94%{opacity:1}
+}
+
+@media(max-width:720px){
+  :root .catalog-home .hero .access-watcher{
+    position:relative;
+    top:auto;
+    right:auto;
+    transform:none;
+    margin-top:30px;
+  }
+  :root .catalog-home .hero .access-watcher{width:100%}
+  :root .catalog-home .hero .access-watcher-copy{flex:1}
+}
+
+@media(prefers-reduced-motion:reduce){
+  :root .catalog-home .hero .access-watcher-status::before{animation:none}
+}
+
 /* Home narrative: introduce, show the work, then end with the photo journal. */
 :root .catalog-home:not(.works-page):not(.photos-body):not(.about-body) #about{order:3}
 :root .catalog-home:not(.works-page):not(.photos-body):not(.about-body) #works{order:4;width:100%}
