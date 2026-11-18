@@ -338,8 +338,11 @@ async function getDownloadStats(url) {
   const fallback = generated?.[url];
   const current = newestDownloadStats(cached, fallback);
   if (current) {
-    // cfwidget で取得できずHTMLから生成した項目は、同じ404を繰り返さない。
-    if (fallback?.source === 'curseforge-html') return current;
+    // ビルド時に公式APIまたはHTMLから取得済みなら、ブラウザからcfwidgetへ
+    // 再問い合わせしない。未登録slugの404を閲覧のたびに発生させないため。
+    if (fallback?.source === 'curseforge-api' || fallback?.source === 'curseforge-html') {
+      return current;
+    }
     // 15秒以内のライブ取得値があれば即表示する。
     if (cached && Date.now() - cached.t < DL_CACHE_TTL) return current;
     // キャッシュが古い場合は最新値を待ち、開いている画面にも反映する。

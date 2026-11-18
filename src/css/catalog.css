@@ -293,13 +293,13 @@
   :root .catalog-home .mac-appearance-controls{
     grid-column:auto;
     grid-row:auto;
-    flex:0 0 120px;
-    width:120px;
-    margin:0;
+    flex:0 0 170px;
+    width:170px;
+    margin:0 0 0 66px;
   }
   :root .catalog-home #mac-appearance-picker,
   :root .catalog-home #mac-appearance-picker summary{width:120px;max-width:120px}
-  :root .catalog-home .film-menu{flex:0 0 118px;margin-left:0}
+  :root .catalog-home .film-menu{flex:0 0 118px;margin-left:auto}
   :root .catalog-home .hero::before{
     top:-36px;
     right:auto;
@@ -319,6 +319,19 @@
     transform:rotate(24deg);
     transform-origin:0 50%;
   }
+}
+@media(max-width:350px){
+  :root .catalog-home .mac-appearance-controls{
+    flex:0 0 100%;
+    width:100%;
+    margin:0;
+  }
+  :root .catalog-home #mac-appearance-picker{
+    margin-left:auto;
+    transform:scale(.76);
+    transform-origin:right center;
+  }
+  :root .catalog-home .film-menu{margin-left:auto}
 }
 @keyframes projection-breathe-mobile{from{transform:rotate(24deg) scaleY(.94);opacity:.32}to{transform:rotate(24deg) scaleY(1.04);opacity:.44}}
 @media(prefers-reduced-motion:reduce){:root .catalog-home .hero::before,:root .catalog-home .hero::after{animation:none!important}}
