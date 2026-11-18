@@ -66,11 +66,18 @@
     });
     const appearancePicker = document.getElementById('mac-appearance-picker');
     if (appearancePicker) {
+      const previousMode = appearancePicker.dataset.selectedMode;
       appearancePicker.dataset.selectedMode = preference;
       const selected = appearancePicker.querySelector(`[data-appearance-mode="${preference}"]`);
       appearancePicker.querySelector('.appearance-current').innerHTML =
         selected.innerHTML.replaceAll('appearance-', 'appearance-current-');
       appearancePicker.querySelector('summary').setAttribute('aria-label', `表示モード: ${selected.title}`);
+      if (previousMode && previousMode !== preference) {
+        appearancePicker.classList.remove('is-switching');
+        void appearancePicker.offsetWidth;
+        appearancePicker.classList.add('is-switching');
+        window.setTimeout(() => appearancePicker.classList.remove('is-switching'), 460);
+      }
     }
   }
   apply();
@@ -183,18 +190,32 @@
         <ellipse class="projector-glass-svg" cx="18" cy="81.5" rx="5" ry="11"/>
         <path class="projector-mount-svg" d="M83 111v8h20v-8M87 119l-15 28M98 119l16 28M93 119v28"/>
       </svg>
-      <span class="projector-projection" aria-hidden="true"></span>
+      <span class="projector-projection" aria-hidden="true"><span class="projector-image-noise"></span></span>
+      <span class="projector-beam-noise" aria-hidden="true"></span>
       <span class="appearance-current" aria-hidden="true"></span><span aria-hidden="true">⌄</span>
     </summary>`;
     appearancePicker.append(modeButtons);
     select.before(appearancePicker);
     select.hidden = true;
+    const updateProjectorReelSpeed = () => {
+      requestAnimationFrame(() => {
+        appearancePicker.querySelectorAll('.projector-reel-svg').forEach(reel => {
+          reel.getAnimations().forEach(animation => {
+            if (animation.animationName === 'projector-idle-reel') {
+              animation.updatePlaybackRate(appearancePicker.open ? 10 : 1);
+            }
+          });
+        });
+      });
+    };
+    appearancePicker.addEventListener('toggle', updateProjectorReelSpeed);
     modeButtons.addEventListener('click', event => {
       const button = event.target.closest('[data-appearance-mode]');
       if (!button) return;
       select.value = button.dataset.appearanceMode;
       select.dispatchEvent(new Event('change'));
       appearancePicker.open = false;
+      updateProjectorReelSpeed();
       appearancePicker.querySelector('summary').focus();
     });
     appearancePicker.addEventListener('keydown', event => {

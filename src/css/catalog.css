@@ -973,8 +973,8 @@
 :root .catalog-home .projector-projection{
   position:absolute;
   z-index:-1;
-  left:-67px;
-  top:57px;
+  left:-66px;
+  top:61px;
   display:grid;
   width:42px;
   height:42px;
@@ -1044,6 +1044,126 @@
   :root .catalog-home .projector-reel-svg,
   :root .catalog-home .projector-projection,
   :root .catalog-home #mac-appearance-picker::after{animation:none!important}
+}
+
+/* Dust and scratches carried by the projected film. */
+:root .catalog-home .projector-beam-noise{
+  position:absolute;
+  z-index:-1;
+  top:59px;
+  right:calc(100% - 20px);
+  width:84px;
+  height:46px;
+  background:
+    radial-gradient(circle at 12% 26%,currentColor 0 1px,transparent 1.4px),
+    radial-gradient(circle at 37% 72%,currentColor 0 .7px,transparent 1.2px),
+    radial-gradient(circle at 63% 31%,currentColor 0 .8px,transparent 1.3px),
+    radial-gradient(circle at 82% 64%,currentColor 0 .6px,transparent 1.1px),
+    repeating-linear-gradient(88deg,transparent 0 24px,currentColor 25px,transparent 26px 43px);
+  color:color-mix(in srgb,var(--projection-color) 36%,transparent);
+  clip-path:polygon(100% 42%,0 0,0 100%,100% 58%);
+  opacity:.28;
+  pointer-events:none;
+  animation:projector-beam-grain 1.3s steps(4,end) infinite;
+}
+
+:root .catalog-home .projector-image-noise{
+  position:absolute;
+  inset:2px;
+  z-index:2;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 18% 22%,currentColor 0 .8px,transparent 1.3px),
+    radial-gradient(circle at 68% 35%,currentColor 0 .7px,transparent 1.2px),
+    radial-gradient(circle at 42% 78%,currentColor 0 .8px,transparent 1.3px),
+    repeating-linear-gradient(91deg,transparent 0 13px,currentColor 14px,transparent 15px 27px);
+  color:color-mix(in srgb,var(--bg) 56%,transparent);
+  mix-blend-mode:soft-light;
+  opacity:.46;
+  pointer-events:none;
+  animation:projector-image-grain .9s steps(3,end) infinite;
+}
+
+@keyframes projector-beam-grain{
+  0%{background-position:0 0,0 0,0 0,0 0,0 0;opacity:.22}
+  45%{background-position:7px 3px,-5px 6px,4px -3px,-7px 2px,3px 0;opacity:.34}
+  100%{background-position:-4px 6px,6px -2px,-3px 5px,5px -4px,-2px 0;opacity:.26}
+}
+
+@keyframes projector-image-grain{
+  0%{background-position:0 0,0 0,0 0,0 0}
+  50%{background-position:4px -3px,-3px 5px,5px 2px,2px 0}
+  100%{background-position:-3px 4px,5px -2px,-4px -3px,-2px 0}
+}
+
+@media(prefers-reduced-motion:reduce){
+  :root .catalog-home .projector-beam-noise,
+  :root .catalog-home .projector-image-noise{animation:none!important}
+}
+
+/* Mechanical motion and interaction feedback. */
+:root .catalog-home .projector-glass-svg{
+  transform-box:fill-box;
+  transform-origin:center;
+  animation:projector-lens-focus 4.8s ease-in-out infinite;
+}
+
+:root .catalog-home #mac-appearance-picker.is-switching .projector-projection{
+  animation:projector-change-frame .46s steps(5,end) both;
+}
+
+:root .catalog-home #mac-appearance-picker.is-switching::after{
+  animation:projector-change-flash .46s steps(5,end) both;
+}
+
+:root .catalog-home .film-menu:not([open]):not(.is-rewinding) .roll-cylinder{
+  animation:menu-film-idle 18s linear infinite;
+}
+
+:root .catalog-home .work-icon,
+:root .catalog-home .work-dl{transition:transform .24s ease,color .24s ease}
+:root .catalog-home .work-card:hover .work-icon,
+:root .catalog-home .work-card:focus-visible .work-icon{transform:translateY(-3px) rotate(-2deg) scale(1.04)}
+:root .catalog-home .work-card:hover .work-dl,
+:root .catalog-home .work-card:focus-visible .work-dl{transform:translateX(3px);color:var(--text)}
+
+@keyframes projector-lens-focus{
+  0%,100%{opacity:.76;transform:scaleX(1)}
+  48%{opacity:1;transform:scaleX(1.08)}
+  52%{opacity:.9;transform:scaleX(.97)}
+}
+
+@keyframes projector-change-frame{
+  0%{opacity:.72;transform:translate(0,0) scale(1)}
+  18%{opacity:.12;transform:translate(-3px,1px) scaleY(.88)}
+  38%{opacity:1;transform:translate(2px,-1px) scale(1.12)}
+  62%{opacity:.38;transform:translate(-1px,1px) scale(.96)}
+  100%{opacity:.7;transform:translate(0,0) scale(1)}
+}
+
+@keyframes projector-change-flash{
+  0%,100%{opacity:.66;filter:none}
+  28%{opacity:1;filter:brightness(1.9)}
+  58%{opacity:.42;filter:brightness(.85)}
+}
+
+@keyframes menu-film-idle{to{transform:rotateX(360deg)}}
+
+@media(prefers-reduced-motion:reduce){
+  :root .catalog-home .projector-glass-svg,
+  :root .catalog-home #mac-appearance-picker.is-switching .projector-projection,
+  :root .catalog-home #mac-appearance-picker.is-switching::after,
+  :root .catalog-home .film-menu .roll-cylinder{animation:none!important}
+  :root .catalog-home .work-icon,
+  :root .catalog-home .work-dl{transition:none!important}
+}
+
+/* Keep the reel angle continuous; JavaScript changes playback speed only. */
+:root .catalog-home #mac-appearance-picker[open] .projector-reel-svg-top{
+  animation:projector-idle-reel 18s linear infinite;
+}
+:root .catalog-home #mac-appearance-picker[open] .projector-reel-svg-side{
+  animation:projector-idle-reel 15s linear infinite reverse;
 }
 
 /* Home narrative: introduce, show the work, then end with the photo journal. */

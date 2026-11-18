@@ -210,3 +210,21 @@
   .lf-return{width:100%}
   .lf-frame-count{margin-top:34px;text-align:left}
 }
+
+.lf-film-frame{animation:lf-frame-load .72s cubic-bezier(.16,1,.3,1) both}
+.lf-frame-meta,.lf-frame-content,.lf-frame-count{animation:lf-frame-content .52s ease .18s both}
+
+@keyframes lf-frame-load{
+  from{opacity:0;transform:translateY(18px) scaleY(.94);filter:blur(5px)}
+  62%{opacity:1;transform:translateY(-2px) scaleY(1.01);filter:blur(0)}
+  to{opacity:1;transform:none;filter:none}
+}
+
+@keyframes lf-frame-content{
+  from{opacity:0;transform:translateX(-8px)}
+  to{opacity:1;transform:none}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .lf-film-frame,.lf-frame-meta,.lf-frame-content,.lf-frame-count{animation:none!important}
+}
