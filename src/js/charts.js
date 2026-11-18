@@ -24,7 +24,14 @@
   const fmt = (n) => Number(n || 0).toLocaleString('en-US');
 
   // テーマ色（SVG に直接埋め込む。単体 .svg でも成立させるため）
-  const COL = { bg: '#161b22', grid: '#30363d', text: '#e6edf3', muted: '#7d8590' };
+  // CSS変数を使うと、埋め込み先のライト/ダークや独自テーマへ即座に追従する。
+  // fallbackを持たせているため、生成SVGを単体で開いた場合は従来色になる。
+  const COL = {
+    bg: 'var(--ghs-bg, #161b22)',
+    grid: 'var(--ghs-border, #30363d)',
+    text: 'var(--ghs-text, #e6edf3)',
+    muted: 'var(--ghs-muted, #7d8590)',
+  };
 
   // GitHub Linguist の言語カラー（未知の言語は灰色）
   const LANG_COLORS = {
@@ -50,8 +57,12 @@
   }
 
   // hex 色 → rgba（透明度つき。濃淡表現に使う）
-  function rgba(hex, alpha) {
-    let h = String(hex || '#7c6af7').replace('#', '');
+  function rgba(color, alpha) {
+    const raw = String(color || '#7c6af7').trim();
+    if (!/^#[0-9a-f]{3,8}$/i.test(raw)) {
+      return `color-mix(in srgb, ${raw} ${Math.round(alpha * 100)}%, transparent)`;
+    }
+    let h = raw.replace('#', '');
     if (h.length === 3) h = h.split('').map((x) => x + x).join('');
     const r = parseInt(h.slice(0, 2), 16) || 0;
     const g = parseInt(h.slice(2, 4), 16) || 0;
@@ -84,7 +95,7 @@
   // ── 横棒グラフ ───────────────────────────────────────
   function hbar(items, o) {
     o = o || {};
-    const accent = o.accent || '#7c6af7';
+    const accent = o.accent || 'var(--ghs-accent, #7c6af7)';
     const scale = o.scale || 'linear';
     const max = o.max || Math.max.apply(null, items.map((d) => d.value).concat(1));
     const W = 460, rowH = 30, padY = 14, labelW = 124, valW = 74;
@@ -96,7 +107,7 @@
       const c = d.color || accent;
       const w = Math.max(norm(d.value, max, scale) * trackW, 3);
       body += `<text x="${labelW - 12}" y="${cy + 4}" text-anchor="end" font-size="12" fill="${COL.text}">${esc(d.label)}</text>`
-        + `<rect x="${trackX}" y="${cy - 6}" width="${trackW}" height="12" rx="6" fill="rgba(255,255,255,0.06)"/>`
+        + `<rect x="${trackX}" y="${cy - 6}" width="${trackW}" height="12" rx="6" fill="color-mix(in srgb, var(--ghs-text, #e6edf3) 6%, transparent)"/>`
         + `<rect x="${trackX}" y="${cy - 6}" width="${w.toFixed(1)}" height="12" rx="6" fill="${c}"><title>${esc(d.label)}: ${esc(disp(d))}</title></rect>`
         + `<text x="${W - valW + 10}" y="${cy + 4}" font-size="11" font-family="monospace" fill="${COL.muted}">${esc(disp(d))}</text>`;
     });
@@ -106,7 +117,7 @@
   // ── 縦棒グラフ ───────────────────────────────────────
   function bar(items, o) {
     o = o || {};
-    const accent = o.accent || '#7c6af7';
+    const accent = o.accent || 'var(--ghs-accent, #7c6af7)';
     const scale = o.scale || 'linear';
     const max = o.max || Math.max.apply(null, items.map((d) => d.value).concat(1));
     const W = 460, H = 290, padT = 34, padB = 48, padX = 18;
@@ -128,7 +139,7 @@
   // ── 面グラフ ─────────────────────────────────────────
   function area(items, o) {
     o = o || {};
-    const accent = o.accent || '#7c6af7';
+    const accent = o.accent || 'var(--ghs-accent, #7c6af7)';
     const scale = o.scale || 'linear';
     const max = o.max || Math.max.apply(null, items.map((d) => d.value).concat(1));
     const W = 460, H = 290, padT = 26, padB = 44, padX = 34;
@@ -154,7 +165,7 @@
   // ── 円（ドーナツ）グラフ ─────────────────────────────
   function pie(items, o) {
     o = o || {};
-    const accent = o.accent || '#7c6af7';
+    const accent = o.accent || 'var(--ghs-accent, #7c6af7)';
     const total = items.reduce((a, d) => a + Math.max(d.value || 0, 0), 0) || 1;
     const W = 460, H = 290, cx = 132, cy = H / 2, rOut = 104, rIn = 56;
     const sliceColor = (d, i) => d.color
@@ -187,7 +198,7 @@
   // ── レーダーチャート（多軸） ─────────────────────────
   function radar(items, o) {
     o = o || {};
-    const accent = o.accent || '#7c6af7';
+    const accent = o.accent || 'var(--ghs-accent, #7c6af7)';
     const scale = o.scale || 'log';
     const N = items.length;
     const W = 460, H = 420, CX = 230, CY = 215, R = 130, RINGS = 5;

@@ -89,7 +89,7 @@
 .ghs-cal-legend{display:flex;align-items:center;gap:.28rem;margin-top:.7rem;font-size:.66rem;color:var(--ghs-muted)}
 .ghs-cal-ltext{margin:0 .2rem}
 .ghs-cal-lcell{width:11px;height:11px;border-radius:2.2px;display:inline-block}
-.ghs-lv0{background:rgba(255,255,255,.045);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+.ghs-lv0{background:color-mix(in srgb,var(--ghs-text) 4.5%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ghs-text) 14%,transparent)}
 .ghs-lv1{background:var(--ghs-grass);opacity:.32}
 .ghs-lv2{background:var(--ghs-grass);opacity:.55}
 .ghs-lv3{background:var(--ghs-grass);opacity:.78}
@@ -262,7 +262,7 @@
       const y = TOP + (i % 7) * STEP;
       const lv = c.level || 0;
       const attr = lv === 0
-        ? 'fill="rgba(255,255,255,0.045)" stroke="rgba(255,255,255,0.14)"'
+        ? 'fill="color-mix(in srgb,var(--ghs-text) 4.5%,transparent)" stroke="color-mix(in srgb,var(--ghs-text) 14%,transparent)"'
         : `style="fill:var(--ghs-grass);fill-opacity:${FILL_OP[lv]}"`;
       rects += `<rect x="${x}" y="${y}" width="${CELL}" height="${CELL}" rx="2.2" ${attr}>`
         + `<title>${esc(c.date)} ・ ${c.count} contributions</title></rect>`;
@@ -322,7 +322,7 @@
 
     // Activity チャート（種類: data-activity-chart / 色: data-activity-color）
     const actType = (root.dataset.activityChart || 'radar').toLowerCase();
-    const actColor = root.dataset.activityColor || root.dataset.accent || '#7c6af7';
+    const actColor = root.dataset.activityColor || root.dataset.accent || 'var(--ghs-accent, #7c6af7)';
     const actItems = [
       { label: 'Commit', value: m.commits || 0 },
       { label: 'PullReq', value: m.prs || 0 },
@@ -376,7 +376,7 @@
 
     const langFn = charts[langType] || charts.hbar;
     const langsHtml = langItems.length
-      ? langFn(langItems, { scale: 'linear', accent: langOverride || '#7c6af7' })
+      ? langFn(langItems, { scale: 'linear', accent: langOverride || 'var(--ghs-accent, #7c6af7)' })
       : '<p class="ghs-msg">言語データがありません。</p>';
 
     // Contributions（種類: data-contrib-chart = default | grid | bars3d）

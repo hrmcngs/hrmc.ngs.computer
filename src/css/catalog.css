@@ -982,6 +982,35 @@
 :root .catalog-home.about-body .about-page::before,
 :root .catalog-home.about-body .about-page::after{display:none}
 
+/* GitHub Activity inherits the same canvas, ink, rules, and accent as the site. */
+:root .catalog-home.about-body .ghs{
+  --ghs-bg:var(--bg);
+  --ghs-border:var(--border);
+  --ghs-text:var(--text);
+  --ghs-muted:var(--catalog-muted);
+  --ghs-accent:var(--accent);
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  grid-template-areas:
+    "head head"
+    "activity languages"
+    "calendar calendar"
+    "foot foot";
+  gap:0 32px;
+}
+:root .catalog-home.about-body .ghs-head{grid-area:head}
+:root .catalog-home.about-body .ghs>.ghs-chart{grid-area:activity}
+:root .catalog-home.about-body .ghs-cal{grid-area:calendar}
+:root .catalog-home.about-body .ghs-langs{grid-area:languages}
+:root .catalog-home.about-body .ghs-foot{grid-area:foot}
+:root .catalog-home.about-body .ghs-chart{margin-bottom:1.25rem}
+:root .catalog-home.about-body .ghs-chart svg{max-width:360px}
+:root .catalog-home.about-body .ghs-cal{margin-bottom:1.4rem}
+@media(max-width:720px){
+  :root .catalog-home.about-body .ghs{display:block}
+  :root .catalog-home.about-body .ghs-chart svg{max-width:400px}
+}
+
 /* The projector shows the selected appearance on the illuminated wall. */
 :root .catalog-home .projector-projection{
   position:absolute;
