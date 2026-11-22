@@ -1,8 +1,8 @@
 {
-  "generated": "2026-11-21T19:48:24.450Z",
+  "generated": "2026-11-22T00:07:49.461Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
-      "count": 77,
+      "count": 78,
       "source": "curseforge-api",
       "projectId": 1492629
     },
@@ -12,12 +12,12 @@
       "projectId": 1544555
     },
     "https://curseforge.com/minecraft/mc-mods/the-four-primitives-and-weapons": {
-      "count": 6687,
+      "count": 6690,
       "source": "curseforge-api",
       "projectId": 961882
     },
     "https://curseforge.com/minecraft/mc-mods/extra-video-settings": {
-      "count": 1499,
+      "count": 1501,
       "source": "curseforge-api",
       "projectId": 1474041
     },
@@ -39,7 +39,7 @@
       "projectId": 1564519
     },
     "https://curseforge.com/minecraft/mc-mods/gun-and-weapons": {
-      "count": 1620,
+      "count": 1622,
       "source": "curseforge-api",
       "projectId": 1620729
     }
