@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-23T01:44:23.525Z",
+  "generated": "2026-11-23T09:51:14.832Z",
   "entries": {
     "https://curseforge.com/minecraft/data-packs/rpg-ish-hp-display-datapack": {
       "count": 78,
@@ -28,7 +28,7 @@
       "source": "vscode-marketplace"
     },
     "https://marketplace.visualstudio.com/items?itemName=hrmcngs.toritsu-ai": {
-      "count": 756,
+      "count": 758,
       "installs": 8,
       "icon": "https://hrmcngs.gallerycdn.vsassets.io/extensions/hrmcngs/toritsu-ai/0.12.19/1791900190973/Microsoft.VisualStudio.Services.Icons.Default",
       "source": "vscode-marketplace"
