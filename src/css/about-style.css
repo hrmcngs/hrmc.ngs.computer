@@ -554,4 +554,87 @@
     :root[data-appearance="light"] .about-body .hljs-comment,
     :root[data-appearance="light"] .about-body .hljs-quote { color: #595248; }
 
+    /* Profile dates may have inline seasonal colors; use paper-safe ink in light mode. */
+    :root[data-appearance="light"] .about-body .info-birthday { color: #51473a; }
+    :root[data-appearance="light"] .about-body .info-birthday strong { color: #3d352c; }
+    :root[data-appearance="light"] .about-body .edu-date {
+      font-weight: 650;
+      opacity: 1;
+    }
+    :root[data-appearance="light"] .about-body .edu-label { color: #4b4135; }
+    :root[data-appearance="light"] .about-body .edu-timeline::before {
+      background: #9d896b;
+      opacity: .72;
+    }
+    :root[data-appearance="light"] .about-body .edu-item::before {
+      background: var(--bg);
+      opacity: 1;
+    }
+
+    /* Education history as a compact Git commit graph. */
+    .about-body .edu-timeline {
+      --git-rail: #79a8dc;
+      gap: 3px;
+      padding-left: 2rem;
+    }
+    .about-body .edu-timeline::before {
+      left: .38rem;
+      top: 1.35rem;
+      bottom: 1.35rem;
+      width: 2px;
+      background: var(--git-rail);
+      opacity: 1;
+    }
+    .about-body .edu-item {
+      min-height: 3.2rem;
+      padding: .65rem .75rem;
+      border: 1px solid transparent;
+      border-radius: 6px;
+    }
+    .about-body .edu-item::before {
+      z-index: 2;
+      left: -1.98rem;
+      width: 10px;
+      height: 10px;
+      background: var(--bg);
+      border: 3px solid var(--git-rail);
+      opacity: 1;
+    }
+    .about-body .edu-item:last-child {
+      background: color-mix(in srgb, var(--git-rail) 9%, transparent);
+      border-color: color-mix(in srgb, var(--git-rail) 42%, transparent);
+    }
+    .about-body .edu-item:last-child::before {
+      width: 14px;
+      height: 14px;
+      left: -2.1rem;
+      background: var(--git-rail);
+      border: 3px solid var(--bg);
+      box-shadow: 0 0 0 2px var(--git-rail);
+    }
+    :root[data-appearance="light"] .about-body .edu-timeline { --git-rail: #315f87; }
+    :root[data-appearance="light"] .about-body .edu-item:nth-child(1) { --commit-color: #176077; }
+    :root[data-appearance="light"] .about-body .edu-item:nth-child(2) { --commit-color: #6b5500; }
+    :root[data-appearance="light"] .about-body .edu-item:nth-child(3) { --commit-color: #74436f; }
+    :root[data-appearance="light"] .about-body .edu-item:nth-child(4) { --commit-color: #78276f; }
+    :root[data-appearance="light"] .about-body .edu-item .edu-date {
+      color: var(--commit-color) !important;
+      background: none !important;
+      -webkit-background-clip: initial !important;
+      background-clip: initial !important;
+      -webkit-text-fill-color: currentColor !important;
+    }
+    :root[data-appearance="light"] .about-body .edu-item::before {
+      border-color: var(--commit-color);
+    }
+    :root[data-appearance="light"] .about-body .edu-item:last-child::before {
+      background: var(--commit-color);
+      box-shadow: 0 0 0 2px var(--commit-color);
+    }
+    :root[data-appearance="light"] .about-body .edu-item:last-child {
+      background: color-mix(in srgb, var(--commit-color) 8%, transparent);
+      border-color: color-mix(in srgb, var(--commit-color) 38%, transparent);
+    }
+    :root[data-appearance="dark"] .about-body .edu-timeline { --git-rail: #79a8dc; }
+
     .about-body .code-wrap::after { content: none; }

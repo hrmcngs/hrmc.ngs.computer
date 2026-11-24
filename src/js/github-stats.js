@@ -82,6 +82,9 @@
 .ghs-chart-anim.ghs-in{opacity:1;transform:translateY(0)}
 .ghs-sub{font-size:.78rem;font-weight:600;
  color:var(--ghs-muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:1rem}
+.ghs-cal-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.35rem .8rem;min-height:1.4rem}
+.ghs-cal-value{color:var(--ghs-text);font-family:ui-monospace,monospace;font-size:.72rem;
+ letter-spacing:0;text-align:right;text-transform:none;white-space:nowrap}
 .ghs-cal{margin-bottom:2.4rem}
 .ghs-cal-scroll{overflow-x:auto;padding-bottom:.2rem}
 .ghs-cal-svg{display:block;width:100%;height:auto}
@@ -101,7 +104,8 @@
 .ghs-tooltip{position:fixed;z-index:1000;display:none;max-width:min(260px,calc(100vw - 24px));
  padding:.42rem .62rem;border:1px solid var(--ghs-border);border-radius:4px;
  color:var(--ghs-bg);background:var(--ghs-text);box-shadow:0 5px 16px #0003;
- font-size:.72rem;font-weight:650;line-height:1.35;white-space:nowrap;pointer-events:none}
+ font-size:.72rem;font-weight:650;line-height:1.35;white-space:nowrap;pointer-events:none;
+ transition:left 70ms ease-out,top 70ms ease-out}
 `;
     document.head.appendChild(s);
   }
@@ -407,7 +411,7 @@
     }
     const calHtml = data.contrib ? `
       <div class="ghs-cal">
-        <p class="ghs-sub">Contributions ・ 過去1年 ${fmt(data.contrib.total)}</p>
+        <p class="ghs-sub ghs-cal-head"><span>Contributions ・ 過去1年 ${fmt(data.contrib.total)}</span><output class="ghs-cal-value" aria-live="polite">—</output></p>
         ${contribInner}
       </div>` : '';
 
@@ -429,42 +433,96 @@
       <p class="ghs-foot">${esc(data.period || '')} · GitHub API${data.orgs && data.orgs.length ? ' · ' + esc(data.orgs.join(', ')) + ' 含む' : ''} · 6時間ごとに更新</p>
     `;
 
+    // The custom tooltip replaces SVG's delayed native title inside the widget.
+    root.querySelectorAll('[data-ghs-tooltip] > title').forEach((title) => title.remove());
+
     const tooltip = document.createElement('div');
     tooltip.className = 'ghs-tooltip';
     tooltip.setAttribute('role', 'status');
     tooltip.setAttribute('aria-live', 'polite');
     root.appendChild(tooltip);
+    const calendarValue = root.querySelector('.ghs-cal-value');
     let tooltipPinned = false;
-    const showTooltip = (target, clientX, clientY) => {
+    let tooltipHideTimer = 0;
+    let tooltipTarget = null;
+    const cancelTooltipHide = () => {
+      if (!tooltipHideTimer) return;
+      window.clearTimeout(tooltipHideTimer);
+      tooltipHideTimer = 0;
+    };
+    const scheduleTooltipHide = () => {
+      if (tooltipPinned) return;
+      cancelTooltipHide();
+      tooltipHideTimer = window.setTimeout(() => {
+        tooltip.style.display = 'none';
+        tooltipTarget = null;
+        tooltipHideTimer = 0;
+      }, 120);
+    };
+    const hideTooltipNow = () => {
+      if (tooltipPinned) return;
+      cancelTooltipHide();
+      tooltip.style.display = 'none';
+      tooltipTarget = null;
+    };
+    const showTooltip = (target) => {
+      cancelTooltipHide();
+      if (target === tooltipTarget && tooltip.style.display === 'block') return;
+      tooltipTarget = target;
       tooltip.textContent = target.dataset.ghsTooltip;
       tooltip.style.display = 'block';
       const gap = 12;
+      const targetBox = target.getBoundingClientRect();
       const maxX = window.innerWidth - tooltip.offsetWidth - gap;
       const maxY = window.innerHeight - tooltip.offsetHeight - gap;
-      tooltip.style.left = `${Math.max(gap, Math.min(clientX + gap, maxX))}px`;
-      tooltip.style.top = `${Math.max(gap, Math.min(clientY + gap, maxY))}px`;
+      const centeredX = targetBox.left + targetBox.width / 2 - tooltip.offsetWidth / 2;
+      const aboveY = targetBox.top - tooltip.offsetHeight - 8;
+      const placedY = aboveY >= gap ? aboveY : targetBox.bottom + 8;
+      tooltip.style.left = `${Math.max(gap, Math.min(centeredX, maxX))}px`;
+      tooltip.style.top = `${Math.max(gap, Math.min(placedY, maxY))}px`;
+    };
+    const showCalendarValue = (target) => {
+      cancelTooltipHide();
+      tooltip.style.display = 'none';
+      tooltipTarget = target;
+      if (calendarValue) calendarValue.textContent = target.dataset.ghsTooltip;
+    };
+    const clearCalendarValue = () => {
+      if (calendarValue) calendarValue.textContent = '—';
     };
     root.addEventListener('pointermove', (event) => {
       if (tooltipPinned) return;
       const target = event.target.closest?.('[data-ghs-tooltip]');
       if (!target || !root.contains(target)) {
-        tooltip.style.display = 'none';
+        if (event.target.closest?.('.ghs-cal-svg')) return;
+        clearCalendarValue();
+        hideTooltipNow();
         return;
       }
-      showTooltip(target, event.clientX, event.clientY);
+      if (target.closest('.ghs-cal-svg')) {
+        showCalendarValue(target);
+        return;
+      }
+      clearCalendarValue();
+      showTooltip(target);
     });
     root.addEventListener('pointerleave', () => {
-      if (!tooltipPinned) tooltip.style.display = 'none';
+      if (!tooltipPinned) clearCalendarValue();
+      hideTooltipNow();
     });
     root.addEventListener('click', (event) => {
       const target = event.target.closest?.('[data-ghs-tooltip]');
       if (!target || !root.contains(target)) {
         tooltipPinned = false;
+        cancelTooltipHide();
         tooltip.style.display = 'none';
+        tooltipTarget = null;
+        clearCalendarValue();
         return;
       }
       tooltipPinned = true;
-      showTooltip(target, event.clientX, event.clientY);
+      if (target.closest('.ghs-cal-svg')) showCalendarValue(target);
+      else showTooltip(target);
     });
     root._ghsTooltipAbort?.abort();
     const tooltipAbort = new AbortController();
@@ -472,7 +530,10 @@
     document.addEventListener('click', (event) => {
       if (root.contains(event.target)) return;
       tooltipPinned = false;
+      cancelTooltipHide();
       tooltip.style.display = 'none';
+      tooltipTarget = null;
+      clearCalendarValue();
     }, { signal: tooltipAbort.signal });
 
     animate(root);
