@@ -85,6 +85,8 @@
 .ghs-cal{margin-bottom:2.4rem}
 .ghs-cal-scroll{overflow-x:auto;padding-bottom:.2rem}
 .ghs-cal-svg{display:block;width:100%;height:auto}
+.ghs-cal-svg [data-ghs-tooltip]{cursor:pointer}
+.ghs-cal-svg [data-ghs-tooltip]:focus{outline:none;stroke:var(--ghs-accent);stroke-width:2px}
 .ghs-cal-mlabel,.ghs-cal-dlabel{fill:var(--ghs-muted);font-size:9px;font-family:'Space Grotesk',sans-serif}
 .ghs-cal-legend{display:flex;align-items:center;gap:.28rem;margin-top:.7rem;font-size:.66rem;color:var(--ghs-muted)}
 .ghs-cal-ltext{margin:0 .2rem}
@@ -96,6 +98,10 @@
 .ghs-lv4{background:var(--ghs-grass)}
 .ghs-foot{margin-top:1.7rem;font-size:.7rem;color:var(--ghs-muted);opacity:.6}
 .ghs-msg{color:var(--ghs-muted);font-size:.85rem;padding:1.2rem 0}
+.ghs-tooltip{position:fixed;z-index:1000;display:none;max-width:min(260px,calc(100vw - 24px));
+ padding:.42rem .62rem;border:1px solid var(--ghs-border);border-radius:4px;
+ color:var(--ghs-bg);background:var(--ghs-text);box-shadow:0 5px 16px #0003;
+ font-size:.72rem;font-weight:650;line-height:1.35;white-space:nowrap;pointer-events:none}
 `;
     document.head.appendChild(s);
   }
@@ -264,7 +270,9 @@
       const attr = lv === 0
         ? 'fill="color-mix(in srgb,var(--ghs-text) 4.5%,transparent)" stroke="color-mix(in srgb,var(--ghs-text) 14%,transparent)"'
         : `style="fill:var(--ghs-grass);fill-opacity:${FILL_OP[lv]}"`;
-      rects += `<rect x="${x}" y="${y}" width="${CELL}" height="${CELL}" rx="2.2" ${attr}>`
+      const tip = `${esc(c.date)} ・ ${c.count} contributions`;
+      rects += `<rect x="${x}" y="${y}" width="${CELL}" height="${CELL}" rx="2.2" ${attr} `
+        + `aria-label="${tip}" data-ghs-tooltip="${tip}">`
         + `<title>${esc(c.date)} ・ ${c.count} contributions</title></rect>`;
     });
 
@@ -420,6 +428,52 @@
       </div>
       <p class="ghs-foot">${esc(data.period || '')} · GitHub API${data.orgs && data.orgs.length ? ' · ' + esc(data.orgs.join(', ')) + ' 含む' : ''} · 6時間ごとに更新</p>
     `;
+
+    const tooltip = document.createElement('div');
+    tooltip.className = 'ghs-tooltip';
+    tooltip.setAttribute('role', 'status');
+    tooltip.setAttribute('aria-live', 'polite');
+    root.appendChild(tooltip);
+    let tooltipPinned = false;
+    const showTooltip = (target, clientX, clientY) => {
+      tooltip.textContent = target.dataset.ghsTooltip;
+      tooltip.style.display = 'block';
+      const gap = 12;
+      const maxX = window.innerWidth - tooltip.offsetWidth - gap;
+      const maxY = window.innerHeight - tooltip.offsetHeight - gap;
+      tooltip.style.left = `${Math.max(gap, Math.min(clientX + gap, maxX))}px`;
+      tooltip.style.top = `${Math.max(gap, Math.min(clientY + gap, maxY))}px`;
+    };
+    root.addEventListener('pointermove', (event) => {
+      if (tooltipPinned) return;
+      const target = event.target.closest?.('[data-ghs-tooltip]');
+      if (!target || !root.contains(target)) {
+        tooltip.style.display = 'none';
+        return;
+      }
+      showTooltip(target, event.clientX, event.clientY);
+    });
+    root.addEventListener('pointerleave', () => {
+      if (!tooltipPinned) tooltip.style.display = 'none';
+    });
+    root.addEventListener('click', (event) => {
+      const target = event.target.closest?.('[data-ghs-tooltip]');
+      if (!target || !root.contains(target)) {
+        tooltipPinned = false;
+        tooltip.style.display = 'none';
+        return;
+      }
+      tooltipPinned = true;
+      showTooltip(target, event.clientX, event.clientY);
+    });
+    root._ghsTooltipAbort?.abort();
+    const tooltipAbort = new AbortController();
+    root._ghsTooltipAbort = tooltipAbort;
+    document.addEventListener('click', (event) => {
+      if (root.contains(event.target)) return;
+      tooltipPinned = false;
+      tooltip.style.display = 'none';
+    }, { signal: tooltipAbort.signal });
 
     animate(root);
   }

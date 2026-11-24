@@ -1,3 +1,5 @@
+// powered by https://github.com/hrmcngs/github-stats-charts
+
 /**
  * charts.js — SVG チャート描画ライブラリ（依存なし・自己完結）
  * --------------------------------------------------------------------------
@@ -23,14 +25,13 @@
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const fmt = (n) => Number(n || 0).toLocaleString('en-US');
 
-  // テーマ色（SVG に直接埋め込む。単体 .svg でも成立させるため）
-  // CSS変数を使うと、埋め込み先のライト/ダークや独自テーマへ即座に追従する。
-  // fallbackを持たせているため、生成SVGを単体で開いた場合は従来色になる。
+  // 埋め込み先の配色へ追従する。fallback により単体 SVG としても読める。
   const COL = {
     bg: 'var(--ghs-bg, #161b22)',
     grid: 'var(--ghs-border, #30363d)',
     text: 'var(--ghs-text, #e6edf3)',
     muted: 'var(--ghs-muted, #7d8590)',
+    track: 'color-mix(in srgb, var(--ghs-text, #e6edf3) 6%, transparent)',
   };
 
   // GitHub Linguist の言語カラー（未知の言語は灰色）
@@ -107,8 +108,8 @@
       const c = d.color || accent;
       const w = Math.max(norm(d.value, max, scale) * trackW, 3);
       body += `<text x="${labelW - 12}" y="${cy + 4}" text-anchor="end" font-size="12" fill="${COL.text}">${esc(d.label)}</text>`
-        + `<rect x="${trackX}" y="${cy - 6}" width="${trackW}" height="12" rx="6" fill="color-mix(in srgb, var(--ghs-text, #e6edf3) 6%, transparent)"/>`
-        + `<rect x="${trackX}" y="${cy - 6}" width="${w.toFixed(1)}" height="12" rx="6" fill="${c}"><title>${esc(d.label)}: ${esc(disp(d))}</title></rect>`
+        + `<rect x="${trackX}" y="${cy - 6}" width="${trackW}" height="12" rx="6" fill="${COL.track}"/>`
+        + `<rect x="${trackX}" y="${cy - 6}" width="${w.toFixed(1)}" height="12" rx="6" fill="${c}" data-ghs-tooltip="${esc(d.label)}: ${esc(disp(d))}"><title>${esc(d.label)}: ${esc(disp(d))}</title></rect>`
         + `<text x="${W - valW + 10}" y="${cy + 4}" font-size="11" font-family="monospace" fill="${COL.muted}">${esc(disp(d))}</text>`;
     });
     return svg(W, H, body);
@@ -129,7 +130,7 @@
       const cx = padX + slot * i + slot / 2;
       const bh = Math.max(norm(d.value, max, scale) * plotH, 3);
       const y = padT + plotH - bh;
-      body += `<rect x="${(cx - bw / 2).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="3" fill="${d.color || accent}"><title>${esc(d.label)}: ${esc(disp(d))}</title></rect>`
+      body += `<rect x="${(cx - bw / 2).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="3" fill="${d.color || accent}" data-ghs-tooltip="${esc(d.label)}: ${esc(disp(d))}"><title>${esc(d.label)}: ${esc(disp(d))}</title></rect>`
         + `<text x="${cx.toFixed(1)}" y="${(y - 7).toFixed(1)}" text-anchor="middle" font-size="11" font-family="monospace" fill="${COL.text}">${esc(disp(d))}</text>`
         + `<text x="${cx.toFixed(1)}" y="${H - padB + 19}" text-anchor="middle" font-size="11" fill="${COL.muted}">${esc(d.label)}</text>`;
     });
@@ -151,7 +152,9 @@
     items.forEach((d, i) => {
       const x = xAt(i), y = yAt(d.value);
       line += `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`;
-      dots += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.6" fill="${accent}" stroke="${COL.bg}" stroke-width="1.5"><title>${esc(d.label)}: ${esc(disp(d))}</title></circle>`;
+      const tip = `${esc(d.label)}: ${esc(disp(d))}`;
+      dots += `<g><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.6" fill="${accent}" stroke="${COL.bg}" stroke-width="1.5"/>`
+        + `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="12" fill="transparent" pointer-events="all" data-ghs-tooltip="${tip}"><title>${tip}</title></circle></g>`;
       labels += `<text x="${x.toFixed(1)}" y="${H - padB + 19}" text-anchor="middle" font-size="11" fill="${COL.muted}">${esc(d.label)}</text>`;
     });
     const fill = `M${xAt(0).toFixed(1)} ${baseY} ${line.replace(/^M/, 'L')} L${xAt(n - 1).toFixed(1)} ${baseY} Z`;
@@ -178,7 +181,7 @@
       const a2 = ang + frac * Math.PI * 2;
       const big = frac > 0.5 ? 1 : 0;
       slices += `<path d="M${arcP(rOut, ang)} A${rOut} ${rOut} 0 ${big} 1 ${arcP(rOut, a2)} `
-        + `L${arcP(rIn, a2)} A${rIn} ${rIn} 0 ${big} 0 ${arcP(rIn, ang)} Z" fill="${sliceColor(d, i)}">`
+        + `L${arcP(rIn, a2)} A${rIn} ${rIn} 0 ${big} 0 ${arcP(rIn, ang)} Z" fill="${sliceColor(d, i)}" data-ghs-tooltip="${esc(d.label)}: ${esc(disp(d))} (${Math.round(frac * 100)}%)">`
         + `<title>${esc(d.label)}: ${esc(disp(d))} (${Math.round(frac * 100)}%)</title></path>`;
       ang = a2;
     });
@@ -237,21 +240,19 @@
     items.forEach((d, i) => {
       const [x, y] = pt(i, toR(d.value || 0));
       dpts.push(`${x},${y}`);
-      dots += `<circle cx="${x}" cy="${y}" r="3.4" fill="${accent}" stroke="${COL.bg}" stroke-width="1.5"><title>${esc(d.label)}: ${esc(disp(d))}</title></circle>`;
+      const tip = `${esc(d.label)}: ${esc(disp(d))}`;
+      dots += `<g><circle cx="${x}" cy="${y}" r="3.4" fill="${accent}" stroke="${COL.bg}" stroke-width="1.5"/>`
+        + `<circle cx="${x}" cy="${y}" r="14" fill="transparent" pointer-events="all" data-ghs-tooltip="${tip}"><title>${tip}</title></circle></g>`;
     });
     const data = `<polygon points="${dpts.join(' ')}" fill="${rgba(accent, 0.38)}" stroke="${accent}" stroke-width="2.5" stroke-linejoin="round"/>${dots}`;
     return svg(W, H, rings + axes + scaleLabels + labels + data);
   }
 
-  // ── 季節・天気で bars3d の色を決める（色だけ・粒子アニメは無し） ──
-  // season: spring|summer|autumn|winter / weather: rain|snow|clear
-  function seasonWeatherColor(season, weather) {
+  // ── 天気で bars3d の色を上書きする（雨/雪のときだけ）──
+  // 季節の上書きはしない：呼び出し側の月別アクセント（新緑・紅葉・冬空…）に任せる。
+  function weatherColor(weather) {
     if (weather === 'rain') return '#5a9bd4';   // 雨 — 青
     if (weather === 'snow') return '#9fc6e8';   // 雪 — 氷青
-    if (season === 'spring') return '#ec9bb5';  // 春 — 桜ピンク
-    if (season === 'summer') return '#3fb950';  // 夏 — 緑
-    if (season === 'autumn') return '#e0813a';  // 秋 — 紅葉オレンジ
-    if (season === 'winter') return '#6f9fd8';  // 冬 — 冬空の青
     return null;
   }
 
@@ -259,8 +260,9 @@
   // days: [{ date, count, level }] / 棒の高さ＝コミット数・色の濃淡＝level
   function bars3d(days, o) {
     o = o || {};
-    // 季節・天気が指定されていればその色を、なければ accent を使う
-    const accent = seasonWeatherColor(o.season, o.weather) || o.accent || '#39d353';
+    // 雨/雪なら天気色で上書き、それ以外は呼び出し側の月別アクセントを使う
+    const accent = weatherColor(o.weather) || o.accent || '#39d353';
+    const isRain = o.weather === 'rain';
     if (!days || !days.length) return svg(240, 90, '');
 
     // 先頭を日曜に合わせてパディングし、7日ごとの週（列）に並べる
@@ -281,19 +283,31 @@
     const barH = (c) => 3 + (Math.log10((c || 0) + 1) / (Math.log10(maxCount + 1) || 1)) * MAXBAR;
 
     // level（0-4）で色の濃淡を、面ごとに明るさを変えて立体感を出す
-    const accRGB = hexRGB(accent);
-    const DARK = [30, 30, 38];
-    const LV_F = [0.12, 0.45, 0.66, 0.85, 1];
+    // 雨の日は脱彩・暗め・面の明暗差を弱めてジメジメした空気感に
+    let accRGB = hexRGB(accent);
+    if (isRain) accRGB = mix(accRGB, [110, 125, 140], 0.22);
+    const DARK = isRain ? [22, 24, 30] : [30, 30, 38];
+    const LV_F = isRain
+      ? [0.10, 0.38, 0.56, 0.72, 0.86]
+      : [0.12, 0.45, 0.66, 0.85, 1];
+    const rightT = isRain ? 0.78 : 0.7;
+    const leftT  = isRain ? 0.58 : 0.48;
     const faces = (lv) => {
       const lit = mix(DARK, accRGB, LV_F[lv] != null ? LV_F[lv] : 1);
       return {
         top: rgbOf(lit),
-        right: rgbOf(mix([0, 0, 0], lit, 0.7)),
-        left: rgbOf(mix([0, 0, 0], lit, 0.48)),
+        right: rgbOf(mix([0, 0, 0], lit, rightT)),
+        left: rgbOf(mix([0, 0, 0], lit, leftT)),
       };
     };
 
-    let body = '';
+    // 雨のときは上に薄い霧のグラデを後で重ねる
+    let body = isRain
+      ? '<defs><linearGradient id="mist" x1="0" y1="0" x2="0" y2="1">'
+        + '<stop offset="0" stop-color="rgb(190,205,220)" stop-opacity="0.20"/>'
+        + '<stop offset="1" stop-color="rgb(190,205,220)" stop-opacity="0"/>'
+        + '</linearGradient></defs>'
+      : '';
     // 奥→手前（depth = c + r 昇順）の順に描画して前後関係を正しく
     const maxDepth = (weeks - 1) + 6;
     for (let depth = 0; depth <= maxDepth; depth++) {
@@ -308,10 +322,11 @@
         const u = (p) => `${p.x.toFixed(1)},${(p.y - h).toFixed(1)}`;
         body += `<polygon points="${u(D)} ${u(Cc)} ${g(Cc)} ${g(D)}" fill="${f.left}"/>`
           + `<polygon points="${u(B)} ${u(Cc)} ${g(Cc)} ${g(B)}" fill="${f.right}"/>`
-          + `<polygon points="${u(A)} ${u(B)} ${u(Cc)} ${u(D)}" fill="${f.top}">`
+          + `<polygon points="${u(A)} ${u(B)} ${u(Cc)} ${u(D)}" fill="${f.top}"${cell ? ` data-ghs-tooltip="${esc(cell.date)} ・ ${cell.count} contributions"` : ''}>`
           + `<title>${cell ? esc(cell.date) + ' ・ ' + cell.count + ' contributions' : ''}</title></polygon>`;
       }
     }
+    if (isRain) body += `<rect x="0" y="0" width="${W}" height="${H}" fill="url(#mist)" pointer-events="none"/>`;
     return svg(W, H, body);
   }
 

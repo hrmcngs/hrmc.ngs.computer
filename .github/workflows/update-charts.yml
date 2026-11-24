@@ -1,23 +1,15 @@
 name: Update chart SVGs
 
+# powered by https://github.com/hrmcngs/github-stats-charts
+#
 # GitHub統計チャートを SVG として生成し charts/ に出力する。
 # .md にはこの SVG を画像として埋め込む（Markdown は JS が動かないため）。
 # 内容に変化があったときだけコミットする。
-#
-# トリガー設計（C案：ハイブリッド）:
-#   - 主要リポからの repository_dispatch (user-commit) → 即時実行
-#   - schedule (15分ごと) → DL数は毎回確認し、GitHubチャートは
-#     hrmcngs の新しいpushがある場合だけ再生成
-#   - push (このリポ自身の main) / workflow_dispatch も従来通り
 
 on:
-  push:
-    branches: [main]
-  repository_dispatch:
-    types: [user-commit]
   schedule:
-    - cron: '*/15 * * * *'
-  workflow_dispatch:
+    - cron: '0 */12 * * *'   # 12時間ごと
+  workflow_dispatch:          # 手動実行（Actions タブから）
 
 permissions:
   contents: write
@@ -29,105 +21,28 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    outputs:
-      charts_changed: ${{ steps.commit.outputs.changed }}
-      charts_commit: ${{ steps.commit.outputs.sha }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0    # git log で前回 commit 時刻を引くため
-
-      - name: Check whether charts need updating
-        id: check
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # schedule 以外（push / dispatch / 手動）は常に実行
-          if [ "${{ github.event_name }}" != "schedule" ]; then
-            echo "trigger=${{ github.event_name }} — proceeding"
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          # 前回 charts/ への commit 時刻
-          LAST="$(git log -1 --format=%aI -- charts/ 2>/dev/null || echo '')"
-          [ -z "$LAST" ] && LAST="1970-01-01T00:00:00Z"
-          echo "last chart commit: $LAST"
-
-          # hrmcngs の直近 PushEvent の時刻（public events、最大100件）
-          LATEST="$(gh api 'users/hrmcngs/events?per_page=100' \
-            --jq '[.[] | select(.type=="PushEvent")][0].created_at // empty')"
-          echo "latest push event: ${LATEST:-(none)}"
-
-          if [ -z "$LATEST" ] || [ "$LATEST" \< "$LAST" ] || [ "$LATEST" = "$LAST" ]; then
-            echo "no new activity since last chart commit — skipping"
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "new activity detected — proceeding"
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Update download counts
-        run: node scripts/gen-downloads.js
-        env:
-          CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
-
-      - name: Install SBCL for star aggregation
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y sbcl
-
-      - name: Update star counts
-        run: node scripts/gen-stars.js
-
       - name: Generate chart SVGs
-        if: steps.check.outputs.skip != 'true'
         run: node scripts/gen-charts.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate usage counter
-        if: steps.check.outputs.skip != 'true'
-        run: node scripts/gen-usage.js
-        env:
-          # USAGE_TOKEN（repo スコープの PAT）が設定されていれば cross-repo
-          # の /search/code が叩ける。未設定なら GITHUB_TOKEN にフォールバック
-          # するが、その場合 search は 429 で失敗し forks/Used by のみで集計。
-          USAGE_TOKEN: ${{ secrets.USAGE_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Commit charts if changed
-        id: commit
         run: |
           git add charts
           if git diff --cached --quiet; then
             echo "チャートに変化なし — コミットしません。"
-            echo "changed=false" >> "$GITHUB_OUTPUT"
           else
-            # このサイト自身のチャート更新は、サイト所有者のコミットとして記録する。
-            git config user.name  "Hiromichi Nagase"
-            git config user.email "78349683+hrmcngs@users.noreply.github.com"
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git commit -m "chore: update chart SVGs [skip ci]"
             git push
-            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
-          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-
-  # charts/ が更新されたら Pages を再デプロイする。
-  # bot の push では push トリガーが発火しないため、ここから明示的に呼ぶ。
-  deploy:
-    needs: update
-    if: needs.update.outputs.charts_changed == 'true' || github.event_name == 'workflow_dispatch'
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    uses: ./.github/workflows/deploy-pages.yml
-    with:
-      source_ref: ${{ needs.update.outputs.charts_commit }}

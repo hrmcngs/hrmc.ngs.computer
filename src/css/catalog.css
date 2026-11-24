@@ -1,7 +1,7 @@
 /* Editorial portfolio based on the restrained Ctrl-N layout. */
 :root .catalog-home,:root .catalog-home *,:root .catalog-home *::before,:root .catalog-home *::after{box-sizing:border-box}
 :root{background:var(--mac-bg)}
-:root .catalog-home{--bg:var(--mac-bg);--surface:var(--mac-window);--text:var(--mac-text);--text-muted:var(--mac-muted);--catalog-muted:var(--mac-muted);--border:var(--mac-border);--accent:var(--mac-accent);--accent2:var(--mac-accent2);background-color:var(--mac-bg)!important;background-image:none!important}
+:root .catalog-home{--bg:var(--mac-bg);--surface:var(--mac-window);--text:var(--mac-text);--text-muted:var(--mac-muted);--catalog-muted:var(--mac-muted);--border:var(--mac-border);--accent:var(--mac-accent);--accent2:var(--mac-accent2);background-color:var(--mac-bg)!important;background-image:var(--site-image,none)!important;background-attachment:fixed;background-size:auto}
 :root[data-appearance="light"] .catalog-home{--projection-color:color-mix(in srgb,var(--projection-accent,var(--mac-accent)) 48%,#000 52%)}
 :root[data-appearance="dark"] .catalog-home{--projection-color:color-mix(in srgb,var(--projection-accent,var(--mac-accent)) 48%,#fff 52%)}
 :root .catalog-home{width:calc(100% - 40px);max-width:920px;min-width:0!important;height:auto!important;min-height:100dvh;margin:0 auto;padding:0 0 40px;overflow-x:hidden;overflow-y:auto!important;color:var(--text);background:var(--bg);font-size:16px}

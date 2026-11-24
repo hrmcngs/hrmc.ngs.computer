@@ -1,5 +1,7 @@
 'use strict';
 
+// powered by https://github.com/hrmcngs/github-stats-charts
+
 /**
  * gen-charts.js — GitHub統計チャートを SVG ファイルとして生成する
  * --------------------------------------------------------------------------
@@ -30,30 +32,61 @@ const CONFIG = {
   periodDays: 365,          // 集計期間（日数）
   outDir: 'charts',         // SVG の出力先ディレクトリ
 
-  // 生成するチャート。type / color を変えると見た目が変わる。
+  // ── 月別カラー ─────────────────────────────────────────────
+  // チャートのアクセント色は実行時の「月」に応じて自動で切り替わる。
+  // 季節を意識した四季カラー（例: 5月＝新緑グリーン、3月＝桃色）はここで上書き。
+  // 指定しなかった月は DEFAULT_MONTHLY_COLORS から被らない既定色を使う。
+  // チャート個別に color を指定するとそちらが最優先。
+  monthlyColors: {
+    // 1:  '#3b6cb0',   // 睦月（1月）
+    // 2:  '#c97aa1',   // 如月（2月）
+    // 3:  '#f4a6a6',   // 弥生（3月）— 桃の節句
+    // 4:  '#f1c66b',   // 卯月（4月）— 春
+    // 5:  '#7fbf3f',   // 皐月（5月）— 新緑
+    // 6:  '#5fa9c8',   // 水無月（6月）— 紫陽花
+    // 7:  '#2bb8a3',   // 文月（7月）— 海
+    // 8:  '#e07b3a',   // 葉月（8月）— 夏
+    // 9:  '#b86fb0',   // 長月（9月）— 葡萄
+    // 10: '#d35c3a',   // 神無月（10月）— 紅葉
+    // 11: '#8c5a3a',   // 霜月（11月）— 落ち葉
+    // 12: '#6b8fb0',   // 師走（12月）— 冬
+  },
+
+  // 生成するチャート。color を指定すると月別カラーより優先される。
   //   activity      : type = radar | pie | bar | hbar | area
   //   languages     : type = hbar | pie | bar | area
   //                   （exclude / pin / other で Other 集約を調整可）
   //   contributions : type = bars3d
   charts: [
-    // 見本用（全種類）— SAMPLE.md で使用
-    { file: 'activity-radar.svg', section: 'activity',  type: 'radar', color: '#2f81f7' },
-    { file: 'activity-pie.svg',   section: 'activity',  type: 'pie',   color: '#2f81f7' },
-    { file: 'activity-bar.svg',   section: 'activity',  type: 'bar',   color: '#2f81f7' },
-    { file: 'activity-hbar.svg',  section: 'activity',  type: 'hbar',  color: '#2f81f7' },
-    { file: 'activity-area.svg',  section: 'activity',  type: 'area',  color: '#2f81f7' },
-    { file: 'languages-hbar.svg', section: 'languages', type: 'hbar',  other: 1 },
-    { file: 'languages-pie.svg',  section: 'languages', type: 'pie',   other: 1 },
-    { file: 'languages-bar.svg',  section: 'languages', type: 'bar',   other: 1 },
-    { file: 'languages-area.svg', section: 'languages', type: 'area',  other: 1 },
-    // 既定（README 等で使う推奨セット）
-    { file: 'activity.svg',      section: 'activity',      type: 'radar',  color: '#2f81f7' },
+    { file: 'activity.svg',      section: 'activity',      type: 'radar'  },
     { file: 'languages.svg',     section: 'languages',     type: 'hbar',   other: 1,
       pin: ['Common Lisp', 'NewLisp'], exclude: ['YAML', 'JSON'] },
-    { file: 'contributions.svg', section: 'contributions', type: 'bars3d', color: '#39d353' },
+    { file: 'contributions.svg', section: 'contributions', type: 'bars3d' },
   ],
 };
 // ============================== 設定ここまで ==============================
+
+// 月別カラーが未指定のときに使う既定色（1月→12月）。各月で被らないよう調整済み。
+const DEFAULT_MONTHLY_COLORS = [
+  '#3b6cb0', // 1月 — 冬の濃紺
+  '#c97aa1', // 2月 — 寒椿のピンク
+  '#f4a6a6', // 3月 — 桃の節句
+  '#f1c66b', // 4月 — 春の山吹
+  '#7fbf3f', // 5月 — 新緑
+  '#5fa9c8', // 6月 — 紫陽花
+  '#2bb8a3', // 7月 — 海のターコイズ
+  '#e07b3a', // 8月 — 真夏の橙
+  '#b86fb0', // 9月 — 葡萄
+  '#d35c3a', // 10月 — 紅葉
+  '#8c5a3a', // 11月 — 落ち葉
+  '#6b8fb0', // 12月 — 冬空
+];
+
+// 実行月の代表色を返す（CONFIG.monthlyColors が優先、無ければ既定色）。
+function monthlyAccent(date) {
+  const m = (date || new Date()).getMonth() + 1; // 1..12
+  return (CONFIG.monthlyColors && CONFIG.monthlyColors[m]) || DEFAULT_MONTHLY_COLORS[m - 1];
+}
 
 const API = 'https://api.github.com';
 const UA = 'hrmc.ngs.computer chart generator';
@@ -257,21 +290,24 @@ async function main() {
   const outDir = path.join(__dirname, '..', CONFIG.outDir);
   fs.mkdirSync(outDir, { recursive: true });
 
+  const accent = monthlyAccent();
+  console.log(`  今月(${new Date().getMonth() + 1}月)のアクセント色: ${accent}`);
+
   let count = 0;
   for (const ch of CONFIG.charts) {
     let svg = '';
     try {
       if (ch.section === 'activity') {
         const fn = GHSCharts[ch.type] || GHSCharts.radar;
-        svg = fn(activityItems(data.metrics), { scale: 'log', accent: ch.color || '#7c6af7' });
+        svg = fn(activityItems(data.metrics), { scale: 'log', accent: ch.color || accent });
       } else if (ch.section === 'languages') {
         const fn = GHSCharts[ch.type] || GHSCharts.hbar;
         const items = languageItems(data.langs, ch);
-        svg = items.length ? fn(items, { scale: 'linear', accent: ch.color || '#7c6af7' }) : '';
+        svg = items.length ? fn(items, { scale: 'linear', accent: ch.color || accent }) : '';
       } else if (ch.section === 'contributions') {
         if (!data.contrib) { console.warn(`  スキップ ${ch.file}: contribution データなし`); continue; }
         svg = GHSCharts.bars3d(data.contrib.days, {
-          accent: ch.color || '#39d353', season: data.season, weather: data.weather,
+          accent: ch.color || accent, season: data.season, weather: data.weather,
         });
       } else {
         console.warn(`  スキップ ${ch.file}: 未知の section "${ch.section}"`);

@@ -84,6 +84,11 @@
   --mac-titlebar: linear-gradient(#e8dcc9, #c9b596);
   --mac-wall-base: linear-gradient(145deg, #c7b394, #e1d3bd);
   --mac-desktop-text: #302a22;
+  --site-image:
+    radial-gradient(ellipse at 12% 8%, rgba(92, 61, 28, .11), transparent 30%),
+    radial-gradient(ellipse at 88% 82%, rgba(111, 76, 35, .08), transparent 34%),
+    radial-gradient(circle at 52% 42%, rgba(255, 247, 224, .16), transparent 42%),
+    repeating-linear-gradient(7deg, rgba(76, 53, 28, .022) 0 1px, transparent 1px 5px);
 }
 
 :root[data-mac-palette="mono"][data-appearance="dark"] {
@@ -102,6 +107,7 @@
   --mac-titlebar: linear-gradient(#2d2b29, #393633);
   --mac-wall-base: linear-gradient(145deg, #201f1d, #34312e);
   --mac-desktop-text: #f1eee8;
+  --site-image: none;
 }
 
 :root[data-mac-palette="ocean"] {
