@@ -534,4 +534,24 @@
       box-shadow: none;
     }
 
+    /* Dark syntax colors become too pale on the paper-colored light theme. */
+    :root[data-appearance="light"] .about-body .code-wrap .hljs {
+      color: #302a22;
+    }
+    :root[data-appearance="light"] .about-body .hljs-keyword,
+    :root[data-appearance="light"] .about-body .hljs-literal,
+    :root[data-appearance="light"] .about-body .hljs-selector-tag { color: #812f2b; }
+    :root[data-appearance="light"] .about-body .hljs-attr,
+    :root[data-appearance="light"] .about-body .hljs-attribute,
+    :root[data-appearance="light"] .about-body .hljs-property { color: #214f68; }
+    :root[data-appearance="light"] .about-body .hljs-string,
+    :root[data-appearance="light"] .about-body .hljs-title,
+    :root[data-appearance="light"] .about-body .hljs-name,
+    :root[data-appearance="light"] .about-body .hljs-type { color: #485c21; }
+    :root[data-appearance="light"] .about-body .hljs-number,
+    :root[data-appearance="light"] .about-body .hljs-symbol,
+    :root[data-appearance="light"] .about-body .hljs-variable { color: #653b72; }
+    :root[data-appearance="light"] .about-body .hljs-comment,
+    :root[data-appearance="light"] .about-body .hljs-quote { color: #595248; }
+
     .about-body .code-wrap::after { content: none; }
