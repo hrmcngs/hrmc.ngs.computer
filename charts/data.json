@@ -4,9 +4,9 @@
   "avatar": "https://avatars.githubusercontent.com/u/78349683?v=4",
   "htmlUrl": "https://github.com/hrmcngs",
   "metrics": {
-    "commits": 2522,
+    "commits": 2535,
     "prs": 279,
-    "issues": 25,
+    "issues": 24,
     "reviews": 1,
     "involved": 284,
     "repos": 27
@@ -14,7 +14,7 @@
   "langs": [
     [
       "Java",
-      6661681
+      6661824
     ],
     [
       "JavaScript",
@@ -26,7 +26,7 @@
     ],
     [
       "JSON",
-      781457
+      781537
     ],
     [
       "Swift",
@@ -50,7 +50,7 @@
     ],
     [
       "HTML",
-      174413
+      174503
     ],
     [
       "Python",
@@ -103,41 +103,6 @@
   ],
   "contrib": {
     "days": [
-      {
-        "date": "2025-11-16",
-        "count": 2,
-        "level": 1
-      },
-      {
-        "date": "2025-11-17",
-        "count": 1,
-        "level": 1
-      },
-      {
-        "date": "2025-11-18",
-        "count": 0,
-        "level": 0
-      },
-      {
-        "date": "2025-11-19",
-        "count": 0,
-        "level": 0
-      },
-      {
-        "date": "2025-11-20",
-        "count": 2,
-        "level": 1
-      },
-      {
-        "date": "2025-11-21",
-        "count": 4,
-        "level": 1
-      },
-      {
-        "date": "2025-11-22",
-        "count": 0,
-        "level": 0
-      },
       {
         "date": "2025-11-23",
         "count": 1,
@@ -1950,13 +1915,33 @@
       },
       {
         "date": "2026-11-20",
+        "count": 7,
+        "level": 1
+      },
+      {
+        "date": "2026-11-21",
+        "count": 5,
+        "level": 1
+      },
+      {
+        "date": "2026-11-22",
+        "count": 4,
+        "level": 1
+      },
+      {
+        "date": "2026-11-23",
         "count": 3,
+        "level": 1
+      },
+      {
+        "date": "2026-11-24",
+        "count": 1,
         "level": 1
       }
     ],
-    "total": 4768
+    "total": 4776
   },
   "season": "autumn",
   "weather": "clear",
-  "generatedAt": "2026-11-20T08:00:51.403Z"
+  "generatedAt": "2026-11-24T03:56:07.862Z"
 }
