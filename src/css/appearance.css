@@ -69,21 +69,21 @@
 #mac-palette { max-width: 100px; }
 
 :root[data-mac-palette="mono"] {
-  --mac-bg: #f6f4f0;
-  --mac-bg2: #ece9e3;
-  --mac-text: #343230;
-  --mac-muted: #76716b;
-  --mac-border: #d7d1c8;
-  --mac-window: #fbfaf7;
-  --mac-bar: #e7e3dc;
+  --mac-bg: #dfd0b9;
+  --mac-bg2: #d3c1a7;
+  --mac-text: #302a22;
+  --mac-muted: #695c4c;
+  --mac-border: #a99272;
+  --mac-window: #e8dcc9;
+  --mac-bar: #c9b596;
   --mac-accent: #77716a;
   --mac-accent2: #8d867e;
-  --mac-wall-warm: #ded9d1;
-  --mac-wall-cool: #f0ede8;
-  --mac-glass: #ece9e3f2;
-  --mac-titlebar: linear-gradient(#fbfaf7, #e7e3dc);
-  --mac-wall-base: linear-gradient(145deg, #d5d0c8, #ece8e1);
-  --mac-desktop-text: #343230;
+  --mac-wall-warm: #cdbb9f;
+  --mac-wall-cool: #e7dbc8;
+  --mac-glass: #d8c8b0f2;
+  --mac-titlebar: linear-gradient(#e8dcc9, #c9b596);
+  --mac-wall-base: linear-gradient(145deg, #c7b394, #e1d3bd);
+  --mac-desktop-text: #302a22;
 }
 
 :root[data-mac-palette="mono"][data-appearance="dark"] {
