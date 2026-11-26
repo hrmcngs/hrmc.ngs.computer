@@ -1,0 +1,8 @@
+FROM node:22-bookworm-slim@sha256:be979e5523c76fa4d5ca4ebd3099078f220aa47ec39c48ad5b5df9314debd6eb
+WORKDIR /opt/ai-bot
+COPY package.json src/verify-container.js ./
+# npm rejects using one path as both userconfig and globalconfig. Keep separate immutable files.
+RUN touch npm-user.npmrc npm-global.npmrc
+USER node
+WORKDIR /workspace
+ENTRYPOINT ["node", "/opt/ai-bot/verify-container.js"]

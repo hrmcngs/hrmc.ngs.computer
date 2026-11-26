@@ -1,0 +1,182 @@
+name: AI investigate worker
+on:
+  workflow_call:
+    inputs:
+      ai:
+        type: string
+        default: default
+      number:
+        type: string
+        required: true
+      target:
+        type: string
+        default: issue
+      result:
+        type: string
+        default: comment
+      reference_previous:
+        type: string
+        default: default
+    secrets:
+      TOKYO_AI_API_KEY:
+        required: false
+      ANTHROPIC_API_KEY:
+        required: false
+      OPENAI_API_KEY:
+        required: false
+permissions: {}
+env:
+  AI_BOT_WORKER: 'true'
+  AI_BOT_AI: ${{ inputs.ai }}
+  AI_BOT_NUMBER: ${{ inputs.number }}
+  AI_BOT_TARGET: ${{ inputs.target }}
+  AI_BOT_RESULT: ${{ inputs.result }}
+  AI_BOT_REFERENCE: ${{ inputs.reference_previous }}
+jobs:
+  prepare:
+    if: >-
+      github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
+      (github.event_name != 'issue_comment' ||
+      (!github.event.issue.pull_request && github.event.comment.user.type == 'User' &&
+      (contains(github.event.comment.body, '/ai-investigate') || contains(github.event.comment.body, '/ai-report-pr'))))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: read
+      vulnerability-alerts: read
+      pull-requests: read
+    outputs:
+      ready: ${{ steps.prepare.outputs.ready }}
+      provider: ${{ steps.prepare.outputs.provider }}
+      report-pr: ${{ steps.prepare.outputs.report-pr }}
+      reuse-report: ${{ steps.prepare.outputs.reuse-report }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - id: prepare
+        run: node .github/ai-bot/src/main.js prepare
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ALLOW_PRIVATE_REPOSITORY: ${{ vars.AI_BOT_ALLOW_PRIVATE }}
+          AI_BOT_HAS_TOKYO: ${{ secrets.TOKYO_AI_API_KEY != '' }}
+          AI_BOT_HAS_CLAUDE: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+          AI_BOT_HAS_CODEX: ${{ secrets.OPENAI_API_KEY != '' }}
+      - if: steps.prepare.outputs.ready == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: investigation-bundle-${{ inputs.target }}-${{ inputs.number }}
+          path: .work/bundle.json
+          retention-days: 1
+          include-hidden-files: true
+          if-no-files-found: error
+
+  analyze:
+    needs: prepare
+    if: needs.prepare.outputs.ready == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: investigation-bundle-${{ inputs.target }}-${{ inputs.number }}
+          path: .work
+      - name: Build isolated Claude runner without credentials
+        if: (needs.prepare.outputs.provider == 'claude' || needs.prepare.outputs.provider == 'all') && needs.prepare.outputs.reuse-report != 'true'
+        run: docker build --build-arg PROVIDER=claude -f .github/ai-bot/Dockerfile -t ai-bot-claude:local .github/ai-bot
+      - name: Build isolated Codex runner without credentials
+        if: (needs.prepare.outputs.provider == 'codex' || needs.prepare.outputs.provider == 'all') && needs.prepare.outputs.reuse-report != 'true'
+        run: docker build --build-arg PROVIDER=codex -f .github/ai-bot/Dockerfile -t ai-bot-codex:local .github/ai-bot
+      - name: Build credential broker without credentials
+        if: needs.prepare.outputs.provider != 'tokyo' && needs.prepare.outputs.reuse-report != 'true'
+        run: docker build --build-arg PROVIDER=broker -f .github/ai-bot/Dockerfile -t ai-bot-broker:local .github/ai-bot
+      - name: Analyze with the selected AI
+        run: node .github/ai-bot/src/main.js analyze
+        env:
+          AI_API_KEY: ${{ needs.prepare.outputs.reuse-report != 'true' && (needs.prepare.outputs.provider == 'tokyo' && secrets.TOKYO_AI_API_KEY || needs.prepare.outputs.provider == 'claude' && secrets.ANTHROPIC_API_KEY || needs.prepare.outputs.provider == 'codex' && secrets.OPENAI_API_KEY) || '' }}
+          TOKYO_AI_API_KEY: ${{ needs.prepare.outputs.provider == 'all' && needs.prepare.outputs.reuse-report != 'true' && secrets.TOKYO_AI_API_KEY || '' }}
+          ANTHROPIC_API_KEY: ${{ needs.prepare.outputs.provider == 'all' && needs.prepare.outputs.reuse-report != 'true' && secrets.ANTHROPIC_API_KEY || '' }}
+          OPENAI_API_KEY: ${{ needs.prepare.outputs.provider == 'all' && needs.prepare.outputs.reuse-report != 'true' && secrets.OPENAI_API_KEY || '' }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: investigation-result-${{ inputs.target }}-${{ inputs.number }}
+          path: .work/result.json
+          retention-days: 1
+          include-hidden-files: true
+          if-no-files-found: error
+
+  publish:
+    needs: [prepare, analyze]
+    if: needs.prepare.outputs.ready == 'true' && needs.analyze.result == 'success' && needs.prepare.outputs.report-pr != 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+      vulnerability-alerts: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: investigation-bundle-${{ inputs.target }}-${{ inputs.number }}
+          path: .work
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: investigation-result-${{ inputs.target }}-${{ inputs.number }}
+          path: .work
+      - name: Publish investigation or safe error
+        run: node .github/ai-bot/src/main.js publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ALLOW_PRIVATE_REPOSITORY: ${{ vars.AI_BOT_ALLOW_PRIVATE }}
+
+  publish-report:
+    needs: [prepare, analyze]
+    if: needs.prepare.outputs.ready == 'true' && needs.analyze.result == 'success' && needs.prepare.outputs.report-pr == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: investigation-bundle-${{ inputs.target }}-${{ inputs.number }}
+          path: .work
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: investigation-result-${{ inputs.target }}-${{ inputs.number }}
+          path: .work
+      - name: Create report PR and reply to the Issue
+        run: node .github/ai-bot/src/main.js publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ALLOW_PRIVATE_REPOSITORY: ${{ vars.AI_BOT_ALLOW_PRIVATE }}

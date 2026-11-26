@@ -1,0 +1,6 @@
+*
+!src/
+!src/broker.js
+!src/cli.js
+!package.json
+!src/verify-container.js

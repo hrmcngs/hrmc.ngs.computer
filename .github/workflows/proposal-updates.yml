@@ -1,0 +1,25 @@
+name: Retire outdated Bot proposals
+on:
+  issues:
+    types: [edited]
+permissions: {}
+jobs:
+  close-outdated:
+    if: github.event.changes.title || github.event.changes.body
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - run: node .github/ai-bot/src/proposal-state.js
+        env:
+          GH_TOKEN: ${{ github.token }}

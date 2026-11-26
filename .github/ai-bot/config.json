@@ -1,0 +1,43 @@
+{
+  "mode": "manual",
+  "referencePreviousPRs": true,
+  "provider": "claude",
+  "models": {
+    "claude": "sonnet",
+    "codex": "gpt-5.4"
+  },
+  "issueLabel": "ai-investigate",
+  "include": [
+    "src/",
+    "lib/",
+    "app/",
+    "js/",
+    "index.js",
+    "package.json",
+    "package-lock.json",
+    "yarn.lock",
+    "pnpm-lock.yaml"
+  ],
+  "maxFiles": 12,
+  "maxFileBytes": 16000,
+  "maxContextBytes": 64000,
+  "maxTargetsPerRun": 1,
+  "fix": {
+    "enabled": false,
+    "label": "ai-fix",
+    "commands": [],
+    "botFiles": []
+  },
+  "autoMerge": {
+    "enabled": false,
+    "label": "ai-auto-merge",
+    "method": "squash",
+    "requiredChecks": [
+      "test",
+      "fix-validation",
+      "cli-smoke (claude)",
+      "cli-smoke (codex)",
+      "cli-smoke (broker)"
+    ]
+  }
+}
