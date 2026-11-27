@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       scope:
-        description: 更新範囲（runtimeは追加トークン不要・Actions定義は手動更新）
+        description: 更新範囲（AIキー不要・runtimeは追加トークン不要）
         type: choice
         options: [runtime, full]
         default: runtime

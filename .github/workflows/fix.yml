@@ -55,6 +55,7 @@ jobs:
     concurrency:
       group: ai-fix-${{ github.repository }}-${{ matrix.kind }}-${{ matrix.number }}
       cancel-in-progress: false
+      queue: max
     needs: select
     if: needs.select.outputs.ready == 'true'
     strategy:

@@ -4,6 +4,11 @@ on:
     types: [created]
   workflow_dispatch:
     inputs:
+      operation:
+        description: 実行内容（update-onlyはBot更新のみ・AI APIとAIキー不要）
+        type: choice
+        options: [investigate, update-only]
+        default: investigate
       check_bot_updates:
         description: Bot本体の更新PRも確認する（追加トークン不要・Actions定義は手動更新）
         type: boolean
@@ -40,7 +45,7 @@ on:
 permissions: {}
 jobs:
   bot-updates:
-    if: github.event_name == 'workflow_dispatch' && inputs.check_bot_updates
+    if: github.event_name == 'workflow_dispatch' && (inputs.operation == 'update-only' || inputs.check_bot_updates)
     permissions:
       contents: write
       pull-requests: write
@@ -50,6 +55,7 @@ jobs:
       scope: runtime
   select:
     if: >-
+      (github.event_name != 'workflow_dispatch' || inputs.operation != 'update-only') &&
       github.ref == format('refs/heads/{0}', github.event.repository.default_branch) &&
       (github.event_name != 'issue_comment' ||
       (!github.event.issue.pull_request && github.event.comment.user.type == 'User' &&

@@ -21,6 +21,7 @@ const marker = n => `<!-- ai-fix:issue:${number(n)} -->`;
 const instructions = '修正PRを作成できませんでした。Issueの具体性、許可パス、検証設定を確認してください。';
 const reasons = {
   STALE: '調査中にデフォルトブランチまたはIssueが更新されました。新しい実行で再調査してください。',
+  OUTPUT: 'AIの修正案または取得データが形式・変更範囲の制約を満たしませんでした。PRは作成していません。',
   VALIDATION: 'オフライン環境での構文チェックまたは指定した検証が失敗しました。PRは作成していません。',
   DEPENDENCIES: '検証に必要な依存パッケージをオフライン環境に用意できません。検証を省略せず、PR作成を停止しました。',
   NOTIFY: 'PRは作成しましたがIssueへの返信に失敗しました。同じコマンドで再実行すると既存PRのリンクを返信します。',
@@ -32,7 +33,12 @@ async function json(file, limit=1000000) {
 }
 async function save(file,data) { await mkdir('.work',{recursive:true});await writeFile(file,JSON.stringify(data),{mode:0o600}); }
 async function summary(text,env) { if(env.GITHUB_STEP_SUMMARY)await appendFile(env.GITHUB_STEP_SUMMARY,`${text}\n\n`); }
-function safeReason(error) {return error instanceof SafeError && error.validation ? validationFailure(error.validation) : reasons[error?.code] || messages[error?.code] || instructions;}
+const generationCode=code=>['AUTH','LIMIT','NETWORK','RUNTIME','CONFIG','OUTPUT','INTERNAL'].includes(code)?code:'OUTPUT';
+function generationFailure(code){const error=new SafeError(generationCode(code));error.phase='generation';return error;}
+function safeReason(error) {
+  const text=error instanceof SafeError && error.validation ? validationFailure(error.validation) : reasons[error?.code] || messages[error?.code] || instructions;
+  return error instanceof SafeError && error.phase==='generation' ? `修正案の生成に失敗しました。構文チェック・テストは実行していません。\n\n${text}` : text;
+}
 function bundleValid(bundle,env) {
   config(bundle.cfg);fixConfig(bundle.cfg);
   if(bundle.repo!==env.GITHUB_REPOSITORY || !Array.isArray(bundle.targets) || bundle.targets.length!==1 || bundle.targets[0].kind!=='issue' || !/^[a-f0-9]{40}$/.test(bundle.targets[0].sha) || !Array.isArray(bundle.context?.files))throw new SafeError('OUTPUT');
@@ -98,7 +104,7 @@ export async function generateFix(env=process.env,providers={tokyo,agent}) {
     const plan=parsePlan(text,bundle);
     await save('.work/fix-plan.json',{ok:true,plan});
     if(plan.changes.length && env.GITHUB_OUTPUT)await appendFile(env.GITHUB_OUTPUT,'has-changes=true\n');
-  }catch(error){await save('.work/fix-plan.json',{ok:false,reason:safeReason(error)});}
+  }catch(error){const failure=generationFailure(error instanceof SafeError?error.code:'INTERNAL');await save('.work/fix-plan.json',{ok:false,code:failure.code,reason:safeReason(failure)});}
 }
 export async function validateFix(env=process.env,{run=command,git=exec}={}) {
   const bundle=await json('.work/fix-bundle.json');bundleValid(bundle,env);
@@ -107,7 +113,7 @@ export async function validateFix(env=process.env,{run=command,git=exec}={}) {
   let verdict;
   let container;
   try{
-    if(!result.ok)verdict={ok:false,reason:result.reason};
+    if(!result.ok)verdict={ok:false,code:generationCode(result.code),stage:'generation',reason:result.reason};
     else {
       const plan=parsePlan(result.plan,bundle);
       if(!plan.changes.length)verdict={ok:false,code:'NO_CHANGES',reason:plan.summary};
@@ -168,7 +174,7 @@ export async function publishFix(env=process.env,ghArg) {
     await failure(reason);
     // Abstaining is an expected outcome, not a test failure. Verify the empty plan again.
     if(result.ok && verdict.code==='NO_CHANGES' && parsePlan(result.plan,bundle).changes.length===0)return;
-    const error=new SafeError(verdict.code==='DEPENDENCIES'?'DEPENDENCIES':'VALIDATION');
+    const error=!result.ok?generationFailure(result.code??verdict.code):new SafeError(verdict.code==='DEPENDENCIES'?'DEPENDENCIES':'VALIDATION');
     if(result.ok && verdict.stage && Array.isArray(verdict.checks)){
       try{error.validation=validationResult(JSON.stringify({version:1,ok:false,stage:verdict.stage,checks:verdict.checks}),parsePlan(result.plan,bundle),settings.commands);}catch{}
     }
