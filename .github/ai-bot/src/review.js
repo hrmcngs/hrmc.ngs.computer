@@ -13,22 +13,36 @@ const save=async(path,value)=>{await mkdir('.work',{recursive:true});await write
 export function reviewSnapshot(pr){
   return hash([pr.number,pr.head?.sha,pr.base?.sha,pr.head?.repo?.full_name,pr.base?.repo?.full_name,pr.title,pr.body||'']);
 }
-export async function reviewAccess(gh,event,env){
+export async function reviewAccess(gh,event,env,cfg){
   if(event.repository?.full_name!==gh.repo)throw new SafeError('ACCESS');
   let n;
   if(env.GITHUB_EVENT_NAME==='issue_comment'){
     if(!event.issue?.pull_request)throw new SafeError('ACCESS');
     n=await requireCommand(gh,event,env,'/ai-review',true);
   }else if(env.GITHUB_EVENT_NAME==='workflow_dispatch')n=number(event.inputs?.number);
+  else if(env.GITHUB_EVENT_NAME==='pull_request'){
+    if(cfg?.autoReview?.enabled!==true)return null;
+    if(!['opened','synchronize','reopened','ready_for_review'].includes(event.action)||event.pull_request?.draft||event.pull_request?.head?.repo?.full_name!==gh.repo)throw new SafeError('ACCESS');
+    n=number(event.number);
+    if(number(event.pull_request?.number)!==n)throw new SafeError('ACCESS');
+  }
   else throw new SafeError('ACCESS');
   const repo=await gh.request(gh.path());
-  if(env.GITHUB_REF!==`refs/heads/${repo.default_branch}`)throw new SafeError('ACCESS');
+  if(env.GITHUB_EVENT_NAME==='pull_request'){
+    if(env.GITHUB_REF!==`refs/pull/${n}/merge`||event.pull_request.base?.ref!==repo.default_branch)throw new SafeError('ACCESS');
+  }else if(env.GITHUB_REF!==`refs/heads/${repo.default_branch}`)throw new SafeError('ACCESS');
   if(repo.private&&env.ALLOW_PRIVATE_REPOSITORY!=='true')throw new SafeError('PRIVATE');
   const role=await gh.request(gh.path(`/collaborators/${encodeURIComponent(env.GITHUB_ACTOR)}/permission`));
   if(!['admin','maintain','write'].includes(role.permission))throw new SafeError('ACCESS');
   const pr=await gh.request(gh.path(`/pulls/${n}`));
   if(pr.state!=='open'||pr.merged||pr.base?.repo?.full_name!==gh.repo||![pr.head?.sha,pr.base?.sha].every(x=>typeof x==='string'&&/^[a-f0-9]{40}$/.test(x)))throw new SafeError('ACCESS');
+  if(env.GITHUB_EVENT_NAME==='pull_request'&&(pr.draft||pr.head?.repo?.full_name!==gh.repo||pr.base?.ref!==repo.default_branch||pr.head.sha!==event.pull_request.head.sha))throw new SafeError('ACCESS');
   return pr;
+}
+function reviewMarker(event,env,pr,cfg){
+  if(env.GITHUB_EVENT_NAME==='pull_request')return `<!-- ai-review-auto:${hash({snapshot:reviewSnapshot(pr),ai:selectionId(cfg),policy:guidance('review')})} -->`;
+  const request=env.GITHUB_EVENT_NAME==='issue_comment'?number(event.comment.id):number(env.GITHUB_RUN_ID);
+  return `<!-- ai-review:${request}:${pr.head.sha} -->`;
 }
 export async function reviewDiff(gh,n){
   const rows=await gh.list(gh.path(`/pulls/${number(n)}/files`));
@@ -52,8 +66,14 @@ export function reviewPrompt(bundle){
 export async function prepareReview(env=process.env,ghArg){
   const event=await json(env.GITHUB_EVENT_PATH);
   if(env.GITHUB_EVENT_NAME==='issue_comment'&&!isCommand(event,env,'/ai-review',true))return;
-  const gh=ghArg||new GitHub(env.GITHUB_REPOSITORY,env.GH_TOKEN),pr=await reviewAccess(gh,event,env);
-  const cfg=chooseAI(config(await json('.github/ai-bot/config.json')),event,env);
+  const raw=config(await json('.github/ai-bot/config.json'));
+  if(env.GITHUB_EVENT_NAME==='pull_request'&&raw.autoReview?.enabled!==true)return;
+  const gh=ghArg||new GitHub(env.GITHUB_REPOSITORY,env.GH_TOKEN),pr=await reviewAccess(gh,event,env,raw);
+  const cfg=chooseAI(raw,event,env);
+  if(env.GITHUB_EVENT_NAME==='pull_request'){
+    const marker=reviewMarker(event,env,pr,cfg);
+    if((await gh.list(gh.path(`/pulls/${pr.number}/reviews`))).some(r=>botOwned(r)&&r.body?.startsWith(marker)))return;
+  }
   const diff=await reviewDiff(gh,pr.number);
   const bundle={version:1,repo:gh.repo,number:pr.number,head:pr.head.sha,base:pr.base.sha,snapshot:reviewSnapshot(pr),cfg,diff,title:scrub(String(pr.title)).slice(0,1000),body:scrub(pr.body||'').slice(0,12000)};
   if(Buffer.byteLength(reviewPrompt(bundle))>190000)throw new SafeError('OUTPUT');
@@ -70,12 +90,13 @@ export async function analyzeReview(env=process.env,ai=runAI){
 }
 export async function publishReview(env=process.env,ghArg){
   const event=await json(env.GITHUB_EVENT_PATH),bundle=await json('.work/review-bundle.json'),result=await json('.work/review-result.json');
-  const gh=ghArg||new GitHub(env.GITHUB_REPOSITORY,env.GH_TOKEN),pr=await reviewAccess(gh,event,env);
+  const raw=config(await json('.github/ai-bot/config.json'));
+  const gh=ghArg||new GitHub(env.GITHUB_REPOSITORY,env.GH_TOKEN),pr=await reviewAccess(gh,event,env,raw);
+  if(!pr)throw new SafeError('ACCESS');
   const flags=Object.fromEntries((bundle.cfg.aiProviders||[]).map(p=>['AI_BOT_HAS_'+p.toUpperCase(),'true']));
-  const cfg=chooseAI(config(await json('.github/ai-bot/config.json')),event,{...env,...flags});
+  const cfg=chooseAI(raw,event,{...env,...flags});
   if(bundle.repo!==gh.repo||bundle.number!==pr.number||bundle.head!==pr.head.sha||bundle.snapshot!==reviewSnapshot(pr)||result.snapshot!==bundle.snapshot||selectionId(cfg)!==selectionId(bundle.cfg))throw new SafeError('STALE');
-  const request=env.GITHUB_EVENT_NAME==='issue_comment'?number(event.comment.id):number(env.GITHUB_RUN_ID);
-  const marker=`<!-- ai-review:${request}:${bundle.head} -->`;
+  const marker=reviewMarker(event,env,pr,cfg);
   const existing=(await gh.list(gh.path(`/pulls/${pr.number}/reviews`))).find(r=>botOwned(r)&&r.body?.startsWith(marker));
   if(existing)return;
   const body=`${marker}\n### ${result.ok===true?'AIによるPRレビュー':'AIレビューを完了できませんでした'}\n\n${aiIdentity(cfg)}\n\n対象head: \`${bundle.head}\` / base: \`${bundle.base}\`\n確認した差分: ${bundle.diff.files.length}/${bundle.diff.totalFiles}ファイル（省略${bundle.diff.omitted}、切り詰め${bundle.diff.truncated}）\n\n${markdown(cleanOutput(result.text))}\n\n差分のみの静的レビューです。テスト・コード変更は実施していません。人間による確認が必要です。`;

@@ -36,6 +36,8 @@
     ".github/ai-bot/src/ai-selection.js",
     ".github/ai-bot/src/review.js",
     ".github/workflows/review.yml",
-    ".github/ai-bot/src/guidance.js"
+    ".github/ai-bot/src/guidance.js",
+    ".github/ai-bot/src/security.js",
+    ".github/workflows/security-audit.yml"
   ]
 }

@@ -37,6 +37,8 @@ export function config(raw) {
   if (typeof raw.issueLabel !== 'string' || !/^[\w-]{1,50}$/.test(raw.issueLabel)) throw new SafeError('CONFIG');
   for (const p of ['claude','codex']) if (typeof raw.models?.[p] !== 'string' || !/^[a-zA-Z0-9._-]{1,100}$/.test(raw.models[p])) throw new SafeError('CONFIG');
   if(raw.referencePreviousPRs!==undefined&&typeof raw.referencePreviousPRs!=='boolean')throw new SafeError('CONFIG');
+  if(raw.autoReview!==undefined&&(!raw.autoReview||typeof raw.autoReview!=='object'||Array.isArray(raw.autoReview)||typeof raw.autoReview.enabled!=='boolean'))throw new SafeError('CONFIG');
+  if(raw.securityAudit!==undefined&&(!raw.securityAudit||typeof raw.securityAudit!=='object'||Array.isArray(raw.securityAudit)||typeof raw.securityAudit.enabled!=='boolean'))throw new SafeError('CONFIG');
   return raw;
 }
 export function number(value) {
