@@ -249,7 +249,19 @@ export function updateContext(gh,event,env,repo){
   if(event.repository?.full_name!==gh.repo)throw new SafeError('UPDATE_REPOSITORY');
   if(env.GITHUB_REF!==`refs/heads/${repo.default_branch}`)throw new SafeError('UPDATE_BRANCH');
 }
-export function updateError(error){
+export function updateError(error,env={}){
+  if(error?.code==='PR'){
+    const repo=typeof env.GITHUB_REPOSITORY==='string'&&/^[A-Za-z0-9_][A-Za-z0-9_.-]*\/[A-Za-z0-9_][A-Za-z0-9_.-]*$/.test(env.GITHUB_REPOSITORY)?env.GITHUB_REPOSITORY:null;
+    const settings=repo?`\n設定画面: https://github.com/${repo}/settings/actions#workflow-permissions`:'';
+    const full=env.AI_BOT_UPDATE_SCOPE==='full';
+    return '更新PRを作成できませんでした。次の設定を確認してください。\n'
+      +'1. 導入先の Settings → Actions → General → Workflow permissions で「Allow GitHub Actions to create and approve pull requests」を有効にし、Saveします。'+settings+'\n'
+      +'   GitHubではPR作成とレビュー承認が共通の設定ですが、Botはレビュー承認しません。\n'
+      +'2. .github/workflows/bot-updates.yml の update-pr ジョブに contents: write と pull-requests: write が必要です。リポジトリ全体の既定権限をwriteに変更する必要はありません。\n'
+      +'3. 設定が変更できない場合は、リポジトリ管理者に確認してください。組織のポリシーで制限されている場合は組織管理者の対応が必要です。\n'
+      +(full?'4. scope=fullでは、導入先限定の AI_BOT_UPDATE_TOKEN に Contents / Pull requests / Workflows の Read and write が必要です。Settings → Secrets and variables → Actions で登録・更新してください。'+(repo?`\nSecret設定: https://github.com/${repo}/settings/secrets/actions`:''):'scope=runtimeでは追加トークン・AIキーは不要です。')+'\n'
+      +'設定後に Bot update notices → Run workflow から新しく実行してください。APIキーやトークンを入力欄・コメントへ貼らないでください。';
+  }
   const known={
     UPDATE_REPOSITORY:'イベントのリポジトリと実行先が一致しません。導入先のActionsから起動してください。',
     UPDATE_BRANCH:'デフォルトブランチを選んで更新確認を実行してください。',
@@ -259,7 +271,6 @@ export function updateError(error){
     UPDATE_SOURCE:'配布元の取得または形式の確認に失敗しました。GitHub APIの一時的な制限や配布ファイルを確認してください。',
     UPDATE_STATE:'Botの導入記録が不正です。インストーラーの --upgrade で移行してください。',
     CONFIG:'更新範囲はruntimeまたはfullを指定してください。',
-    PR:'更新PRを作成できませんでした。ActionsのPR作成許可を確認してください。',
     STALE:'確認中にブランチが更新されました。新しい実行で再確認してください。'
   };
   return known[error?.code]||'Bot更新の処理に失敗しました。安全なエラー分類: '+(['TypeError','SyntaxError','Error'].includes(error?.name)?error.name:'INTERNAL');
@@ -288,9 +299,10 @@ export async function updates(env=process.env){
     const writer=env.AI_BOT_UPDATE_TOKEN?new GitHub(gh.repo,env.AI_BOT_UPDATE_TOKEN):null;
     try{await applyUpdate(gh,writer,event,env,state);}catch(error){
       if(error.code==='NOTIFY')throw error;
-      const text=error.code==='STALE'?'確認中にIssueまたはデフォルトブランチが更新されました。変更内容を確認して、次の定期実行、またはRun workflowで再実行してください。':error.code==='UPDATE_CONFLICT'?'Botファイルに独自の変更または保存先の競合があります。上書きせず停止しました。差分を確認して手動で更新してください。':'更新PRを作成できませんでした。トークンの権限と配布元へのアクセスを確認してください。ファイルを直接上書きしていません。';
+      const text=error.code==='PR'?updateError(error,env):error.code==='STALE'?'確認中にIssueまたはデフォルトブランチが更新されました。変更内容を確認して、次の定期実行、またはRun workflowで再実行してください。':error.code==='UPDATE_CONFLICT'?'Botファイルに独自の変更または保存先の競合があります。上書きせず停止しました。差分を確認して手動で更新してください。':'更新PRを作成できませんでした。トークンの権限と配布元へのアクセスを確認してください。ファイルを直接上書きしていません。';
       if(error.code!=='UPDATE_TOKEN'){
-        if(env.AI_BOT_UPDATE_AUTOMATIC==='true')await updateSummary(env,text);
+        // The CLI handler prints the actionable PR guide and Summary once.
+        if(env.AI_BOT_UPDATE_AUTOMATIC==='true'){if(error.code!=='PR')await updateSummary(env,text);}
         else await updateStatus(gh,number(event.issue?.number),updateTarget(event.issue),text);
       }
       throw error;
@@ -298,5 +310,5 @@ export async function updates(env=process.env){
   }else throw new SafeError('CONFIG');
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
-  try{await updates();}catch(error){const text=updateError(error);console.error(text);if(process.env.GITHUB_STEP_SUMMARY)await appendFile(process.env.GITHUB_STEP_SUMMARY,text+'\n').catch(()=>{});process.exitCode=1;}
+  try{await updates();}catch(error){const text=updateError(error,process.env);console.error(text);if(process.env.GITHUB_STEP_SUMMARY)await appendFile(process.env.GITHUB_STEP_SUMMARY,text+'\n').catch(()=>{});process.exitCode=1;}
 }
