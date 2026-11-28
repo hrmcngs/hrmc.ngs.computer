@@ -1,7 +1,7 @@
 name: Bot update notices
 on:
   schedule:
-    - cron: '17 * * * *'
+    - cron: '2-59/5 * * * *'
   workflow_dispatch:
     inputs:
       scope:
