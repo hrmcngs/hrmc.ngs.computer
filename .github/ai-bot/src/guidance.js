@@ -1,5 +1,5 @@
 // Reviewed, locally bundled summaries; no remote skill loading or executable tools.
-// Runtime update delivery smoke marker: run-46098382524.
+// Runtime update delivery smoke marker: run-46113387051.
 // These are our own summaries, not a copy of the upstream skills or an affiliation.
 export const guidanceSources = Object.freeze([
   Object.freeze({repository:'mukul975/Anthropic-Cybersecurity-Skills',ref:'54a798831d2266a3ca61ce68a7acb80b81160d57',license:'Apache-2.0',paths:Object.freeze([
