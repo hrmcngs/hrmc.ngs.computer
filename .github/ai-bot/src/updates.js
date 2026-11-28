@@ -1,4 +1,8 @@
-import {readFile,appendFile} from 'node:fs/promises';
+import {readFile,appendFile,mkdtemp,rm} from 'node:fs/promises';
+import {execFile} from 'node:child_process';
+import {promisify} from 'node:util';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 import {createHash} from 'node:crypto';
 import {pathToFileURL} from 'node:url';
 import {GitHub,botOwned,responseWithRetry,temporaryStatus} from './github.js';
@@ -27,12 +31,63 @@ export function installation(data){
   return data;
 }
 // Anonymous access to one fixed public upstream. The destination token is never sent upstream.
+const execute=promisify(execFile);
+// Hosted runners may share an exhausted anonymous REST quota. Read Git objects
+// from a fresh bare repository instead; never check out or execute upstream code.
+export async function gitReleaseSnapshot(ref='main'){
+  if(ref!=='main'&&!sha(ref))throw new SafeError('UPDATE_SOURCE');
+  const directory=await mkdtemp(join(tmpdir(),'ai-bot-source-'));
+  const env={PATH:process.env.PATH,HOME:directory,GIT_CONFIG_NOSYSTEM:'1',GIT_CONFIG_GLOBAL:'/dev/null',GIT_TERMINAL_PROMPT:'0'};
+  const git=async(args,maxBuffer=3000000)=>{
+    const {stdout}=await execute('git',['-c','core.hooksPath=/dev/null','-c','credential.helper=','-c','http.followRedirects=false','-c','protocol.allow=never','-c','protocol.https.allow=always',...args],{cwd:directory,env,encoding:'buffer',maxBuffer,timeout:60000});
+    return stdout;
+  };
+  try{
+    await git(['init','--bare','--template=','.']);
+    await git(['fetch','--depth=1','--no-tags',`https://github.com/${SOURCE}.git`,ref]);
+    const commit=(await git(['rev-parse','FETCH_HEAD'])).toString('ascii').trim();
+    if(!sha(commit)||(ref!=='main'&&commit!==ref))throw new SafeError('UPDATE_SOURCE');
+    const rows=(await git(['ls-tree','-r','-t','-l','-z',commit])).toString('utf8').split('\0').filter(Boolean);
+    const tree=rows.map(row=>{
+      const match=row.match(/^(\d{6}) (blob|tree) ([a-f0-9]{40}) +(-|\d+)\t([\s\S]+)$/);
+      if(!match)throw new SafeError('UPDATE_SOURCE');
+      return{mode:match[1],type:match[2],sha:match[3],size:match[4]==='-'?0:Number(match[4]),path:match[5]};
+    });
+    const entries=new Map(tree.map(entry=>[entry.path,entry])),blobs=new Map();let total=0;
+    const read=async path=>{
+      const entry=entries.get(path);
+      if(entry?.type!=='blob'||entry.mode!=='100644'||entry.size>128000)throw new SafeError('UPDATE_SOURCE');
+      if(blobs.has(entry.sha))return blobs.get(entry.sha);
+      total+=entry.size;if(total>1000000)throw new SafeError('UPDATE_SOURCE');
+      const bytes=await git(['cat-file','blob',entry.sha],128001);
+      if(bytes.length!==entry.size||createHash('sha1').update(`blob ${bytes.length}\0`).update(bytes).digest('hex')!==entry.sha)throw new SafeError('UPDATE_SOURCE');
+      const data={encoding:'base64',content:bytes.toString('base64')};blobs.set(entry.sha,data);return data;
+    };
+    const data=await read(MANIFEST);
+    const paths=manifest(JSON.parse(Buffer.from(data.content,'base64').toString('utf8')));
+    for(const path of paths)if(path!=='.github/ai-bot/config.json')await read(path);
+    return{commit,tree,blobs};
+  }catch{throw new SafeError('UPDATE_SOURCE');}finally{await rm(directory,{recursive:true,force:true});}
+}
 export class Upstream{
-  constructor(fetcher=fetch){this.fetcher=fetcher;}
+  constructor(fetcher=fetch,snapshot=gitReleaseSnapshot){this.fetcher=fetcher;this.snapshot=snapshot;}
+  async gitRequest(tail){
+    const ref=this.ref||'main';
+    this.gitData??=await this.snapshot(ref);
+    if(tail==='/commits/main')return{sha:this.gitData.commit};
+    if(tail===`/git/trees/${this.gitData.commit}?recursive=1`)return{tree:this.gitData.tree,truncated:false};
+    if(tail.startsWith('/git/blobs/')&&this.gitData.blobs.has(tail.split('/')[3]))return this.gitData.blobs.get(tail.split('/')[3]);
+    throw new SafeError('UPDATE_SOURCE');
+  }
   async request(tail){
     if(!/^\/(?:commits\/main|git\/trees\/[a-f0-9]{40}\?recursive=1|git\/blobs\/[a-f0-9]{40})$/.test(tail))throw new SafeError('UPDATE_SOURCE');
+    if(tail.startsWith('/git/trees/'))this.ref=tail.split('/')[3].split('?')[0];
     try{
+      if(this.gitData)return await this.gitRequest(tail);
       const res=await responseWithRetry(this.fetcher,`https://api.github.com/repos/${SOURCE}${tail}`,{headers:{Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},redirect:'error',signal:AbortSignal.timeout(30000)});
+      if(res.status===429||(res.status===403&&res.headers.get('x-ratelimit-remaining')==='0')){
+        await res.body?.cancel();return await this.gitRequest(tail);
+      }
       if(!res.ok){await res.body?.cancel();throw new SafeError(temporaryStatus(res.status)?'API_UNAVAILABLE':'UPDATE_SOURCE');}
       const length=Number(res.headers.get('content-length')||0);if(length>3000000)throw new Error();
       const chunks=[];let used=0;

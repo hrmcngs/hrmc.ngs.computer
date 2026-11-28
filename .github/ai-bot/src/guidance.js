@@ -1,4 +1,5 @@
 // Reviewed, locally bundled summaries; no remote skill loading or executable tools.
+// Runtime update delivery smoke marker: 2026-11-27-01.
 // These are our own summaries, not a copy of the upstream skills or an affiliation.
 export const guidanceSources = Object.freeze([
   Object.freeze({repository:'mukul975/Anthropic-Cybersecurity-Skills',ref:'54a798831d2266a3ca61ce68a7acb80b81160d57',license:'Apache-2.0',paths:Object.freeze([
