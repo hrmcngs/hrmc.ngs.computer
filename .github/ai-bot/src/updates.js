@@ -158,12 +158,14 @@ export async function authorizeUpdate(gh,event,env){
   if(approved!==current)throw new SafeError('STALE');
   return{number:n,commit:current,branch:repo.default_branch};
 }
-// Automatic proposals are authorized by the trusted scheduled/check job, not Issue text.
+const automaticEvent=(event,env)=>['schedule','workflow_dispatch'].includes(env.GITHUB_EVENT_NAME)
+  ||(env.GITHUB_EVENT_NAME==='push'&&!event.deleted&&event.ref===env.GITHUB_REF&&sha(env.GITHUB_SHA)&&event.after===env.GITHUB_SHA);
+// Automatic proposals are authorized by the trusted push/scheduled/check job, not Issue text.
 export async function authorizeAutomaticUpdate(gh,event,env){
-  if(env.AI_BOT_UPDATE_AUTOMATIC!=='true'||!['schedule','workflow_dispatch'].includes(env.GITHUB_EVENT_NAME))throw new SafeError('ACCESS');
+  if(env.AI_BOT_UPDATE_AUTOMATIC!=='true'||!automaticEvent(event,env))throw new SafeError('ACCESS');
   const repo=await gh.request(gh.path());
   if(event.repository?.full_name!==gh.repo||env.GITHUB_REF!==`refs/heads/${repo.default_branch}`)throw new SafeError('ACCESS');
-  if(env.GITHUB_EVENT_NAME==='workflow_dispatch'){
+  if(env.GITHUB_EVENT_NAME!=='schedule'){
     const role=await gh.request(gh.path(`/collaborators/${encodeURIComponent(env.GITHUB_ACTOR)}/permission`));
     if(!['admin','maintain','write'].includes(role.permission))throw new SafeError('ACCESS');
   }
@@ -214,7 +216,8 @@ export async function applyUpdate(gh,writer,event,env,state,source=new Upstream(
   if(!['runtime','full'].includes(scope))throw new SafeError('CONFIG');
   if(scope==='runtime')writer=gh;
   const marker=`<!-- ai-bot-update-pr:${auth.commit}${scope==='runtime'?':runtime':''} -->`;
-  const proposals=(await gh.list(gh.path('/pulls?state=all'))).filter(pr=>pr.body?.startsWith(marker+'\n')&&pr.head?.repo?.full_name===gh.repo&&pr.base?.repo?.full_name===gh.repo&&pr.base.ref===auth.branch&&/^ai-update\/(?:bot|issue-[1-9]\d*)-[a-f0-9]{12}-[1-9]\d*$/.test(pr.head.ref||''));
+  const appFull=`<!-- ai-bot-update-pr:${auth.commit}:runtime -->\n<!-- ai-bot-app-scope:full -->\n`;
+  const proposals=(await gh.list(gh.path('/pulls?state=all'))).filter(pr=>(pr.body?.startsWith(marker+'\n')||(scope==='full'&&pr.body?.startsWith(appFull)))&&pr.head?.repo?.full_name===gh.repo&&pr.base?.repo?.full_name===gh.repo&&pr.base.ref===auth.branch&&/^ai-update\/(?:bot|issue-[1-9]\d*)-[a-f0-9]{12}-[1-9]\d*$/.test(pr.head.ref||''));
   const existing=proposals.find(pr=>pr.state==='open');
   if(existing){await notify(`更新PRは ${proposalLink(gh,existing.number)} です。レビューしてマージするとBotが更新されます。`);return;}
   if(env.AI_BOT_UPDATE_AUTOMATIC==='true'&&proposals.some(pr=>pr.state==='closed')){await notify('この版の更新PRは既に閉じられています。同じ版のPRは自動で作り直しません。');return;}
@@ -291,7 +294,7 @@ export async function updates(env=process.env){
   }
   const state=await loadInstallation(gh,event,env,action);if(!state)return;
   if(action==='check'){
-    if(!['schedule','workflow_dispatch'].includes(env.GITHUB_EVENT_NAME))throw new SafeError('UPDATE_EVENT');
+    if(!automaticEvent(event,env))throw new SafeError('UPDATE_EVENT');
     const update=await checkUpdate(gh,state,undefined,scope);
     if(!update)await updateSummary(env,scope==='runtime'?'Bot本体の更新はありません。Actions定義の更新は手動で確認してください。':'Botは最新版です。');
     if(update&&env.GITHUB_OUTPUT)await appendFile(env.GITHUB_OUTPUT,`ready=true\ncommit=${update.commit}\n`);
